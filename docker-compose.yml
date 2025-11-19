@@ -1,0 +1,38 @@
+version: '3.9'
+
+services:
+  symfony:
+    build: ./backend-symfony
+    container_name: symfony-app
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend-symfony:/var/www
+    depends_on:
+      - db
+    command: bash -c "php -S 0.0.0.0:8000 -t public"
+
+  angular:
+    build: ./frontend-angular
+    container_name: angular-app
+    ports:
+      - "4200:4200"
+    volumes:
+      - ./frontend-angular:/app
+    command: npm start
+
+  db:
+    image: postgres:15
+    container_name: postgres-db
+    environment:
+      POSTGRES_DB: mydb
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
+
