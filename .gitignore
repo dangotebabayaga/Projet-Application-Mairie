@@ -2,10 +2,9 @@
 # GITIGNORE - Projet Application Mairie UniCity
 # ============================================================================
 
-# Documentation et fichiers sensibles
-docs/BD propose.sql
-docs/BD_amelioree.sql
-docs/Cahier_Charges-Gestion_Projet_2026-V1.pdf
+# Documentation et fichiers sensibles (garder seulement BD_amelioree_CORRIGEE.sql)
+docs/*
+!docs/BD_amelioree_CORRIGEE.sql
 
 # Environnement et configuration
 .env
