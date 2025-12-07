@@ -1,0 +1,81 @@
+# ============================================================================
+# GITIGNORE - Projet Application Mairie UniCity
+# ============================================================================
+
+# Documentation et fichiers sensibles
+docs/BD propose.sql
+docs/BD_amelioree.sql
+docs/Cahier_Charges-Gestion_Projet_2026-V1.pdf
+
+# Environnement et configuration
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+
+# Base de données (ignorer les dumps et backups)
+*.db
+*.sqlite
+*.sqlite3
+*_backup.sql
+*_dump.sql
+# EXCEPTION: On garde le fichier SQL principal pour initialiser la BD
+!docs/BD_amelioree_CORRIGEE.sql
+
+# Node.js / Angular
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.pnpm-debug.log*
+
+# Angular
+/dist/
+/tmp/
+/out-tsc/
+/bazel-out/
+.angular/
+
+# Symfony / PHP
+/backend-symfony/app/vendor/
+/backend-symfony/app/var/
+/backend-symfony/app/.env
+/backend-symfony/app/.env.local
+/backend-symfony/app/.env.local.php
+/backend-symfony/app/.env.*.local
+/backend-symfony/app/composer.lock
+/backend-symfony/app/symfony.lock
+/backend-symfony/app/public/bundles/
+/backend-symfony/app/var/cache/
+/backend-symfony/app/var/log/
+
+# Scripts utilitaires de génération (ne pas versionner)
+/backend-symfony/app/generate_entities.php
+/backend-symfony/app/add_all_relations.php
+/backend-symfony/app/clean_entities_final.php
+/backend-symfony/app/create_repositories.php
+/backend-symfony/app/fix_duplicate_properties.php
+/backend-symfony/app/clean_all*.php
+/backend-symfony/app/clean_all*.py
+/backend-symfony/app/fix_*.php
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml
+
+# Fichiers temporaires
+*.tmp
+*.bak
+*.backup

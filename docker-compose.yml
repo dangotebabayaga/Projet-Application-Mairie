@@ -7,7 +7,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./backend-symfony:/var/www
+      - ./backend-symfony/app:/var/www
     depends_on:
       - db
     command: bash -c "php -S 0.0.0.0:8000 -t public"
@@ -18,20 +18,21 @@ services:
     ports:
       - "4200:4200"
     volumes:
-      - ./frontend-angular:/app
-    command: npm start
+      - ./frontend-angular/app:/app
+    command: bash -c "npm install && npx ng serve --host 0.0.0.0"
 
   db:
     image: postgres:15
     container_name: postgres-db
     environment:
-      POSTGRES_DB: mydb
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: unicity_db
+      POSTGRES_USER: unicity_user
+      POSTGRES_PASSWORD: unicity_pass
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./docs/BD_amelioree_CORRIGEE.sql:/docker-entrypoint-initdb.d/init.sql
 
 volumes:
   pgdata:
