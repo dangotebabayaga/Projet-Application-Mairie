@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   symfony:
     build: ./backend-symfony
@@ -32,7 +30,7 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - ./docs/BD_amelioree_CORRIGEE.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./docs/SimplifiUniCyties.sql:/docker-entrypoint-initdb.d/init.sql
 
 volumes:
   pgdata:

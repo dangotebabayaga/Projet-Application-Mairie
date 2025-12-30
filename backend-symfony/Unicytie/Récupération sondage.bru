@@ -1,0 +1,15 @@
+meta {
+  name: Récupération sondage
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:8000/api/sondages
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}
