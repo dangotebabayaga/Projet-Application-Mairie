@@ -11,34 +11,34 @@ class Signalements
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
-
-    #[ORM\Column(nullable: true)]
+    
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $titre = null;
-
-    #[ORM\Column(nullable: true)]
+    
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $etat = null;
-
-    #[ORM\Column(nullable: true)]
+    
+    #[ORM\Column(type: "text", nullable: true)]
     private ?string $description = null;
-
-    #[ORM\Column(nullable: true)]
+    
+    #[ORM\Column(type: "decimal", precision: 10, scale: 7, nullable: true)]
     private ?float $latitude = null;
-
-    #[ORM\Column(nullable: true)]
+    
+    #[ORM\Column(type: "decimal", precision: 10, scale: 7, nullable: true)]
     private ?float $longitude = null;
-
+    
     #[ORM\Column(nullable: true)]
     private ?int $typeId = null;
-
+    
     #[ORM\Column(nullable: true)]
     private ?int $citoyenId = null;
-
-    #[ORM\Column(nullable: true)]
+    
+    // **Ajoute explicitement le type datetime**
+    #[ORM\Column(type: "datetime", nullable: true)]
     private ?\DateTimeInterface $dateCreation = null;
-
-    #[ORM\Column(nullable: true)]
+    
+    #[ORM\Column(type: "datetime", nullable: true)]
     private ?\DateTimeInterface $dateModification = null;
-
     public function getId(): ?int
     {
         return $this->id;

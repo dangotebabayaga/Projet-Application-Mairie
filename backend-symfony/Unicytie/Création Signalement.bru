@@ -1,0 +1,30 @@
+meta {
+  name: Création Signalement
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:8000/api/signalements
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "titre": "Nid de poule rue Victor Hugo",
+    "etat": "ouvert",
+    "description": "Un gros nid de poule devant le numéro 12",
+    "adresse": "12 Rue Victor Hugo, Paris, France",
+    "typeId": 1,
+    "citoyenId": 42,
+    "dateCrea": "2026-01-14 09:00:00",
+    "dateModif": "2026-01-14 09:00:00"
+  }
+  
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
