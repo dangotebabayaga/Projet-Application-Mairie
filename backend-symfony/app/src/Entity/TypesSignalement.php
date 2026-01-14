@@ -16,4 +16,20 @@ class TypesSignalement
     #[ORM\Column(nullable: true)]
     private ?string $nom = null;
 
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getNom(): ?string
+    {
+        return $this->nom;
+    }
+
+    public function setNom(?string $nom)
+    {
+        $this->nom = $nom;
+    }
+
+
 }

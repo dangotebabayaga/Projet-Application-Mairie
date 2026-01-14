@@ -1,5 +1,5 @@
 CREATE TABLE "utilisateurs" (
-  "id" integer PRIMARY KEY,
+  "id" SERIAL PRIMARY KEY,
   "nom" varchar(100),
   "prenom" varchar(100),
   "email" varchar(255) UNIQUE,
@@ -11,17 +11,17 @@ CREATE TABLE "utilisateurs" (
 );
 
 CREATE TABLE "administrateurs" (
-  "utilisateur_id" integer PRIMARY KEY,
+  "utilisateur_id" SERIAL PRIMARY KEY,
   "ville_id" integer
 );
 
 CREATE TABLE "citoyens" (
-  "utilisateur_id" integer PRIMARY KEY,
+  "utilisateur_id" SERIAL PRIMARY KEY,
   "ville_id" integer
 );
 
 CREATE TABLE "sondages" (
-  "id" integer PRIMARY KEY,
+  "id" SERIAL PRIMARY KEY,
   "titre" varchar(255),
   "description" text,
   "date_debut" timestamp,
@@ -29,33 +29,20 @@ CREATE TABLE "sondages" (
   "administrateur_id" integer
 );
 
-CREATE TABLE "questions_sondage" (
-  "id" integer PRIMARY KEY,
-  "sondage_id" integer,
-  "question" text
-);
-
-CREATE TABLE "reponses_sondage" (
-  "id" integer PRIMARY KEY,
-  "question_id" integer,
-  "libelle" text
-);
-
 CREATE TABLE "votes_sondage" (
-  "id" integer PRIMARY KEY,
+  "id" SERIAL PRIMARY KEY,
   "citoyen_id" integer,
-  "question_id" integer,
-  "reponse_id" integer,
-  "date_vote" timestamp
+  "date_vote" timestamp,
+  "id_sondage" integer
 );
 
 CREATE TABLE "types_signalement" (
-  "id" integer PRIMARY KEY,
+  "id" SERIAL PRIMARY KEY,
   "nom" varchar(100)
 );
 
 CREATE TABLE "signalements" (
-  "id" integer PRIMARY KEY,
+  "id" SERIAL PRIMARY KEY,
   "titre" varchar(255),
   "etat" varchar(255),
   "description" text,
@@ -68,7 +55,7 @@ CREATE TABLE "signalements" (
 );
 
 CREATE TABLE "Commentaire" (
-  "id" integer PRIMARY KEY,
+  "id" SERIAL PRIMARY KEY,
   "titre" varchar(255),
   "description" text,
   "auteur" integer,
@@ -77,7 +64,7 @@ CREATE TABLE "Commentaire" (
 );
 
 CREATE TABLE "Evenement" (
-  "id" integer PRIMARY KEY,
+  "id" SERIAL PRIMARY KEY,
   "titre" varchar(255),
   "dateEv" date,
   "heureDeb" heure,
@@ -88,7 +75,7 @@ CREATE TABLE "Evenement" (
 );
 
 CREATE TABLE "Ville" (
-  "id" integer PRIMARY KEY,
+  "id" SERIAL PRIMARY KEY,
   "Nom" varchar(255),
   "slogan" varchar(255),
   "logo" varchar(255),
@@ -97,14 +84,14 @@ CREATE TABLE "Ville" (
 );
 
 CREATE TABLE "reseau_sociale" (
-  "id" integer PRIMARY KEY,
+  "id" SERIAL PRIMARY KEY,
   "ville_id" integer,
   "plateform" varchar(255),
   "lien" varchar(255)
 );
 
 CREATE TABLE "Type_ev" (
-  "id" integer PRIMARY KEY,
+  "id" SERIAL PRIMARY KEY,
   "nom" varchar(255)
 );
 

@@ -25,4 +25,56 @@ class VotesSondage
     #[ORM\Column(nullable: true)]
     private ?\DateTimeInterface $dateVote = null;
 
+
+    public function get_citoyenId(): ?int
+    {
+        return $this->citoyenId;
+    }
+
+    public function set_citoyenId(int $new_id)
+    {
+        $this->citoyenId = $new_id;
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function setCitoyenId(?int $citoyenId)
+    {
+        $this->citoyenId = $citoyenId;
+    }
+
+    public function getQuestionId(): ?int
+    {
+        return $this->questionId;
+    }
+
+    public function setQuestionId(?int $questionId)
+    {
+        $this->questionId = $questionId;
+    }
+
+    public function getReponseId(): ?int
+    {
+        return $this->reponseId;
+    }
+
+    public function setReponseId(?int $reponseId)
+    {
+        $this->reponseId = $reponseId;
+    }
+
+    public function getDateVote(): ?\DateTimeInterface
+    {
+        return $this->dateVote;
+    }
+
+    public function setDateVote(?\DateTimeInterface $dateVote)
+    {
+        $this->dateVote = $dateVote;
+    }
+
+
 }

@@ -21,4 +21,38 @@ class ReseauSociale
     #[ORM\Column(nullable: true)]
     private ?string $lien = null;
 
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getVilleId(): ?int
+    {
+        return $this->villeId;
+    }
+
+    public function setVilleId(?int $villeId)
+    {
+        $this->villeId = $villeId;
+    }
+
+    public function getPlateform(): ?string
+    {
+        return $this->plateform;
+    }
+
+    public function setPlateform(?string $plateform)
+    {
+        $this->plateform = $plateform;
+    }
+
+    public function getLien(): ?string
+    {
+        return $this->lien;
+    }
+
+    public function setLien(?string $lien)
+    {
+        $this->lien = $lien;
+    }
 }
