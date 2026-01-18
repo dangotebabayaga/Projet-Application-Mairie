@@ -1,0 +1,215 @@
+@import '../../../styles/variables';
+
+.login-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, $blue-50, #E0E7FF);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-4;
+}
+
+.login-container {
+  max-width: 28rem;
+  width: 100%;
+}
+
+// City Header
+.city-header {
+  text-align: center;
+  margin-bottom: $spacing-8;
+}
+
+.city-logo {
+  font-size: 3.75rem;
+  margin-bottom: $spacing-4;
+}
+
+.city-name {
+  font-size: $text-3xl;
+  font-weight: 600;
+  color: $gray-900;
+  margin: 0 0 $spacing-2;
+}
+
+.city-slogan {
+  color: $gray-600;
+  margin: 0;
+}
+
+// Login Card
+.login-card {
+  background: $white;
+  border-radius: $radius-2xl;
+  box-shadow: $shadow-xl;
+  padding: $spacing-8;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  margin-bottom: $spacing-6;
+
+  .header-icon {
+    width: 24px;
+    height: 24px;
+    color: $blue-600;
+  }
+
+  h2 {
+    font-size: $text-xl;
+    font-weight: 600;
+    color: $gray-900;
+    margin: 0;
+  }
+}
+
+// Form
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+  margin-bottom: $spacing-6;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+
+  label {
+    font-size: $text-sm;
+    font-weight: 500;
+    color: $gray-700;
+    margin-bottom: $spacing-1;
+  }
+
+  input {
+    width: 100%;
+    padding: $spacing-2 $spacing-4;
+    border: 1px solid $gray-300;
+    border-radius: $radius-lg;
+    font-size: $text-base;
+    outline: none;
+    transition: all 0.2s;
+
+    &:focus {
+      border-color: transparent;
+      box-shadow: 0 0 0 2px $blue-500;
+    }
+
+    &:disabled {
+      background-color: $gray-100;
+      cursor: not-allowed;
+    }
+
+    &::placeholder {
+      color: $gray-400;
+    }
+  }
+}
+
+.btn-submit {
+  width: 100%;
+  background: $blue-600;
+  color: $white;
+  padding: $spacing-3 0;
+  border: none;
+  border-radius: $radius-lg;
+  font-size: $text-base;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover:not(:disabled) {
+    background: $blue-700;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// Demo Section
+.demo-section {
+  border-top: 1px solid $gray-200;
+  padding-top: $spacing-6;
+}
+
+.demo-label {
+  font-size: $text-sm;
+  color: $gray-600;
+  text-align: center;
+  margin: 0 0 $spacing-3;
+}
+
+.demo-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-3;
+}
+
+.btn-demo {
+  padding: $spacing-2 $spacing-4;
+  border-radius: $radius-lg;
+  font-size: $text-sm;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: transparent;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &.btn-citizen {
+    border: 1px solid $blue-600;
+    color: $blue-600;
+
+    &:hover:not(:disabled) {
+      background: $blue-50;
+    }
+  }
+
+  &.btn-municipal {
+    border: 1px solid $green-600;
+    color: $green-600;
+
+    &:hover:not(:disabled) {
+      background: $green-50;
+    }
+  }
+}
+
+// Register Link
+.register-link {
+  margin-top: $spacing-6;
+  text-align: center;
+
+  button {
+    background: none;
+    border: none;
+    font-size: $text-sm;
+    color: $blue-600;
+    cursor: pointer;
+    padding: 0;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+// Footer Info
+.footer-info {
+  text-align: center;
+  margin-top: $spacing-6;
+
+  p {
+    font-size: $text-sm;
+    color: $gray-600;
+    margin: 0;
+  }
+}

@@ -1,0 +1,542 @@
+@import '../../../styles/variables';
+
+.landing-page {
+  min-height: 100vh;
+  background: linear-gradient(to bottom, $blue-50, $white, $blue-50);
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 $spacing-4;
+
+  @media (min-width: $breakpoint-sm) {
+    padding: 0 $spacing-6;
+  }
+
+  @media (min-width: $breakpoint-lg) {
+    padding: 0 $spacing-8;
+  }
+}
+
+// Header
+.landing-header {
+  background: $white;
+  box-shadow: $shadow-sm;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.header-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: $spacing-4;
+
+  @media (min-width: $breakpoint-sm) {
+    padding: $spacing-4 $spacing-6;
+  }
+
+  @media (min-width: $breakpoint-lg) {
+    padding: $spacing-4 $spacing-8;
+  }
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+}
+
+.logo-icon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, $blue-600, #4F46E5);
+  border-radius: $radius-lg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 24px;
+    height: 24px;
+    color: $white;
+  }
+}
+
+.logo-text {
+  h1 {
+    font-size: $text-xl;
+    font-weight: 600;
+    color: $gray-900;
+    margin: 0;
+  }
+
+  p {
+    font-size: $text-xs;
+    color: $gray-500;
+    margin: 0;
+  }
+}
+
+// Buttons
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-2;
+  background: $blue-600;
+  color: $white;
+  padding: $spacing-2 $spacing-6;
+  border-radius: $radius-lg;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background: $blue-700;
+  }
+
+  &.btn-large {
+    padding: $spacing-4 $spacing-8;
+    font-size: $text-lg;
+    border-radius: $radius-xl;
+    box-shadow: 0 10px 25px rgba($blue-600, 0.3);
+  }
+
+  &.btn-xlarge {
+    padding: $spacing-5 $spacing-10;
+    font-size: $text-xl;
+    border-radius: $radius-xl;
+    box-shadow: 0 15px 30px rgba($blue-600, 0.3);
+  }
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: $white;
+  color: $gray-700;
+  padding: $spacing-2 $spacing-6;
+  border-radius: $radius-lg;
+  border: 1px solid $gray-200;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background: $gray-50;
+  }
+
+  &.btn-large {
+    padding: $spacing-4 $spacing-8;
+    font-size: $text-lg;
+    border-radius: $radius-xl;
+  }
+}
+
+.icon-arrow {
+  width: 16px;
+  height: 16px;
+
+  .btn-large & {
+    width: 20px;
+    height: 20px;
+  }
+
+  .btn-xlarge & {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+// Hero Section
+.hero-section {
+  padding: $spacing-16 0;
+
+  @media (min-width: $breakpoint-sm) {
+    padding: 6rem 0;
+  }
+}
+
+.hero-content {
+  text-align: center;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-2;
+  background: $blue-100;
+  color: $blue-700;
+  padding: $spacing-2 $spacing-4;
+  border-radius: 9999px;
+  margin-bottom: $spacing-6;
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  span {
+    font-size: $text-sm;
+    font-weight: 500;
+  }
+}
+
+.hero-title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: $gray-900;
+  margin: 0 0 $spacing-6;
+  line-height: 1.2;
+
+  @media (min-width: $breakpoint-sm) {
+    font-size: 3rem;
+  }
+
+  @media (min-width: $breakpoint-lg) {
+    font-size: 3.75rem;
+  }
+
+  .highlight {
+    display: block;
+    color: $blue-600;
+    margin-top: $spacing-2;
+  }
+}
+
+.hero-description {
+  font-size: $text-xl;
+  color: $gray-600;
+  max-width: 48rem;
+  margin: 0 auto $spacing-10;
+  line-height: 1.6;
+}
+
+.hero-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+  justify-content: center;
+
+  @media (min-width: $breakpoint-sm) {
+    flex-direction: row;
+  }
+}
+
+// Features Section
+.features-section {
+  background: $white;
+  padding: 5rem 0;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: $spacing-16;
+
+  h3 {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: $gray-900;
+    margin: 0 0 $spacing-4;
+
+    @media (min-width: $breakpoint-sm) {
+      font-size: 2.25rem;
+    }
+  }
+
+  p {
+    font-size: $text-lg;
+    color: $gray-600;
+    max-width: 42rem;
+    margin: 0 auto;
+  }
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-8;
+
+  @media (min-width: $breakpoint-md) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: $breakpoint-lg) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.feature-card {
+  background: $gray-50;
+  border-radius: $radius-xl;
+  padding: $spacing-8;
+  border: 1px solid $gray-100;
+  transition: all 0.3s;
+
+  &:hover {
+    box-shadow: $shadow-lg;
+
+    .feature-icon {
+      transform: scale(1.1);
+    }
+  }
+
+  .feature-icon {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, $blue-600, #4F46E5);
+    border-radius: $radius-xl;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: $spacing-5;
+    transition: transform 0.3s;
+
+    svg {
+      width: 28px;
+      height: 28px;
+      color: $white;
+      stroke: $white;
+    }
+  }
+
+  h4 {
+    font-size: $text-xl;
+    font-weight: 600;
+    color: $gray-900;
+    margin: 0 0 $spacing-3;
+  }
+
+  p {
+    color: $gray-600;
+    line-height: 1.6;
+    margin: 0;
+  }
+}
+
+// Benefits Section
+.benefits-section {
+  padding: 5rem 0;
+  background: linear-gradient(135deg, $blue-600, #4F46E5);
+}
+
+.benefits-grid {
+  display: grid;
+  gap: $spacing-12;
+  align-items: center;
+
+  @media (min-width: $breakpoint-lg) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.benefits-content {
+  h3 {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: $white;
+    margin: 0 0 $spacing-6;
+
+    @media (min-width: $breakpoint-sm) {
+      font-size: 2.25rem;
+    }
+  }
+
+  .benefits-intro {
+    color: rgba($white, 0.8);
+    font-size: $text-lg;
+    margin: 0 0 $spacing-8;
+    line-height: 1.6;
+  }
+}
+
+.benefits-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+}
+
+.benefit-item {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-3;
+
+  .check-icon {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    background: $white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+
+    svg {
+      width: 16px;
+      height: 16px;
+      color: $blue-600;
+    }
+  }
+
+  span {
+    color: $white;
+    font-size: $text-lg;
+  }
+}
+
+.benefits-cards {
+  background: rgba($white, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: $radius-2xl;
+  padding: $spacing-8;
+  border: 1px solid rgba($white, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-6;
+}
+
+.stat-card {
+  background: $white;
+  border-radius: $radius-xl;
+  padding: $spacing-6;
+  box-shadow: $shadow-lg;
+  display: flex;
+  align-items: center;
+  gap: $spacing-4;
+
+  .stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: $radius-lg;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    &.blue {
+      background: $blue-100;
+      svg { color: $blue-600; }
+    }
+
+    &.green {
+      background: $green-50;
+      svg { color: $green-600; }
+    }
+
+    &.purple {
+      background: #F3E8FF;
+      svg { color: #9333EA; }
+    }
+  }
+
+  .stat-text {
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: $gray-900;
+    }
+
+    .stat-label {
+      font-size: $text-sm;
+      color: $gray-600;
+    }
+  }
+}
+
+// CTA Section
+.cta-section {
+  padding: 5rem 0;
+  background: $white;
+}
+
+.cta-content {
+  max-width: 56rem;
+  margin: 0 auto;
+  text-align: center;
+
+  h3 {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: $gray-900;
+    margin: 0 0 $spacing-6;
+
+    @media (min-width: $breakpoint-sm) {
+      font-size: 2.25rem;
+    }
+  }
+
+  p {
+    font-size: $text-xl;
+    color: $gray-600;
+    margin: 0 0 $spacing-10;
+  }
+}
+
+// Footer
+.landing-footer {
+  background: $gray-900;
+  padding: $spacing-12 0;
+}
+
+.footer-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-6;
+
+  @media (min-width: $breakpoint-md) {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+.footer-logo {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+
+  .logo-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, $blue-600, #4F46E5);
+    border-radius: $radius-lg;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+      width: 24px;
+      height: 24px;
+      color: $white;
+    }
+  }
+
+  .footer-title {
+    font-weight: 600;
+    color: $white;
+  }
+
+  .footer-subtitle {
+    font-size: $text-sm;
+    color: $gray-400;
+  }
+}
+
+.footer-copyright {
+  color: $gray-400;
+  font-size: $text-sm;
+}

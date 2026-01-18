@@ -1,0 +1,278 @@
+@import '../../../styles/variables';
+
+.discussion-page {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-6;
+}
+
+// Page Header
+.page-header {
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: $gray-900;
+    margin: 0;
+  }
+
+  p {
+    color: $gray-600;
+    margin: $spacing-1 0 0;
+  }
+}
+
+// Social Links Card
+.social-links-card {
+  background: $white;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-sm;
+  padding: $spacing-6;
+
+  h2 {
+    font-size: $text-lg;
+    font-weight: 600;
+    color: $gray-900;
+    margin: 0 0 $spacing-4;
+  }
+}
+
+.social-links-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-4;
+
+  @media (min-width: $breakpoint-md) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-4;
+  border-radius: $radius-lg;
+  color: $white;
+  text-decoration: none;
+  transition: all 0.2s;
+
+  &.social-facebook {
+    background: $blue-600;
+    &:hover { background: $blue-700; }
+  }
+
+  &.social-twitter {
+    background: #0EA5E9;
+    &:hover { background: #0284C7; }
+  }
+
+  &.social-instagram {
+    background: #DB2777;
+    &:hover { background: #BE185D; }
+  }
+
+  .social-link-content {
+    display: flex;
+    align-items: center;
+    gap: $spacing-3;
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    span {
+      font-weight: 500;
+    }
+  }
+
+  .external-icon {
+    width: 20px;
+    height: 20px;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  &:hover .external-icon {
+    opacity: 1;
+  }
+}
+
+// Feed Section
+.feed-section {
+  h2 {
+    font-size: $text-lg;
+    font-weight: 600;
+    color: $gray-900;
+    margin: 0 0 $spacing-4;
+  }
+}
+
+.posts-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+}
+
+.post-card {
+  background: $white;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-sm;
+  padding: $spacing-6;
+}
+
+.post-header {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+  margin-bottom: $spacing-4;
+}
+
+.post-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: $gray-100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  &.platform-facebook svg { color: $blue-600; }
+  &.platform-twitter svg { color: #0EA5E9; }
+  &.platform-instagram svg { color: #DB2777; }
+}
+
+.post-info {
+  flex: 1;
+
+  .post-author {
+    font-weight: 500;
+    color: $gray-900;
+  }
+
+  .post-date {
+    font-size: $text-sm;
+    color: $gray-500;
+  }
+}
+
+.btn-external {
+  background: none;
+  border: none;
+  padding: $spacing-2;
+  color: $gray-400;
+  cursor: pointer;
+  transition: color 0.2s;
+
+  &:hover {
+    color: $gray-600;
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.post-content {
+  color: $gray-900;
+  line-height: 1.6;
+  white-space: pre-line;
+  margin: 0 0 $spacing-4;
+}
+
+.post-image {
+  margin-bottom: $spacing-4;
+  border-radius: $radius-lg;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+}
+
+.post-actions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-6;
+  padding-top: $spacing-4;
+  border-top: 1px solid $gray-100;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  background: none;
+  border: none;
+  color: $gray-600;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s;
+
+  &:hover {
+    color: $blue-600;
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  span {
+    font-size: $text-sm;
+  }
+}
+
+// Load More
+.load-more {
+  text-align: center;
+  margin-top: $spacing-6;
+}
+
+.btn-load-more {
+  padding: $spacing-3 $spacing-6;
+  border: 1px solid $gray-300;
+  background: transparent;
+  color: $gray-700;
+  border-radius: $radius-lg;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background: $gray-50;
+  }
+}
+
+// Info Banner
+.info-banner {
+  background: $blue-50;
+  border: 1px solid $blue-200;
+  border-radius: $radius-xl;
+  padding: $spacing-6;
+
+  h3 {
+    font-weight: 600;
+    color: #1E3A8A;
+    margin: 0 0 $spacing-2;
+
+    &::before {
+      content: '📱 ';
+    }
+  }
+
+  p {
+    font-size: $text-sm;
+    color: #1E40AF;
+    margin: 0;
+    line-height: 1.5;
+  }
+}

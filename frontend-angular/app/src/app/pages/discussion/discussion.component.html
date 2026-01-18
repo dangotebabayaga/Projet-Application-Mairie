@@ -1,0 +1,134 @@
+<div class="discussion-page">
+  <!-- En-tête -->
+  <div class="page-header">
+    <h1>Discussion citoyenne</h1>
+    <p>Suivez l'actualité de votre mairie sur les réseaux sociaux</p>
+  </div>
+
+  <!-- Liens réseaux sociaux -->
+  <div class="social-links-card">
+    <h2>Suivez-nous sur les réseaux sociaux</h2>
+    <div class="social-links-grid">
+      <a
+        *ngFor="let social of socialLinks"
+        [href]="social.url"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="social-link"
+        [ngClass]="social.colorClass"
+      >
+        <div class="social-link-content">
+          <!-- Facebook -->
+          <svg *ngIf="social.platform === 'facebook'" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+          </svg>
+          <!-- Twitter -->
+          <svg *ngIf="social.platform === 'twitter'" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
+          </svg>
+          <!-- Instagram -->
+          <svg *ngIf="social.platform === 'instagram'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+          </svg>
+          <span>{{ social.name }}</span>
+        </div>
+        <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+          <polyline points="15 3 21 3 21 9"></polyline>
+          <line x1="10" y1="14" x2="21" y2="3"></line>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- Fil d'actualité -->
+  <div class="feed-section">
+    <h2>Dernières publications</h2>
+    <div class="posts-list">
+      <div class="post-card" *ngFor="let post of posts">
+        <!-- En-tête du post -->
+        <div class="post-header">
+          <div class="post-avatar" [ngClass]="getPlatformClass(post.platform)">
+            <!-- Facebook -->
+            <svg *ngIf="post.platform === 'facebook'" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+            </svg>
+            <!-- Twitter -->
+            <svg *ngIf="post.platform === 'twitter'" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
+            </svg>
+            <!-- Instagram -->
+            <svg *ngIf="post.platform === 'instagram'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+            </svg>
+          </div>
+          <div class="post-info">
+            <div class="post-author">Mairie - Ville Connectée</div>
+            <div class="post-date">{{ formatDate(post.postedAt) }}</div>
+          </div>
+          <button class="btn-external" (click)="openLink(post.link)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Contenu du post -->
+        <p class="post-content">{{ post.content }}</p>
+
+        <!-- Image du post -->
+        <div class="post-image" *ngIf="post.imageUrl">
+          <img [src]="post.imageUrl" alt="Publication" />
+        </div>
+
+        <!-- Actions -->
+        <div class="post-actions">
+          <button class="action-btn" (click)="onLike(post.id)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+            </svg>
+            <span>J'aime</span>
+          </button>
+          <button class="action-btn" (click)="onComment(post.id)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+            </svg>
+            <span>Commenter</span>
+          </button>
+          <button class="action-btn" (click)="onShare(post.id)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="18" cy="5" r="3"></circle>
+              <circle cx="6" cy="12" r="3"></circle>
+              <circle cx="18" cy="19" r="3"></circle>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+            </svg>
+            <span>Partager</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bouton charger plus -->
+    <div class="load-more">
+      <button class="btn-load-more" (click)="loadMore()">
+        Charger plus de publications
+      </button>
+    </div>
+  </div>
+
+  <!-- Information -->
+  <div class="info-banner">
+    <h3>Restez connecté</h3>
+    <p>
+      Retrouvez toutes nos actualités, événements et informations importantes sur nos réseaux sociaux.
+      N'hésitez pas à partager et à commenter !
+    </p>
+  </div>
+</div>

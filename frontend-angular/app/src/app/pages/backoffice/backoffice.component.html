@@ -1,0 +1,299 @@
+<div class="backoffice-page">
+  <!-- En-tête -->
+  <div class="page-header">
+    <h1>Back-Office Municipal</h1>
+    <p>Gestion des services municipaux</p>
+  </div>
+
+  <!-- Onglets -->
+  <div class="tabs-container">
+    <div class="tabs">
+      <button
+        *ngFor="let tab of tabs"
+        class="tab-btn"
+        [class.active]="activeTab === tab.id"
+        (click)="setActiveTab(tab.id)"
+      >
+        <svg *ngIf="tab.icon === 'trending-up'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+          <polyline points="17 6 23 6 23 12"></polyline>
+        </svg>
+        <svg *ngIf="tab.icon === 'file-text'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+        </svg>
+        <svg *ngIf="tab.icon === 'bar-chart'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="20" x2="12" y2="10"></line>
+          <line x1="18" y1="20" x2="18" y2="4"></line>
+          <line x1="6" y1="20" x2="6" y2="16"></line>
+        </svg>
+        <svg *ngIf="tab.icon === 'calendar'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        <span>{{ tab.label }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- VUE D'ENSEMBLE -->
+  <div class="tab-content" *ngIf="activeTab === 'overview'">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-header">
+          <span>Signalements actifs</span>
+          <svg class="stat-icon blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+          </svg>
+        </div>
+        <div class="stat-value">{{ stats.reportsInProgress + stats.reportsRegistered }}</div>
+        <div class="stat-label">{{ stats.reportsRegistered }} nouveaux, {{ stats.reportsInProgress }} en cours</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-header">
+          <span>Sondages actifs</span>
+          <svg class="stat-icon purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="20" x2="12" y2="10"></line>
+            <line x1="18" y1="20" x2="18" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="16"></line>
+          </svg>
+        </div>
+        <div class="stat-value">{{ stats.surveysActive }}</div>
+        <div class="stat-label">{{ stats.surveyResponses }} réponses au total</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-header">
+          <span>Événements à venir</span>
+          <svg class="stat-icon green" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+        </div>
+        <div class="stat-value">{{ stats.eventsUpcoming }}</div>
+        <div class="stat-label">Ce mois-ci</div>
+      </div>
+    </div>
+
+    <div class="admin-banner">
+      <h2>Tableau de bord administrateur</h2>
+      <p>Gérez les signalements citoyens, créez des sondages et publiez des événements depuis cette interface.</p>
+    </div>
+  </div>
+
+  <!-- SIGNALEMENTS -->
+  <div class="tab-content" *ngIf="activeTab === 'reports'">
+    <div class="section-header">
+      <h2>Signalements citoyens ({{ reports.length }})</h2>
+    </div>
+
+    <div class="reports-list">
+      <div class="report-admin-card" *ngFor="let report of reports">
+        <div class="report-content">
+          <img *ngIf="report.photo" [src]="report.photo" alt="" class="report-photo" />
+          <div class="report-details">
+            <div class="report-badges">
+              <span class="badge-category">{{ report.category }}</span>
+              <span class="badge-status" [ngClass]="getStatusConfig(report.status).colorClass">
+                {{ getStatusConfig(report.status).label }}
+              </span>
+            </div>
+            <p class="report-description">{{ report.description }}</p>
+            <div class="report-meta">
+              <span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                {{ report.location.address }}
+              </span>
+              <span>•</span>
+              <span>Par {{ report.userName }}</span>
+              <span>•</span>
+              <span>{{ formatDate(report.createdAt) }}</span>
+            </div>
+            <div class="report-actions">
+              <button
+                *ngIf="report.status !== 'in_progress'"
+                class="btn-status orange"
+                (click)="updateReportStatus(report.id, 'in_progress')"
+              >
+                Marquer en cours
+              </button>
+              <button
+                *ngIf="report.status !== 'resolved'"
+                class="btn-status green"
+                (click)="updateReportStatus(report.id, 'resolved')"
+              >
+                Marquer résolu
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SONDAGES -->
+  <div class="tab-content" *ngIf="activeTab === 'surveys'">
+    <div class="section-header">
+      <h2>Sondages ({{ surveys.length }})</h2>
+      <button class="btn-primary" (click)="toggleSurveyForm()">
+        <svg *ngIf="!showSurveyForm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        <svg *ngIf="showSurveyForm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+        {{ showSurveyForm ? 'Annuler' : 'Nouveau sondage' }}
+      </button>
+    </div>
+
+    <!-- Formulaire sondage -->
+    <div class="form-card" *ngIf="showSurveyForm">
+      <h3>Créer un sondage</h3>
+      <form (ngSubmit)="onCreateSurvey()" class="admin-form">
+        <div class="form-group">
+          <label>Titre</label>
+          <input type="text" [(ngModel)]="surveyForm.title" name="title" required />
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea [(ngModel)]="surveyForm.description" name="description" rows="3" required></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Date de fin</label>
+            <input type="date" [(ngModel)]="surveyForm.endDate" name="endDate" required />
+          </div>
+          <div class="form-group">
+            <label>Quartier (optionnel)</label>
+            <input type="text" [(ngModel)]="surveyForm.neighborhood" name="neighborhood" placeholder="Centre-ville, Quartier Sud..." />
+          </div>
+        </div>
+        <button type="submit" class="btn-submit">Créer le sondage</button>
+      </form>
+    </div>
+
+    <!-- Liste sondages -->
+    <div class="surveys-list">
+      <div class="survey-admin-card" *ngFor="let survey of surveys">
+        <div class="survey-info">
+          <h3>{{ survey.title }}</h3>
+          <p>{{ survey.description }}</p>
+          <div class="survey-meta">
+            <span>{{ survey.responses }} réponses</span>
+            <span>•</span>
+            <span>Jusqu'au {{ formatDate(survey.endDate) }}</span>
+            <span *ngIf="survey.neighborhood">• {{ survey.neighborhood }}</span>
+          </div>
+        </div>
+        <span class="badge-active" [class.inactive]="!survey.isActive">
+          {{ survey.isActive ? 'Actif' : 'Terminé' }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ÉVÉNEMENTS -->
+  <div class="tab-content" *ngIf="activeTab === 'events'">
+    <div class="section-header">
+      <h2>Événements ({{ events.length }})</h2>
+      <button class="btn-primary" (click)="toggleEventForm()">
+        <svg *ngIf="!showEventForm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        <svg *ngIf="showEventForm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+        {{ showEventForm ? 'Annuler' : 'Nouvel événement' }}
+      </button>
+    </div>
+
+    <!-- Formulaire événement -->
+    <div class="form-card" *ngIf="showEventForm">
+      <h3>Créer un événement</h3>
+      <form (ngSubmit)="onCreateEvent()" class="admin-form">
+        <div class="form-group">
+          <label>Titre</label>
+          <input type="text" [(ngModel)]="eventForm.title" name="title" required />
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea [(ngModel)]="eventForm.description" name="description" rows="3" required></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Date</label>
+            <input type="datetime-local" [(ngModel)]="eventForm.date" name="date" required />
+          </div>
+          <div class="form-group">
+            <label>Lieu</label>
+            <input type="text" [(ngModel)]="eventForm.location" name="location" required />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Thème</label>
+            <select [(ngModel)]="eventForm.theme" name="theme">
+              <option value="sport">Sport</option>
+              <option value="culture">Culture</option>
+              <option value="citoyennete">Citoyenneté</option>
+              <option value="environnement">Environnement</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Organisateur</label>
+            <input type="text" [(ngModel)]="eventForm.organizer" name="organizer" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Image URL (optionnel)</label>
+          <input type="text" [(ngModel)]="eventForm.imageUrl" name="imageUrl" placeholder="https://..." />
+        </div>
+        <button type="submit" class="btn-submit">Créer l'événement</button>
+      </form>
+    </div>
+
+    <!-- Liste événements -->
+    <div class="events-grid">
+      <div class="event-admin-card" *ngFor="let event of events">
+        <img *ngIf="event.imageUrl" [src]="event.imageUrl" [alt]="event.title" class="event-image" />
+        <div class="event-info">
+          <h3>{{ event.title }}</h3>
+          <p>{{ event.description }}</p>
+          <div class="event-details">
+            <div class="detail-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              {{ formatDate(event.date) }}
+            </div>
+            <div class="detail-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
+              {{ event.location }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

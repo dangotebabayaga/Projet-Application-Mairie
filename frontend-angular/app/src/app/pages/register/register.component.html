@@ -1,0 +1,170 @@
+<div class="register-page">
+  <div class="register-container">
+    <!-- Logo et nom de la ville -->
+    <div class="city-header">
+      <div class="city-logo">{{ cityConfig.logo }}</div>
+      <h1 class="city-name">{{ cityConfig.name }}</h1>
+      <p class="city-slogan">{{ cityConfig.slogan }}</p>
+    </div>
+
+    <!-- Formulaire d'inscription -->
+    <div class="register-card">
+      <div class="card-header">
+        <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="8.5" cy="7" r="4"></circle>
+          <line x1="20" y1="8" x2="20" y2="14"></line>
+          <line x1="23" y1="11" x2="17" y2="11"></line>
+        </svg>
+        <h2>Créer un compte</h2>
+      </div>
+
+      <!-- Error message -->
+      <div class="error-message" *ngIf="error">
+        {{ error }}
+      </div>
+
+      <form (ngSubmit)="onSubmit()" class="register-form">
+        <!-- Nom complet -->
+        <div class="form-group">
+          <label for="name">Nom complet</label>
+          <input
+            type="text"
+            id="name"
+            [(ngModel)]="formData.name"
+            name="name"
+            placeholder="Jean Dupont"
+            required
+            [disabled]="loading"
+          />
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            [(ngModel)]="formData.email"
+            name="email"
+            placeholder="votre@email.fr"
+            required
+            [disabled]="loading"
+          />
+        </div>
+
+        <!-- Mot de passe -->
+        <div class="form-group">
+          <label for="password">Mot de passe</label>
+          <input
+            type="password"
+            id="password"
+            [(ngModel)]="formData.password"
+            name="password"
+            placeholder="••••••••"
+            required
+            [disabled]="loading"
+          />
+        </div>
+
+        <!-- Confirmer mot de passe -->
+        <div class="form-group">
+          <label for="confirmPassword">Confirmer le mot de passe</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            [(ngModel)]="formData.confirmPassword"
+            name="confirmPassword"
+            placeholder="••••••••"
+            required
+            [disabled]="loading"
+          />
+        </div>
+
+        <!-- Type de compte -->
+        <div class="form-group">
+          <label class="role-label">Type de compte</label>
+          <div class="role-buttons">
+            <button
+              type="button"
+              class="role-btn"
+              [class.active]="formData.role === 'citizen'"
+              [class.citizen]="formData.role === 'citizen'"
+              (click)="selectRole('citizen')"
+              [disabled]="loading"
+            >
+              <div class="role-title">Citoyen</div>
+              <div class="role-desc">Habitant de la ville</div>
+            </button>
+            <button
+              type="button"
+              class="role-btn"
+              [class.active]="formData.role === 'municipal'"
+              [class.municipal]="formData.role === 'municipal'"
+              (click)="selectRole('municipal')"
+              [disabled]="loading"
+            >
+              <div class="role-title">Élu/Agent</div>
+              <div class="role-desc">Personnel municipal</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Champs spécifiques citoyen -->
+        <ng-container *ngIf="formData.role === 'citizen'">
+          <!-- Adresse -->
+          <div class="form-group">
+            <label for="address">Adresse</label>
+            <input
+              type="text"
+              id="address"
+              [(ngModel)]="formData.address"
+              name="address"
+              placeholder="12 rue de la République"
+              [disabled]="loading"
+            />
+          </div>
+
+          <!-- Quartier -->
+          <div class="form-group">
+            <label for="neighborhood">Quartier</label>
+            <select
+              id="neighborhood"
+              [(ngModel)]="formData.neighborhood"
+              name="neighborhood"
+              [disabled]="loading"
+            >
+              <option value="">Sélectionnez votre quartier</option>
+              <option *ngFor="let n of neighborhoods" [value]="n">{{ n }}</option>
+            </select>
+          </div>
+        </ng-container>
+
+        <!-- Submit button -->
+        <button
+          type="submit"
+          class="btn-submit"
+          [disabled]="loading || !formData.name || !formData.email || !formData.password || !formData.confirmPassword"
+        >
+          {{ loading ? 'Création du compte...' : 'Créer mon compte' }}
+        </button>
+      </form>
+
+      <!-- Retour connexion -->
+      <div class="back-link">
+        <button type="button" (click)="onBackToLogin()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          Retour à la connexion
+        </button>
+      </div>
+    </div>
+
+    <!-- Info -->
+    <div class="footer-info">
+      <p>Plateforme de participation citoyenne</p>
+    </div>
+  </div>
+</div>

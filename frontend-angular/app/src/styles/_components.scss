@@ -1,0 +1,165 @@
+// ===========================================
+// COMPOSANTS - Styles réutilisables
+// ===========================================
+
+@import 'variables';
+
+// ----- CARTES -----
+.card {
+  background-color: $color-bg-primary;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-lg;
+  padding: $spacing-lg;
+  transition: box-shadow $transition-fast;
+
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+}
+
+.card-header {
+  margin-bottom: $spacing-md;
+  padding-bottom: $spacing-md;
+  border-bottom: 1px solid $color-border;
+}
+
+.card-body {
+  margin-bottom: $spacing-md;
+}
+
+.card-footer {
+  margin-top: $spacing-md;
+  padding-top: $spacing-md;
+  border-top: 1px solid $color-border;
+}
+
+// ----- INPUTS -----
+.form-group {
+  margin-bottom: $spacing-md;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: $spacing-xs;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+}
+
+.form-input {
+  width: 100%;
+  padding: $spacing-sm $spacing-md;
+  font-family: $font-family-primary;
+  font-size: $font-size-base;
+  color: $color-text-primary;
+  background-color: $color-bg-primary;
+  border: 1px solid $color-border-dark;
+  border-radius: $border-radius-md;
+  transition: border-color $transition-fast, box-shadow $transition-fast;
+
+  &:focus {
+    outline: none;
+    border-color: $color-primary;
+    box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
+  }
+
+  &::placeholder {
+    color: $color-text-muted;
+  }
+
+  &:disabled {
+    background-color: $color-bg-secondary;
+    cursor: not-allowed;
+  }
+}
+
+.form-textarea {
+  @extend .form-input;
+  min-height: 120px;
+  resize: vertical;
+}
+
+.form-select {
+  @extend .form-input;
+  cursor: pointer;
+}
+
+// ----- BADGES -----
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: $spacing-xs $spacing-sm;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  border-radius: $border-radius-full;
+}
+
+.badge-primary {
+  background-color: $color-primary-light;
+  color: $color-primary;
+}
+
+.badge-success {
+  background-color: rgba($color-success, 0.1);
+  color: $color-success;
+}
+
+.badge-warning {
+  background-color: rgba($color-warning, 0.1);
+  color: darken($color-warning, 20%);
+}
+
+.badge-danger {
+  background-color: rgba($color-danger, 0.1);
+  color: $color-danger;
+}
+
+// ----- ALERTES -----
+.alert {
+  padding: $spacing-md;
+  border-radius: $border-radius-md;
+  margin-bottom: $spacing-md;
+}
+
+.alert-info {
+  background-color: rgba($color-info, 0.1);
+  border: 1px solid $color-info;
+  color: darken($color-info, 20%);
+}
+
+.alert-success {
+  background-color: rgba($color-success, 0.1);
+  border: 1px solid $color-success;
+  color: darken($color-success, 20%);
+}
+
+.alert-warning {
+  background-color: rgba($color-warning, 0.1);
+  border: 1px solid $color-warning;
+  color: darken($color-warning, 30%);
+}
+
+.alert-danger {
+  background-color: rgba($color-danger, 0.1);
+  border: 1px solid $color-danger;
+  color: darken($color-danger, 10%);
+}
+
+// ----- AVATAR -----
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: $border-radius-full;
+  object-fit: cover;
+}
+
+.avatar-sm { width: 32px; height: 32px; }
+.avatar-lg { width: 56px; height: 56px; }
+.avatar-xl { width: 80px; height: 80px; }
+
+// ----- DIVIDER -----
+.divider {
+  height: 1px;
+  background-color: $color-border;
+  margin: $spacing-md 0;
+}

@@ -1,0 +1,185 @@
+<div class="reports-page">
+  <!-- En-tête -->
+  <div class="page-header">
+    <div class="header-text">
+      <h1>Signalements citoyens</h1>
+      <p>Signalez un problème dans votre ville</p>
+    </div>
+    <button class="btn-primary" (click)="toggleForm()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+      Nouveau signalement
+    </button>
+  </div>
+
+  <!-- Formulaire de signalement -->
+  <div class="form-card" *ngIf="showForm">
+    <h2>Créer un signalement</h2>
+    <form (ngSubmit)="onSubmit()" class="report-form">
+      <!-- Catégorie -->
+      <div class="form-group">
+        <label for="category">Catégorie</label>
+        <select
+          id="category"
+          [(ngModel)]="formData.category"
+          name="category"
+        >
+          <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+        </select>
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label for="description">Description du problème</label>
+        <textarea
+          id="description"
+          [(ngModel)]="formData.description"
+          name="description"
+          rows="4"
+          placeholder="Décrivez le problème en détail..."
+          required
+        ></textarea>
+      </div>
+
+      <!-- Localisation -->
+      <div class="form-group">
+        <label for="address">
+          <svg class="label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          Localisation / Adresse
+        </label>
+        <input
+          type="text"
+          id="address"
+          [(ngModel)]="formData.address"
+          name="address"
+          placeholder="Ex: 12 rue de la République"
+          required
+        />
+      </div>
+
+      <!-- Photo -->
+      <div class="form-group">
+        <label for="photo">
+          <svg class="label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+            <circle cx="12" cy="13" r="4"></circle>
+          </svg>
+          Photo (URL)
+        </label>
+        <input
+          type="text"
+          id="photo"
+          [(ngModel)]="formData.photo"
+          name="photo"
+          placeholder="https://..."
+        />
+        <p class="form-hint">Optionnel : ajoutez une photo du problème</p>
+      </div>
+
+      <!-- Boutons -->
+      <div class="form-actions">
+        <button type="submit" class="btn-submit" [disabled]="!formData.description || !formData.address">
+          Envoyer le signalement
+        </button>
+        <button type="button" class="btn-cancel" (click)="toggleForm()">
+          Annuler
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Mes signalements -->
+  <div class="section">
+    <h2>Mes signalements ({{ myReports.length }})</h2>
+    <div class="reports-list">
+      <div class="report-card" *ngFor="let report of myReports">
+        <div class="report-header">
+          <div class="report-info">
+            <div class="report-badges">
+              <span class="badge-category">{{ report.category }}</span>
+              <span class="badge-status" [ngClass]="getStatusInfo(report.status).colorClass">
+                <svg *ngIf="report.status === 'registered'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <svg *ngIf="report.status === 'in_progress'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <svg *ngIf="report.status === 'resolved'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                {{ getStatusInfo(report.status).label }}
+              </span>
+            </div>
+            <p class="report-description">{{ report.description }}</p>
+          </div>
+          <img *ngIf="report.photo" [src]="report.photo" alt="Signalement" class="report-photo" />
+        </div>
+        <div class="report-footer">
+          <div class="report-meta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            {{ report.location.address }}
+          </div>
+          <div class="report-meta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            {{ formatDate(report.createdAt) }}
+          </div>
+        </div>
+      </div>
+
+      <div class="empty-state" *ngIf="myReports.length === 0">
+        <p>Vous n'avez pas encore de signalements</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Signalements de la ville -->
+  <div class="section">
+    <h2>Signalements de la ville ({{ reports.length }})</h2>
+    <div class="reports-grid">
+      <div class="report-card-small" *ngFor="let report of otherReports">
+        <div class="report-badges">
+          <span class="badge-category small">{{ report.category }}</span>
+          <span class="badge-status small" [ngClass]="getStatusInfo(report.status).colorClass">
+            <svg *ngIf="report.status === 'registered'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <svg *ngIf="report.status === 'in_progress'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <svg *ngIf="report.status === 'resolved'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            {{ getStatusInfo(report.status).label }}
+          </span>
+        </div>
+        <p class="report-description">{{ report.description }}</p>
+        <div class="report-meta">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          {{ report.location.address }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

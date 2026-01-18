@@ -1,0 +1,282 @@
+@import '../../../styles/variables';
+
+.layout {
+  min-height: 100vh;
+  background-color: $gray-50;
+}
+
+// Header
+.header {
+  background-color: $white;
+  border-bottom: 1px solid $gray-200;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.header-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 $spacing-4;
+
+  @media (min-width: $breakpoint-sm) {
+    padding: 0 $spacing-6;
+  }
+
+  @media (min-width: $breakpoint-lg) {
+    padding: 0 $spacing-8;
+  }
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 64px;
+}
+
+// Logo section
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+  cursor: pointer;
+}
+
+.logo-icon {
+  font-size: 1.875rem;
+}
+
+.logo-text {
+  .city-name {
+    font-weight: 600;
+    color: $gray-900;
+  }
+
+  .city-slogan {
+    font-size: $text-xs;
+    color: $gray-500;
+  }
+}
+
+// Desktop navigation
+.nav-desktop {
+  display: none;
+  align-items: center;
+  gap: $spacing-1;
+
+  @media (min-width: $breakpoint-md) {
+    display: flex;
+  }
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  padding: $spacing-2 $spacing-4;
+  border-radius: $radius-lg;
+  border: none;
+  background: transparent;
+  color: $gray-600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: $gray-100;
+  }
+
+  &.active {
+    background-color: $blue-50;
+    color: $blue-600;
+  }
+
+  .nav-icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .nav-label {
+    font-size: $text-sm;
+  }
+}
+
+// User section desktop
+.user-section-desktop {
+  display: none;
+  align-items: center;
+  gap: $spacing-4;
+
+  @media (min-width: $breakpoint-md) {
+    display: flex;
+  }
+}
+
+.user-info {
+  text-align: right;
+
+  .user-name {
+    font-size: $text-sm;
+    font-weight: 500;
+    color: $gray-900;
+  }
+
+  .user-role {
+    font-size: $text-xs;
+    color: $gray-500;
+  }
+}
+
+.logout-btn {
+  padding: $spacing-2;
+  color: $gray-600;
+  background: transparent;
+  border: none;
+  border-radius: $radius-lg;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: $gray-100;
+  }
+
+  .icon {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+// Mobile menu button
+.mobile-menu-btn {
+  display: flex;
+  padding: $spacing-2;
+  color: $gray-600;
+  background: transparent;
+  border: none;
+  border-radius: $radius-lg;
+  cursor: pointer;
+
+  &:hover {
+    background-color: $gray-100;
+  }
+
+  .icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  @media (min-width: $breakpoint-md) {
+    display: none;
+  }
+}
+
+// Mobile menu
+.mobile-menu {
+  border-top: 1px solid $gray-200;
+  background-color: $white;
+
+  @media (min-width: $breakpoint-md) {
+    display: none;
+  }
+}
+
+.mobile-menu-content {
+  padding: $spacing-4;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-1;
+}
+
+.mobile-nav-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+  padding: $spacing-3 $spacing-4;
+  border-radius: $radius-lg;
+  border: none;
+  background: transparent;
+  color: $gray-600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+
+  &:hover {
+    background-color: $gray-100;
+  }
+
+  &.active {
+    background-color: $blue-50;
+    color: $blue-600;
+  }
+
+  .nav-icon {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.mobile-user-section {
+  padding-top: $spacing-3;
+  margin-top: $spacing-3;
+  border-top: 1px solid $gray-200;
+}
+
+.mobile-user-info {
+  padding: $spacing-2 $spacing-4;
+
+  .user-name {
+    font-weight: 500;
+    color: $gray-900;
+  }
+
+  .user-role {
+    font-size: $text-sm;
+    color: $gray-500;
+  }
+}
+
+.mobile-logout-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+  padding: $spacing-3 $spacing-4;
+  color: $gray-600;
+  background: transparent;
+  border: none;
+  border-radius: $radius-lg;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: $gray-100;
+  }
+
+  .icon {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+// Main content
+.main-content {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: $spacing-8 $spacing-4;
+
+  @media (min-width: $breakpoint-sm) {
+    padding: $spacing-8 $spacing-6;
+  }
+
+  @media (min-width: $breakpoint-lg) {
+    padding: $spacing-8;
+  }
+}
+
+// Icons in nav
+.nav-icon {
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+}

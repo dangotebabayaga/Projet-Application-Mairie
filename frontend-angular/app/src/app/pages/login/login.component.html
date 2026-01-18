@@ -1,0 +1,93 @@
+<div class="login-page">
+  <div class="login-container">
+    <!-- Logo et nom de la ville -->
+    <div class="city-header">
+      <div class="city-logo">{{ cityConfig.logo }}</div>
+      <h1 class="city-name">{{ cityConfig.name }}</h1>
+      <p class="city-slogan">{{ cityConfig.slogan }}</p>
+    </div>
+
+    <!-- Formulaire de connexion -->
+    <div class="login-card">
+      <div class="card-header">
+        <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+          <polyline points="10 17 15 12 10 7"></polyline>
+          <line x1="15" y1="12" x2="3" y2="12"></line>
+        </svg>
+        <h2>Connexion</h2>
+      </div>
+
+      <form (ngSubmit)="onSubmit()" class="login-form">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            [(ngModel)]="email"
+            name="email"
+            placeholder="votre@email.fr"
+            required
+            [disabled]="loading"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Mot de passe</label>
+          <input
+            type="password"
+            id="password"
+            [(ngModel)]="password"
+            name="password"
+            placeholder="••••••••"
+            required
+            [disabled]="loading"
+          />
+        </div>
+
+        <button
+          type="submit"
+          class="btn-submit"
+          [disabled]="loading || !email || !password"
+        >
+          {{ loading ? 'Connexion...' : 'Se connecter' }}
+        </button>
+      </form>
+
+      <!-- Comptes de démonstration -->
+      <div class="demo-section">
+        <p class="demo-label">Accès rapide démo :</p>
+        <div class="demo-buttons">
+          <button
+            type="button"
+            class="btn-demo btn-citizen"
+            (click)="quickLogin('citizen')"
+            [disabled]="loading"
+          >
+            Citoyen
+          </button>
+          <button
+            type="button"
+            class="btn-demo btn-municipal"
+            (click)="quickLogin('municipal')"
+            [disabled]="loading"
+          >
+            Élu/Agent
+          </button>
+        </div>
+      </div>
+
+      <!-- Inscription -->
+      <div class="register-link">
+        <button type="button" (click)="onRegister()">
+          Pas encore inscrit ? Inscrivez-vous ici
+        </button>
+      </div>
+    </div>
+
+    <!-- Info -->
+    <div class="footer-info">
+      <p>Plateforme de participation citoyenne</p>
+    </div>
+  </div>
+</div>

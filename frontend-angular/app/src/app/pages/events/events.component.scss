@@ -1,0 +1,329 @@
+@import '../../../styles/variables';
+
+.events-page {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-6;
+}
+
+// Page Header
+.page-header {
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: $gray-900;
+    margin: 0;
+  }
+
+  p {
+    color: $gray-600;
+    margin: $spacing-1 0 0;
+  }
+}
+
+// Filter Card
+.filter-card {
+  background: $white;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-sm;
+  padding: $spacing-4;
+}
+
+.filter-header {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  margin-bottom: $spacing-3;
+
+  svg {
+    width: 20px;
+    height: 20px;
+    color: $gray-600;
+  }
+
+  span {
+    font-weight: 500;
+    color: $gray-900;
+  }
+}
+
+.filter-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-2;
+}
+
+.filter-btn {
+  padding: $spacing-2 $spacing-4;
+  border-radius: $radius-lg;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  opacity: 0.6;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  &.active {
+    opacity: 1;
+    box-shadow: 0 0 0 2px $white, 0 0 0 4px $blue-500;
+  }
+
+  &.theme-all {
+    background: $gray-200;
+    color: $gray-800;
+  }
+
+  &.theme-sport {
+    background: #FEE2E2;
+    color: #991B1B;
+  }
+
+  &.theme-culture {
+    background: #F3E8FF;
+    color: #6B21A8;
+  }
+
+  &.theme-citoyennete {
+    background: $blue-100;
+    color: #1E40AF;
+  }
+
+  &.theme-environnement {
+    background: #DCFCE7;
+    color: #166534;
+  }
+}
+
+// Events Section
+.events-section {
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: $spacing-4;
+
+    h2 {
+      font-size: $text-lg;
+      font-weight: 600;
+      color: $gray-900;
+      margin: 0;
+    }
+  }
+}
+
+.events-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-6;
+
+  @media (min-width: $breakpoint-md) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: $breakpoint-lg) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.event-card {
+  background: $white;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-sm;
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+}
+
+.event-image {
+  height: 192px;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  &.placeholder {
+    background: $gray-100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+      width: 48px;
+      height: 48px;
+      color: $gray-400;
+    }
+  }
+}
+
+.event-content {
+  padding: $spacing-5;
+}
+
+.event-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: $spacing-3;
+}
+
+.event-theme {
+  padding: $spacing-1 $spacing-3;
+  border-radius: 9999px;
+  font-size: $text-xs;
+  font-weight: 500;
+
+  &.theme-sport {
+    background: #FEE2E2;
+    color: #991B1B;
+  }
+
+  &.theme-culture {
+    background: #F3E8FF;
+    color: #6B21A8;
+  }
+
+  &.theme-citoyennete {
+    background: $blue-100;
+    color: #1E40AF;
+  }
+
+  &.theme-environnement {
+    background: #DCFCE7;
+    color: #166534;
+  }
+}
+
+.btn-favorite {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  color: $gray-300;
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+
+  &.saved {
+    color: $red-500;
+  }
+}
+
+.event-content h3 {
+  font-weight: 600;
+  color: $gray-900;
+  margin: 0 0 $spacing-2;
+}
+
+.event-description {
+  font-size: $text-sm;
+  color: $gray-600;
+  margin: 0 0 $spacing-4;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.event-details {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+  margin-bottom: $spacing-4;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  font-size: $text-sm;
+  color: $gray-600;
+
+  svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+}
+
+.btn-calendar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-2;
+  background: $blue-600;
+  color: $white;
+  padding: $spacing-2 0;
+  border: none;
+  border-radius: $radius-lg;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background: $blue-700;
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+// Empty State
+.empty-state {
+  background: $white;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-sm;
+  padding: $spacing-12;
+  text-align: center;
+
+  svg {
+    width: 48px;
+    height: 48px;
+    color: $gray-400;
+    margin: 0 auto $spacing-3;
+  }
+
+  p {
+    color: $gray-600;
+    margin: 0;
+  }
+}
+
+// Favorites Section
+.favorites-section {
+  h2 {
+    font-size: $text-lg;
+    font-weight: 600;
+    color: $gray-900;
+    margin: 0 0 $spacing-4;
+  }
+}
+
+.favorites-banner {
+  background: $blue-50;
+  border: 1px solid $blue-200;
+  border-radius: $radius-xl;
+  padding: $spacing-4;
+
+  p {
+    font-size: $text-sm;
+    color: #1E40AF;
+    margin: 0;
+  }
+}

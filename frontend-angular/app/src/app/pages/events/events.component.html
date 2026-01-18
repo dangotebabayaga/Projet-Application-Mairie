@@ -1,0 +1,123 @@
+<div class="events-page">
+  <!-- En-tête -->
+  <div class="page-header">
+    <h1>Agenda participatif</h1>
+    <p>Découvrez les événements de la ville et des associations locales</p>
+  </div>
+
+  <!-- Filtres par thématique -->
+  <div class="filter-card">
+    <div class="filter-header">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+      </svg>
+      <span>Filtrer par thématique</span>
+    </div>
+    <div class="filter-buttons">
+      <button
+        *ngFor="let theme of themes"
+        (click)="selectTheme(theme.id)"
+        class="filter-btn"
+        [ngClass]="[theme.colorClass, isThemeSelected(theme.id) ? 'active' : '']"
+      >
+        {{ theme.label }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Liste des événements -->
+  <div class="events-section">
+    <div class="section-header">
+      <h2>Événements à venir ({{ filteredEvents.length }})</h2>
+    </div>
+
+    <div class="events-grid">
+      <div class="event-card" *ngFor="let event of filteredEvents">
+        <!-- Image -->
+        <div class="event-image" *ngIf="event.imageUrl">
+          <img [src]="event.imageUrl" [alt]="event.title" />
+        </div>
+        <div class="event-image placeholder" *ngIf="!event.imageUrl">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+        </div>
+
+        <!-- Contenu -->
+        <div class="event-content">
+          <div class="event-header">
+            <span class="event-theme" [ngClass]="getThemeClass(event.theme)">
+              {{ getThemeLabel(event.theme) }}
+            </span>
+            <button
+              class="btn-favorite"
+              [class.saved]="isEventSaved(event.id)"
+              (click)="toggleSaveEvent(event.id)"
+            >
+              {{ isEventSaved(event.id) ? '❤️' : '🤍' }}
+            </button>
+          </div>
+
+          <h3>{{ event.title }}</h3>
+          <p class="event-description">{{ event.description }}</p>
+
+          <div class="event-details">
+            <div class="detail-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              <span>{{ formatDate(event.date) }}</span>
+            </div>
+            <div class="detail-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
+              <span>{{ event.location }}</span>
+            </div>
+            <div class="detail-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              <span>{{ event.organizer }}</span>
+            </div>
+          </div>
+
+          <button class="btn-calendar" (click)="addToCalendar(event)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Ajouter à mon calendrier
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div class="empty-state" *ngIf="filteredEvents.length === 0">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+        <line x1="16" y1="2" x2="16" y2="6"></line>
+        <line x1="8" y1="2" x2="8" y2="6"></line>
+        <line x1="3" y1="10" x2="21" y2="10"></line>
+      </svg>
+      <p>Aucun événement trouvé pour cette thématique</p>
+    </div>
+  </div>
+
+  <!-- Événements sauvegardés -->
+  <div class="favorites-section" *ngIf="savedEvents.length > 0">
+    <h2>Mes événements favoris ({{ savedEvents.length }})</h2>
+    <div class="favorites-banner">
+      <p>💡 Vous avez {{ savedEvents.length }} événement(s) dans vos favoris</p>
+    </div>
+  </div>
+</div>

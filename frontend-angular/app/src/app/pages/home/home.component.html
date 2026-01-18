@@ -1,0 +1,136 @@
+<div class="home-page">
+  <!-- En-tête de bienvenue -->
+  <div class="welcome-card">
+    <div class="welcome-content">
+      <div class="welcome-text">
+        <h1>Bienvenue, {{ user?.name }}</h1>
+        <p>{{ welcomeMessage }}</p>
+        <div class="user-location" *ngIf="user?.role === 'citizen' && user?.neighborhood">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          <span>{{ user?.neighborhood }}</span>
+        </div>
+      </div>
+      <div class="notification-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modules principaux -->
+  <div class="modules-section">
+    <h2>Accès rapide aux services</h2>
+    <div class="modules-grid">
+      <button
+        *ngFor="let module of modules"
+        class="module-card"
+        (click)="onNavigate(module.id)"
+      >
+        <div class="module-icon" [attr.data-color]="module.color">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <use [attr.href]="'#icon-' + module.icon"></use>
+          </svg>
+        </div>
+        <h3>{{ module.title }}</h3>
+        <p>{{ module.description }}</p>
+        <div class="module-stats">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+            <polyline points="17 6 23 6 23 12"></polyline>
+          </svg>
+          <span>{{ module.stats }}</span>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Actualités rapides -->
+  <div class="news-card">
+    <h2>Actualité de la semaine</h2>
+    <p>Les illuminations de Noël sont installées ! Venez les découvrir dès ce soir dans tout le centre-ville.</p>
+    <button class="btn-news" (click)="onNavigate('discussion')">
+      Voir toutes les actualités
+    </button>
+  </div>
+
+  <!-- Statistiques pour agents municipaux -->
+  <div class="stats-section" *ngIf="user?.role === 'municipal'">
+    <div class="stat-card">
+      <div class="stat-header">
+        <span>Signalements en cours</span>
+        <svg class="stat-icon blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+        </svg>
+      </div>
+      <div class="stat-value">{{ activeReportsCount }}</div>
+      <div class="stat-label">À traiter</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-header">
+        <span>Réponses aux sondages</span>
+        <svg class="stat-icon purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="20" x2="12" y2="10"></line>
+          <line x1="18" y1="20" x2="18" y2="4"></line>
+          <line x1="6" y1="20" x2="6" y2="16"></line>
+        </svg>
+      </div>
+      <div class="stat-value">{{ totalSurveyResponses }}</div>
+      <div class="stat-label success">Total des participations</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-header">
+        <span>Événements planifiés</span>
+        <svg class="stat-icon green" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+      </div>
+      <div class="stat-value">{{ upcomingEventsCount }}</div>
+      <div class="stat-label">À venir</div>
+    </div>
+  </div>
+</div>
+
+<!-- SVG Icons definitions -->
+<svg style="display: none;">
+  <defs>
+    <symbol id="icon-file-text" viewBox="0 0 24 24">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+      <polyline points="14 2 14 8 20 8"></polyline>
+      <line x1="16" y1="13" x2="8" y2="13"></line>
+      <line x1="16" y1="17" x2="8" y2="17"></line>
+    </symbol>
+    <symbol id="icon-bar-chart" viewBox="0 0 24 24">
+      <line x1="12" y1="20" x2="12" y2="10"></line>
+      <line x1="18" y1="20" x2="18" y2="4"></line>
+      <line x1="6" y1="20" x2="6" y2="16"></line>
+    </symbol>
+    <symbol id="icon-calendar" viewBox="0 0 24 24">
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+      <line x1="16" y1="2" x2="16" y2="6"></line>
+      <line x1="8" y1="2" x2="8" y2="6"></line>
+      <line x1="3" y1="10" x2="21" y2="10"></line>
+    </symbol>
+    <symbol id="icon-message-square" viewBox="0 0 24 24">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+    </symbol>
+    <symbol id="icon-layout-dashboard" viewBox="0 0 24 24">
+      <rect x="3" y="3" width="7" height="9"></rect>
+      <rect x="14" y="3" width="7" height="5"></rect>
+      <rect x="14" y="12" width="7" height="9"></rect>
+      <rect x="3" y="16" width="7" height="5"></rect>
+    </symbol>
+  </defs>
+</svg>
