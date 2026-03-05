@@ -1,0 +1,23 @@
+meta {
+  name: Connexion
+  type: http
+  seq: 6
+}
+
+post {
+  url: http://localhost:8000/api/utilisateur/login
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+      "email": "jean@mail.com",
+      "motDePasse": "test123"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

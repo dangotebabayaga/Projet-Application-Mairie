@@ -25,10 +25,10 @@ class Utilisateurs
     #[ORM\Column(nullable: true)]
     private ?string $motDePasseHash = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(type: "datetime", nullable: true)]
     private ?\DateTimeInterface $dateCreation = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(type: "datetime", nullable: true)]
     private ?\DateTimeInterface $dateNaissance = null;
 
     #[ORM\Column(nullable: true)]
