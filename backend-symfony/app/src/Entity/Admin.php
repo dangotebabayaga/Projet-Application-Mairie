@@ -5,7 +5,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: AdministrateursRepository::class)]
 #[ORM\Table(name: 'administrateurs')]
-class Administrateurs
+class Admin
 {
     #[ORM\Column(nullable: true)]
     private ?int $utilisateurId = null;

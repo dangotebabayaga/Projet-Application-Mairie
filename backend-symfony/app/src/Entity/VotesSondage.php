@@ -17,10 +17,7 @@ class VotesSondage
     private ?int $citoyenId = null;
 
     #[ORM\Column(nullable: true)]
-    private ?int $questionId = null;
-
-    #[ORM\Column(nullable: true)]
-    private ?int $reponseId = null;
+    private ?int $sondageId = null;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeInterface $dateVote = null;
@@ -46,24 +43,14 @@ class VotesSondage
         $this->citoyenId = $citoyenId;
     }
 
-    public function getQuestionId(): ?int
+    public function getSondageId(): ?int
     {
-        return $this->questionId;
+        return $this->sondageId;
     }
 
-    public function setQuestionId(?int $questionId)
+    public function setSondageId(?int $sondageId)
     {
-        $this->questionId = $questionId;
-    }
-
-    public function getReponseId(): ?int
-    {
-        return $this->reponseId;
-    }
-
-    public function setReponseId(?int $reponseId)
-    {
-        $this->reponseId = $reponseId;
+        $this->sondageId = $sondageId;
     }
 
     public function getDateVote(): ?\DateTimeInterface
