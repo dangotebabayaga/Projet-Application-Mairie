@@ -73,7 +73,7 @@ class UserApi extends AbstractController
             return $this->json(['error' => 'Email ou mot de passe incorrect'], 401);
         }
 
-        return $this->json(['message' => 'Connexion réussie', 'id' => $utilisateur->getUtilisateurId()]);
+        return $this->json(['message' => 'Connexion réussie', 'id' => $utilisateur->getId()]);
 
     }
 }
