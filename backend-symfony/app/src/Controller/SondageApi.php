@@ -107,34 +107,50 @@ use App\Entity\ListeChoixSondage;
     }
 
     #[Route('/vote', name: 'api_vote_sondage', methods: ['POST'])]
-    public function vote(Request $request): JsonResponse
+   public function vote(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
-
-        if (empty($data['idCitoyen']) || empty($data['choixId']) || empty($data['sondageId'])) {
+    
+        // Vérifie que les champs nécessaires sont présents
+        if (empty($data['citoyenId']) || empty($data['sondageId']) || empty($data['choixIds'])) {
             return $this->json(['error' => 'Données manquantes'], 400);
         }
-
-        $choix = $this->choixRepo->find($data['choixId']);
-        if (!$choix) {
-            return $this->json(['error' => 'Choix invalide'], 400);
+    
+        $citoyenId = (int) $data['citoyenId'];
+        $sondageId = (int) $data['sondageId'];
+        $choixIds = $data['choixIds'];
+    
+        // Si un seul choix est envoyé sous forme d'entier, le transforme en tableau
+        if (!is_array($choixIds)) {
+            $choixIds = [$choixIds];
         }
-
-        // Appel de la fonction voteChoix dans le repository
-        $this->votesRepo->voteChoix(
-            (int)$data['idCitoyen'],
-            $choix,
-            (int)$data['sondageId']
-        );
-
+    
+        if (empty($choixIds)) {
+            return $this->json(['error' => 'Liste de choix invalide'], 400);
+        }
+    
+        // Transforme les IDs en entités Choix
+        $choixEntities = [];
+        foreach ($choixIds as $id) {
+            $choix = $this->choixRepo->find((int) $id);
+            if (!$choix) {
+                return $this->json(['error' => "Choix invalide: $id"], 400);
+            }
+            $choixEntities[] = $choix;
+        }
+    
+        // Appel du repository pour enregistrer le vote (gère maintenant 1 ou plusieurs choix)
+        $this->votesRepo->voteChoixMultiple($citoyenId, $choixEntities, $sondageId);
+    
+        // Flush global
         $this->em->flush();
-
+    
         return $this->json([
             'message' => 'Vote enregistré avec succès',
-            'citoyen_id' => $data['idCitoyen'],
-            'choix_id' => $choix->getId(),
-            'sondage_id' => $data['sondageId']
+            'citoyen_id' => $citoyenId,
+            'choix_ids' => array_map(fn($c) => $c->getId(), $choixEntities),
+            'sondage_id' => $sondageId
         ]);
-    }
-
+    } 
+    
  }

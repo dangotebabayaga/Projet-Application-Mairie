@@ -85,6 +85,35 @@ class VotesSondageRepository extends ServiceEntityRepository
         // 4. Pas de flush ici : le contrôleur fait le flush global
     }
 
+    public function voteChoixMultiple(int $idCitoyen, array $choixList, int $idSondage): void
+    {
+        $citoyen = $this->em->getRepository(Citoyens::class)->find($idCitoyen);
+        $sondage = $this->em->getRepository(Sondages::class)->find($idSondage);
+        // 1. Vérifie si le citoyen a déjà voté pour ce sondage
+        $existingVote = $this->findOneBy([
+            'citoyen' => $idCitoyen,
+            'sondage' => $idSondage
+        ]);
+
+        if (!$existingVote) {
+            // 2. Crée le vote
+            $vote = new VotesSondage();
+            $vote->setCitoyen($citoyen);
+            $vote->setSondage($sondage);
+            $vote->setDateVote(new \DateTime());
+            $this->em->persist($vote);
+
+            // 3. Crée la liaison vote <-> choix pour chaque choix
+            foreach ($choixList as $choix) {
+                $listeChoixVote = new ListeChoixVote();
+                $listeChoixVote->setVote($vote);
+                $listeChoixVote->setChoix($choix);
+                $this->em->persist($listeChoixVote);
+            }
+        }
+
+        // 4. Pas de flush ici : le contrôleur fera le flush global
+    }
 
 }
 
