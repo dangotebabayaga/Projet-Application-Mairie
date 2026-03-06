@@ -4,6 +4,8 @@ namespace App\Repository;
 use App\Entity\VotesSondage;
 use App\Entity\ListeChoixVote;
 use App\Entity\Choix;
+use App\Entity\Citoyens;
+use App\Entity\Sondages;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
@@ -29,7 +31,7 @@ class VotesSondageRepository extends ServiceEntityRepository
             FROM liste_choix_vote lcv
             JOIN votes_sondage vs ON lcv.id_vote = vs.id
             JOIN choix c ON lcv.id_choix = c.id
-            WHERE vs.question_id = :idSondage
+            WHERE vs.id_sondage = :idSondage
             GROUP BY c.nom
             ORDER BY nb_votes DESC
         ";
@@ -51,17 +53,25 @@ class VotesSondageRepository extends ServiceEntityRepository
      */
     public function voteChoix(int $idCitoyen, Choix $choix, int $idSondage): void
     {
+        // Récupère les entités nécessaires
+        $citoyen = $this->em->getRepository(Citoyens::class)->find($idCitoyen);
+        $sondage = $this->em->getRepository(Sondages::class)->find($idSondage);
+
+        if (!$citoyen || !$sondage) {
+            throw new \Exception("Citoyen ou sondage introuvable.");
+        }
+
         // 1. Vérifie si le citoyen a déjà voté pour ce sondage
         $existingVote = $this->findOneBy([
-            'citoyenId' => $idCitoyen,
-            'questionId' => $idSondage
+            'citoyen' => $citoyen,
+            'sondage' => $sondage
         ]);
 
         if (!$existingVote) {
             // 2. Crée le vote
             $vote = new VotesSondage();
-            $vote->setCitoyenId($idCitoyen);
-            $vote->setSondageId($idSondage);
+            $vote->setCitoyen($citoyen);
+            $vote->setSondage($sondage);
             $vote->setDateVote(new \DateTime());
             $this->em->persist($vote);
 
@@ -71,6 +81,7 @@ class VotesSondageRepository extends ServiceEntityRepository
             $listeChoixVote->setChoix($choix);
             $this->em->persist($listeChoixVote);
         }
+
         // 4. Pas de flush ici : le contrôleur fait le flush global
     }
 

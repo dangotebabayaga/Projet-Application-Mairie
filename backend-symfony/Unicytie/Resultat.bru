@@ -5,11 +5,12 @@ meta {
 }
 
 get {
-  url: http://localhost:8000/api/sondages/{id}/resultat
+  url: http://localhost:8000/api/sondages/5/resultat
   body: none
   auth: inherit
 }
 
 settings {
   encodeUrl: true
+  timeout: 0
 }

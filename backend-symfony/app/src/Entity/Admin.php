@@ -7,10 +7,11 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'administrateurs')]
 class Admin
 {
-    #[ORM\Column(nullable: true)]
+    #[ORM\Id]
+    #[ORM\Column(name: "utilisateur_id", type: "integer")]
     private ?int $utilisateurId = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(name: "ville_id", type: "integer")]
     private ?int $villeId = null;
 
     public function getUtilisateurId(): ?int

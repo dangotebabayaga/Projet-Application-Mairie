@@ -6,6 +6,7 @@ use App\Repository\ChoixRepository;
 use App\Repository\SondagesRepository;
 use App\Repository\VotesSondageRepository;
 use App\Repository\AdministrateursRepository;
+use App\Entity\ListeChoixSondage;
  use Doctrine\ORM\EntityManagerInterface;
  use Symfony\Component\Routing\Annotation\Route;
  use Symfony\Component\HttpFoundation\Request;
@@ -34,27 +35,48 @@ use App\Repository\AdministrateursRepository;
     } 
 
     #[Route('', name: 'api_get_sondages', methods: ['GET'])] 
-    public function getAll(): JsonResponse { 
-        $sondages = $this->em->getRepository(Sondages::class)->findAll(); 
-        $data = array_map(fn($s) => [ 
-            'id' => $s->getId(), 
-            'titre' => $s->getTitre(), 
-            'description' => $s->getDescription(),
-            'dateDebut' => $s->getDateDebut(),
-            'dateFin' => $s->getDateFin(), 
-            'idAdmin' => $s->getAdministrateur()
-        ], $sondages); 
-        return $this->json($data);
-    } 
+    public function getAll(): JsonResponse
+    {
+        $sondages = $this->em->getRepository(Sondages::class)->findAll();
 
-   #[Route('', name: 'api_post_sondage', methods: ['POST'])]
+        $data = [];
+
+        foreach ($sondages as $s) {
+
+            $relations = $this->em
+                ->getRepository(ListeChoixSondage::class)
+                ->findBy(['sondage' => $s]);
+
+            $choix = array_map(function ($relation) {
+                $c = $relation->getChoix();
+                return [
+                    'id' => $c->getId(),
+                    'nom' => $c->getNom()
+                ];
+            }, $relations);
+
+            $data[] = [
+                'id' => $s->getId(),
+                'titre' => $s->getTitre(),
+                'description' => $s->getDescription(),
+                'dateDebut' => $s->getDateDebut(),
+                'dateFin' => $s->getDateFin(),
+                'idAdmin' => $s->getAdministrateur(),
+                'choix' => $choix
+            ];
+        }
+
+        return $this->json($data);
+    }
+
+    #[Route('', name: 'api_post_sondage', methods: ['POST'])]
     public function create(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
         // Vérifie que l'utilisateur est admin dans la table Administrateurs
-        //if (!$this->adminRepo->isAdmin($data['administrateur_Id'])) {
-        //    return $this->json(['error' => 'Accès interdit : vous n’êtes pas administrateur'], 403);
-        //}
+        if (!$this->adminRepo->isAdmin($data['administrateur_Id'])) {
+            return $this->json(['error' => 'Accès interdit : vous n’êtes pas administrateur'], 403);
+        }
 
         // Création du sondage via le repository
         $sondage = $this->sondageRepo->createSondageFromData($data);
@@ -73,7 +95,7 @@ use App\Repository\AdministrateursRepository;
         ]);
     } 
 
-    #[Route('/api/sondages/{id}/resultat', name: 'sondage_resultat', methods: ['GET'])]
+    #[Route('/{id}/resultat', name: 'sondage_resultat', methods: ['GET'])]
     public function resultat(int $id, VotesSondageRepository $votesRepo): JsonResponse
     {
         $result = $votesRepo->resultatSondage($id);

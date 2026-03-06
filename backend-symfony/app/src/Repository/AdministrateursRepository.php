@@ -23,7 +23,7 @@ class AdministrateursRepository extends ServiceEntityRepository
      */
     public function isAdmin(int $userId): bool
     {
-        $admin = $this->findOneBy(['utilisateur_id' => $userId]);
+        $admin = $this->findOneBy(['utilisateurId' => $userId]);
         return $admin !== null;
     }
 
