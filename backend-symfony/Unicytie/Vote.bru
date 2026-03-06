@@ -1,0 +1,24 @@
+meta {
+  name: Vote
+  type: http
+  seq: 5
+}
+
+post {
+  url: http://localhost:8000/api/sondages/vote
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "citoyenId": 15,
+    "sondageId": 5,
+    "choixIds": 2
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

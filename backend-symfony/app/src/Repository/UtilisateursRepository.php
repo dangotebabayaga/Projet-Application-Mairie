@@ -3,7 +3,7 @@ namespace App\Repository;
 
 use App\Entity\Utilisateurs;
 use App\Entity\Citoyens;
-use App\Entity\Administrateurs;
+use App\Entity\Admin;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
@@ -70,7 +70,7 @@ class UtilisateursRepository extends ServiceEntityRepository
 
         } elseif ($data['role'] == 2) {
 
-            $admin = new Administrateurs();
+            $admin = new Admin();
             $admin->setUtilisateurId($user->getId());
             $admin->setVilleId(1);
             $this->em->persist($admin);
