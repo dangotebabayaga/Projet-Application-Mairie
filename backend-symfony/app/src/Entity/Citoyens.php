@@ -7,11 +7,9 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'citoyens')]
 class Citoyens
 {
-    #[ORM\Column(nullable: true)]
+    #[ORM\Id]
+    #[ORM\Column(type: "integer", name: "utilisateur_id")]
     private ?int $utilisateurId = null;
-
-    #[ORM\Column(nullable: true)]
-    private ?int $villeId = null;
 
     public function getUtilisateurId(): ?int
     {
@@ -22,16 +20,5 @@ class Citoyens
     {
         $this->utilisateurId = $utilisateurId;
     }
-
-    public function getVilleId(): ?int
-    {
-        return $this->villeId;
-    }
-
-    public function setVilleId(?int $villeId)
-    {
-        $this->villeId = $villeId;
-    }
-
 
 }
