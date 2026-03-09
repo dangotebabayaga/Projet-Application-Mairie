@@ -1,6 +1,8 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 interface CityConfig {
   name: string;
@@ -9,7 +11,8 @@ interface CityConfig {
 }
 
 interface RegisterForm {
-  name: string;
+  nom: string;
+  prenom: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -30,7 +33,8 @@ export class RegisterComponent {
   @Output() registerSuccess = new EventEmitter<void>();
 
   formData: RegisterForm = {
-    name: '',
+    nom: '',
+    prenom: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -38,6 +42,8 @@ export class RegisterComponent {
     address: '',
     neighborhood: ''
   };
+
+  constructor(private authService: AuthService, private router: Router) {}
 
   loading: boolean = false;
   error: string = '';
@@ -57,10 +63,9 @@ export class RegisterComponent {
     'Quartier Ouest'
   ];
 
-  async onSubmit(): Promise<void> {
+  onSubmit(): void {
     this.error = '';
 
-    // Validation
     if (this.formData.password !== this.formData.confirmPassword) {
       this.error = 'Les mots de passe ne correspondent pas';
       return;
@@ -72,17 +77,26 @@ export class RegisterComponent {
     }
 
     this.loading = true;
-    try {
-      // TODO: Appeler AuthService.register()
-      console.log('Register attempt:', this.formData);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      this.registerSuccess.emit();
-    } catch (error) {
-      this.error = "Une erreur est survenue lors de l'inscription";
-      console.error('Register error:', error);
-    } finally {
-      this.loading = false;
-    }
+
+    const payload = {
+      nom: this.formData.nom,
+      prenom: this.formData.prenom,
+      email: this.formData.email,
+      motDePasse: this.formData.password,
+      role: this.formData.role === 'citizen' ? 1 : 2
+    };
+
+    this.authService.register(payload).subscribe({
+      next: () => {
+        this.loading = false;
+        this.router.navigate(['/login']);
+      },
+      error: (err) => {
+        this.loading = false;
+        this.error = "Une erreur est survenue lors de l'inscription";
+        console.error('Register error:', err);
+      }
+    });
   }
 
   selectRole(role: 'citizen' | 'municipal'): void {
@@ -94,6 +108,6 @@ export class RegisterComponent {
   }
 
   onBackToLogin(): void {
-    this.backToLogin.emit();
+    this.router.navigate(['/login']);
   }
 }

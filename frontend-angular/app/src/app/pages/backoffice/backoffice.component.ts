@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { SurveyService, Survey } from '../../services/survey.service';
 
 type ReportStatus = 'registered' | 'in_progress' | 'resolved';
 type EventTheme = 'sport' | 'culture' | 'citoyennete' | 'environnement';
@@ -19,15 +20,6 @@ interface Report {
   updatedAt: Date;
 }
 
-interface Survey {
-  id: string;
-  title: string;
-  description: string;
-  endDate: Date;
-  neighborhood?: string;
-  isActive: boolean;
-  responses: number;
-}
 
 interface Event {
   id: string;
@@ -75,6 +67,8 @@ export class BackofficeComponent {
   showSurveyForm = false;
   showEventForm = false;
 
+  constructor(private surveyService: SurveyService) {}
+
   tabs: Tab[] = [
     { id: 'overview', label: "Vue d'ensemble", icon: 'trending-up' },
     { id: 'reports', label: 'Signalements', icon: 'file-text' },
@@ -98,6 +92,10 @@ export class BackofficeComponent {
     organizer: 'Mairie',
     imageUrl: ''
   };
+
+  get surveys(): Survey[] {
+    return this.surveyService.getAll();
+  }
 
   // Données de démonstration
   reports: Report[] = [
@@ -133,26 +131,6 @@ export class BackofficeComponent {
       status: 'resolved',
       createdAt: new Date('2024-01-05'),
       updatedAt: new Date('2024-01-08')
-    }
-  ];
-
-  surveys: Survey[] = [
-    {
-      id: '1',
-      title: 'Aménagement du centre-ville',
-      description: 'Donnez votre avis sur le projet de réaménagement',
-      endDate: new Date('2024-02-28'),
-      isActive: true,
-      responses: 156
-    },
-    {
-      id: '2',
-      title: 'Horaires de la médiathèque',
-      description: 'Consultation sur les nouveaux horaires',
-      endDate: new Date('2024-01-31'),
-      neighborhood: 'Centre-ville',
-      isActive: true,
-      responses: 89
     }
   ];
 
@@ -228,13 +206,15 @@ export class BackofficeComponent {
       id: Date.now().toString(),
       title: this.surveyForm.title,
       description: this.surveyForm.description,
+      questions: [],
+      createdAt: new Date(),
       endDate: new Date(this.surveyForm.endDate),
       neighborhood: this.surveyForm.neighborhood || undefined,
       isActive: true,
       responses: 0
     };
 
-    this.surveys.unshift(newSurvey);
+    this.surveyService.add(newSurvey);
     this.showSurveyForm = false;
     this.resetSurveyForm();
   }
