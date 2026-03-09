@@ -11,9 +11,6 @@ class Admin
     #[ORM\Column(name: "utilisateur_id", type: "integer")]
     private ?int $utilisateurId = null;
 
-    #[ORM\Column(name: "ville_id", type: "integer")]
-    private ?int $villeId = null;
-
     public function getUtilisateurId(): ?int
     {
         return $this->utilisateurId;
@@ -23,16 +20,5 @@ class Admin
     {
         $this->utilisateurId = $utilisateurId;
     }
-
-    public function getVilleId(): ?int
-    {
-        return $this->villeId;
-    }
-
-    public function setVilleId(?int $villeId)
-    {
-        $this->villeId = $villeId;
-    }
-
 
 }

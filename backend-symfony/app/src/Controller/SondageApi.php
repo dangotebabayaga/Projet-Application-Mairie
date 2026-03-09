@@ -7,6 +7,7 @@ use App\Repository\SondagesRepository;
 use App\Repository\VotesSondageRepository;
 use App\Repository\AdministrateursRepository;
 use App\Entity\ListeChoixSondage;
+use App\Repository\CitoyensRepository;
  use Doctrine\ORM\EntityManagerInterface;
  use Symfony\Component\Routing\Annotation\Route;
  use Symfony\Component\HttpFoundation\Request;
@@ -20,18 +21,21 @@ use App\Entity\ListeChoixSondage;
     private ChoixRepository $choixRepo;
     private VotesSondageRepository $votesRepo;
     private AdministrateursRepository $adminRepo;
+    private CitoyensRepository $citoyenRepo;
     public function __construct(
         EntityManagerInterface $em,
         SondagesRepository $sondageRepo,
         ChoixRepository $choixRepo,
         VotesSondageRepository $votesRepo,
-        AdministrateursRepository $adminRepo
+        AdministrateursRepository $adminRepo,
+        CitoyensRepository $citoyenRepo
         ) { 
             $this->em = $em;
             $this->sondageRepo=$sondageRepo;
             $this->choixRepo=$choixRepo; 
             $this->votesRepo=$votesRepo;
             $this->adminRepo=$adminRepo;
+            $this->citoyenRepo = $citoyenRepo;
     } 
 
     #[Route('', name: 'api_get_sondages', methods: ['GET'])] 
@@ -110,6 +114,10 @@ use App\Entity\ListeChoixSondage;
    public function vote(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
+
+        if (!$this->citoyenRepo->isCitoyen($data['citoyenId'])) {
+            return $this->json(['error' => 'Accès interdit : vous n’êtes pas citoyen'], 403);
+        }
     
         // Vérifie que les champs nécessaires sont présents
         if (empty($data['citoyenId']) || empty($data['sondageId']) || empty($data['choixIds'])) {
