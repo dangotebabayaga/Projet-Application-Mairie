@@ -1,0 +1,27 @@
+meta {
+  name: Update
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:8000/api/paramettre
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "id": 1,
+    "administrateur_Id":1,
+    "nom": "Nantes",
+    "slogan": "Bonjour, fait déjàs un bon jour",
+    "logo": "frontend-angular/app/image/logo.png",
+    "theme": "2"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

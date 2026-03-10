@@ -1,0 +1,28 @@
+meta {
+  name: CréationUserAdmin
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:8000/api/utilisateur/register
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "nom": "Stark",
+    "prenom": "Anthony",
+    "email": "ironman@mail.com",
+    "motDePasse": "jtmplopr",
+    "dateNaissance": "1995-05-10",
+    "telephone": "0600000000",
+    "role": 2
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

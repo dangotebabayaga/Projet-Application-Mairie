@@ -7,6 +7,7 @@ use App\Repository\SondagesRepository;
 use App\Repository\VotesSondageRepository;
 use App\Repository\AdministrateursRepository;
 use App\Entity\ListeChoixSondage;
+use App\Repository\CitoyensRepository;
 use App\Service\AuthChecker;
  use Doctrine\ORM\EntityManagerInterface;
  use Symfony\Component\Routing\Annotation\Route;
@@ -21,6 +22,7 @@ use App\Service\AuthChecker;
     private ChoixRepository $choixRepo;
     private VotesSondageRepository $votesRepo;
     private AdministrateursRepository $adminRepo;
+    private CitoyensRepository $citoyenRepo;
     private AuthChecker $auth;
     public function __construct(
         EntityManagerInterface $em,
@@ -28,6 +30,8 @@ use App\Service\AuthChecker;
         ChoixRepository $choixRepo,
         VotesSondageRepository $votesRepo,
         AdministrateursRepository $adminRepo,
+        CitoyensRepository $citoyenRepo
+        ) { 
         AuthChecker $auth
         ) {
             $this->em = $em;
@@ -35,6 +39,7 @@ use App\Service\AuthChecker;
             $this->choixRepo=$choixRepo;
             $this->votesRepo=$votesRepo;
             $this->adminRepo=$adminRepo;
+            $this->citoyenRepo = $citoyenRepo;
             $this->auth=$auth;
     } 
 
@@ -128,6 +133,10 @@ use App\Service\AuthChecker;
         }
 
         $data = json_decode($request->getContent(), true);
+
+        if (!$this->citoyenRepo->isCitoyen($data['citoyenId'])) {
+            return $this->json(['error' => 'Accès interdit : vous n’êtes pas citoyen'], 403);
+        }
     
         // Vérifie que les champs nécessaires sont présents
         if (empty($data['citoyenId']) || empty($data['sondageId']) || empty($data['choixIds'])) {

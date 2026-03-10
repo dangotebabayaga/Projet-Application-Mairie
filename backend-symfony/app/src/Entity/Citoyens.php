@@ -20,5 +20,4 @@ class Citoyens
     {
         $this->utilisateurId = $utilisateurId;
     }
-
 }

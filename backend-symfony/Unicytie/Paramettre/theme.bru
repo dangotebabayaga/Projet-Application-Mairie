@@ -1,15 +1,16 @@
 meta {
-  name: Récupération Signalement
+  name: theme
   type: http
-  seq: 4
+  seq: 1
 }
 
 get {
-  url: http://localhost:8000/api/signalements
+  url: http://localhost:8000/api/paramettre/1/theme
   body: none
   auth: inherit
 }
 
 settings {
   encodeUrl: true
+  timeout: 0
 }

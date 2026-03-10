@@ -25,7 +25,7 @@ class Ville
     #[ORM\Column(nullable: true)]
     private ?string $themecouleur = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(type:"datetime",name:"date_creation",nullable: true)]
     private ?\DateTimeInterface $dateCreation = null;
 
     public function getId(): ?int

@@ -22,19 +22,22 @@ class Utilisateurs
     #[ORM\Column(nullable: true)]
     private ?string $email = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(name:"mot_de_passe_hash",nullable: true)]
     private ?string $motDePasseHash = null;
 
-    #[ORM\Column(type: "datetime", nullable: true)]
+    #[ORM\Column(type: "datetime", name:"date_creation",nullable: true)]
     private ?\DateTimeInterface $dateCreation = null;
 
-    #[ORM\Column(type: "datetime", nullable: true)]
+    #[ORM\Column(type: "date", name:"date_naissance", nullable: true)]
     private ?\DateTimeInterface $dateNaissance = null;
 
     #[ORM\Column(nullable: true)]
     private ?string $telephone = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(name: 'ville_id', nullable: true)]
+    private ?int $villeId = null;
+
+    #[ORM\Column(name:"compte_actif",nullable: true)]
     private ?bool $compteActif = null;
 
     public function getId(): ?int
@@ -110,6 +113,16 @@ class Utilisateurs
     public function setTelephone(?string $telephone)
     {
         $this->telephone = $telephone;
+    }
+
+    public function getVileId(): ?int
+    {
+        return $this->villeId;
+    }
+
+    public function setVilleId(?int $villeId)
+    {
+        $this->villeId = $villeId;
     }
 
     public function isCompteActif(): ?bool

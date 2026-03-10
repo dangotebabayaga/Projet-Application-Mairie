@@ -15,6 +15,5 @@ class VilleRepository extends ServiceEntityRepository
         parent::__construct($registry, Ville::class);
     }
 
-    // Ajoutez vos méthodes personnalisées ici
 }
 

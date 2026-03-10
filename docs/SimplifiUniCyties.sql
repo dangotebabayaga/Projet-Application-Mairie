@@ -23,6 +23,7 @@ CREATE TABLE utilisateurs (
   date_creation timestamp,
   date_naissance date,
   telephone varchar(20),
+  ville_id integer,
   compte_actif boolean
 );
 
@@ -32,12 +33,11 @@ CREATE TABLE ville (
   slogan varchar(255),
   logo varchar(255),
   themeCouleur varchar(255),
-  date_creation date
+  date_creation timestamp
 );
 
 CREATE TABLE administrateurs (
-  utilisateur_id integer PRIMARY KEY,
-  ville_id integer
+  utilisateur_id integer PRIMARY KEY
 );
 
 CREATE TABLE citoyens (
@@ -112,11 +112,12 @@ CREATE TABLE type_ev (
 CREATE TABLE evenement (
   id SERIAL PRIMARY KEY,
   titre varchar(255),
+  commentaire Text,
+  lieux varchar(255),
   dateEv date,
   heureDeb time,
   heureFin time,
   administrateur_id integer,
-  ville_id integer,
   type integer
 );
 
@@ -130,11 +131,11 @@ CREATE TABLE reseau_sociale (
 ALTER TABLE administrateurs
 ADD FOREIGN KEY (utilisateur_id) REFERENCES utilisateurs(id);
 
-ALTER TABLE administrateurs
-ADD FOREIGN KEY (ville_id) REFERENCES ville(id);
-
 ALTER TABLE citoyens
 ADD FOREIGN KEY (utilisateur_id) REFERENCES utilisateurs(id);
+
+ALTER TABLE utilisateurs
+ADD FOREIGN KEY (ville_id) REFERENCES ville(id);
 
 ALTER TABLE sondages
 ADD FOREIGN KEY (administrateur_id) REFERENCES administrateurs(utilisateur_id);
@@ -168,9 +169,6 @@ ADD FOREIGN KEY (auteur) REFERENCES utilisateurs(id);
 
 ALTER TABLE evenement
 ADD FOREIGN KEY (administrateur_id) REFERENCES administrateurs(utilisateur_id);
-
-ALTER TABLE evenement
-ADD FOREIGN KEY (ville_id) REFERENCES ville(id);
 
 ALTER TABLE evenement
 ADD FOREIGN KEY (type) REFERENCES type_ev(id);

@@ -1,10 +1,11 @@
 <?php
 namespace App\Entity;
+
 use App\Repository\EvenementRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: EvenementRepository::class)]
-#[ORM\Table(name: 'Evenement')]
+#[ORM\Table(name: 'evenement')]
 class Evenement
 {
     #[ORM\Id]
@@ -12,26 +13,31 @@ class Evenement
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $titre = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?\DateTimeInterface $dateev = null;
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $commentaire = null; // <-- texte long
 
-    #[ORM\Column(nullable: true)]
-    private ?\DateTimeInterface $heuredeb = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $lieux = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?\DateTimeInterface $heurefin = null;
+    #[ORM\Column(type: 'date',name:"dateev", nullable: true)]
+    private ?\DateTimeInterface $dateEv = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(type: 'time',name:"heuredeb", nullable: true)]
+    private ?\DateTimeInterface $heureDeb = null;
+
+    #[ORM\Column(type: 'time',name:"heurefin", nullable: true)]
+    private ?\DateTimeInterface $heureFin = null;
+
+    #[ORM\Column(name:"administrateur_id",nullable: true)]
     private ?int $administrateurId = null;
 
     #[ORM\Column(nullable: true)]
-    private ?int $villeId = null;
-
-    #[ORM\Column(nullable: true)]
     private ?int $type = null;
+
+    // ===== Getters & Setters =====
 
     public function getId(): ?int
     {
@@ -43,39 +49,65 @@ class Evenement
         return $this->titre;
     }
 
-    public function setTitre(?string $titre)
+    public function setTitre(?string $titre): self
     {
         $this->titre = $titre;
+        return $this;
     }
 
-    public function getDateev(): ?\DateTimeInterface
+    public function getCommentaire(): ?string
     {
-        return $this->dateev;
+        return $this->commentaire;
     }
 
-    public function setDateev(?\DateTimeInterface $dateev)
+    public function setCommentaire(?string $commentaire): self
     {
-        $this->dateev = $dateev;
+        $this->commentaire = $commentaire;
+        return $this;
     }
 
-    public function getHeuredeb(): ?\DateTimeInterface
+    public function getLieux(): ?string
     {
-        return $this->heuredeb;
+        return $this->lieux;
     }
 
-    public function setHeuredeb(?\DateTimeInterface $heuredeb)
+    public function setLieux(?string $lieux): self
     {
-        $this->heuredeb = $heuredeb;
+        $this->lieux = $lieux;
+        return $this;
     }
 
-    public function getHeurefin(): ?\DateTimeInterface
+    public function getDateEv(): ?\DateTimeInterface
     {
-        return $this->heurefin;
+        return $this->dateEv;
     }
 
-    public function setHeurefin(?\DateTimeInterface $heurefin)
+    public function setDateEv(?\DateTimeInterface $dateEv): self
     {
-        $this->heurefin = $heurefin;
+        $this->dateEv = $dateEv;
+        return $this;
+    }
+
+    public function getHeureDeb(): ?\DateTimeInterface
+    {
+        return $this->heureDeb;
+    }
+
+    public function setHeureDeb(?\DateTimeInterface $heureDeb): self
+    {
+        $this->heureDeb = $heureDeb;
+        return $this;
+    }
+
+    public function getHeureFin(): ?\DateTimeInterface
+    {
+        return $this->heureFin;
+    }
+
+    public function setHeureFin(?\DateTimeInterface $heureFin): self
+    {
+        $this->heureFin = $heureFin;
+        return $this;
     }
 
     public function getAdministrateurId(): ?int
@@ -83,19 +115,10 @@ class Evenement
         return $this->administrateurId;
     }
 
-    public function setAdministrateurId(?int $administrateurId)
+    public function setAdministrateurId(?int $administrateurId): self
     {
         $this->administrateurId = $administrateurId;
-    }
-
-    public function getVilleId(): ?int
-    {
-        return $this->villeId;
-    }
-
-    public function setVilleId(?int $villeId)
-    {
-        $this->villeId = $villeId;
+        return $this;
     }
 
     public function getType(): ?int
@@ -103,10 +126,9 @@ class Evenement
         return $this->type;
     }
 
-    public function setType(?int $type)
+    public function setType(?int $type): self
     {
         $this->type = $type;
+        return $this;
     }
-
-
 }

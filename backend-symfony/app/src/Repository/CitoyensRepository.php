@@ -15,6 +15,16 @@ class CitoyensRepository extends ServiceEntityRepository
         parent::__construct($registry, Citoyens::class);
     }
 
-    // Ajoutez vos méthodes personnalisées ici
+    /**
+     * Vérifie si un utilisateur est administrateur
+     *
+     * @param int $userId
+     * @return bool
+     */
+    public function isCitoyen(int $userId): bool
+    {
+        $cit = $this->findOneBy(['utilisateurId' => $userId]);
+        return $cit !== null;
+    }
 }
 
