@@ -19,21 +19,40 @@
         <h2>Créer un compte</h2>
       </div>
 
+      <!-- Success message -->
+      <div class="success-message" *ngIf="successMessage">
+        {{ successMessage }}
+      </div>
+
       <!-- Error message -->
       <div class="error-message" *ngIf="error">
         {{ error }}
       </div>
 
-      <form (ngSubmit)="onSubmit()" class="register-form">
-        <!-- Nom complet -->
+      <form (ngSubmit)="onSubmit()" class="register-form" *ngIf="!successMessage">
+        <!-- Nom -->
         <div class="form-group">
-          <label for="name">Nom complet</label>
+          <label for="nom">Nom</label>
           <input
             type="text"
-            id="name"
-            [(ngModel)]="formData.name"
-            name="name"
-            placeholder="Jean Dupont"
+            id="nom"
+            [(ngModel)]="formData.nom"
+            name="nom"
+            placeholder="Dupont"
+            required
+            [disabled]="loading"
+          />
+        </div>
+
+        <!-- Prénom -->
+        <div class="form-group">
+          <label for="prenom">Prénom</label>
+          <input
+            type="text"
+            id="prenom"
+            [(ngModel)]="formData.prenom"
+            name="prenom"
+            placeholder="Jean"
             required
             [disabled]="loading"
           />
@@ -56,29 +75,55 @@
         <!-- Mot de passe -->
         <div class="form-group">
           <label for="password">Mot de passe</label>
-          <input
-            type="password"
-            id="password"
-            [(ngModel)]="formData.password"
-            name="password"
-            placeholder="••••••••"
-            required
-            [disabled]="loading"
-          />
+          <div class="password-wrapper">
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              id="password"
+              [(ngModel)]="formData.password"
+              name="password"
+              placeholder="••••••••"
+              required
+              [disabled]="loading"
+            />
+            <button type="button" class="toggle-password" (click)="showPassword = !showPassword">
+              <svg *ngIf="!showPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              <svg *ngIf="showPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"></path>
+                <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"></path>
+                <line x1="1" y1="1" x2="23" y2="23"></line>
+              </svg>
+            </button>
+          </div>
         </div>
 
         <!-- Confirmer mot de passe -->
         <div class="form-group">
           <label for="confirmPassword">Confirmer le mot de passe</label>
-          <input
-            type="password"
-            id="confirmPassword"
-            [(ngModel)]="formData.confirmPassword"
-            name="confirmPassword"
-            placeholder="••••••••"
-            required
-            [disabled]="loading"
-          />
+          <div class="password-wrapper">
+            <input
+              [type]="showConfirmPassword ? 'text' : 'password'"
+              id="confirmPassword"
+              [(ngModel)]="formData.confirmPassword"
+              name="confirmPassword"
+              placeholder="••••••••"
+              required
+              [disabled]="loading"
+            />
+            <button type="button" class="toggle-password" (click)="showConfirmPassword = !showConfirmPassword">
+              <svg *ngIf="!showConfirmPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              <svg *ngIf="showConfirmPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"></path>
+                <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"></path>
+                <line x1="1" y1="1" x2="23" y2="23"></line>
+              </svg>
+            </button>
+          </div>
         </div>
 
         <!-- Type de compte -->
@@ -144,7 +189,7 @@
         <button
           type="submit"
           class="btn-submit"
-          [disabled]="loading || !formData.name || !formData.email || !formData.password || !formData.confirmPassword"
+          [disabled]="loading || !formData.nom || !formData.prenom || !formData.email || !formData.password || !formData.confirmPassword"
         >
           {{ loading ? 'Création du compte...' : 'Créer mon compte' }}
         </button>

@@ -8,6 +8,7 @@ use App\Repository\VotesSondageRepository;
 use App\Repository\AdministrateursRepository;
 use App\Entity\ListeChoixSondage;
 use App\Repository\CitoyensRepository;
+use App\Service\AuthChecker;
  use Doctrine\ORM\EntityManagerInterface;
  use Symfony\Component\Routing\Annotation\Route;
  use Symfony\Component\HttpFoundation\Request;
@@ -22,6 +23,7 @@ use App\Repository\CitoyensRepository;
     private VotesSondageRepository $votesRepo;
     private AdministrateursRepository $adminRepo;
     private CitoyensRepository $citoyenRepo;
+    private AuthChecker $auth;
     public function __construct(
         EntityManagerInterface $em,
         SondagesRepository $sondageRepo,
@@ -30,17 +32,23 @@ use App\Repository\CitoyensRepository;
         AdministrateursRepository $adminRepo,
         CitoyensRepository $citoyenRepo
         ) { 
+        AuthChecker $auth
+        ) {
             $this->em = $em;
             $this->sondageRepo=$sondageRepo;
-            $this->choixRepo=$choixRepo; 
+            $this->choixRepo=$choixRepo;
             $this->votesRepo=$votesRepo;
             $this->adminRepo=$adminRepo;
             $this->citoyenRepo = $citoyenRepo;
+            $this->auth=$auth;
     } 
 
-    #[Route('', name: 'api_get_sondages', methods: ['GET'])] 
-    public function getAll(): JsonResponse
+    #[Route('', name: 'api_get_sondages', methods: ['GET'])]
+    public function getAll(Request $request): JsonResponse
     {
+        if (!$this->auth->getUser($request)) {
+            return $this->json(['error' => 'Non authentifié'], 401);
+        }
         $sondages = $this->em->getRepository(Sondages::class)->findAll();
 
         $data = [];
@@ -76,6 +84,10 @@ use App\Repository\CitoyensRepository;
     #[Route('', name: 'api_post_sondage', methods: ['POST'])]
     public function create(Request $request): JsonResponse
     {
+        if (!$this->auth->getUser($request)) {
+            return $this->json(['error' => 'Non authentifié'], 401);
+        }
+
         $data = json_decode($request->getContent(), true);
         // Vérifie que l'utilisateur est admin dans la table Administrateurs
         if (!$this->adminRepo->isAdmin($data['administrateur_Id'])) {
@@ -100,8 +112,11 @@ use App\Repository\CitoyensRepository;
     } 
 
     #[Route('/{id}/resultat', name: 'sondage_resultat', methods: ['GET'])]
-    public function resultat(int $id, VotesSondageRepository $votesRepo): JsonResponse
+    public function resultat(int $id, Request $request, VotesSondageRepository $votesRepo): JsonResponse
     {
+        if (!$this->auth->getUser($request)) {
+            return $this->json(['error' => 'Non authentifié'], 401);
+        }
         $result = $votesRepo->resultatSondage($id);
 
         return $this->json([
@@ -113,6 +128,10 @@ use App\Repository\CitoyensRepository;
     #[Route('/vote', name: 'api_vote_sondage', methods: ['POST'])]
    public function vote(Request $request): JsonResponse
     {
+        if (!$this->auth->getUser($request)) {
+            return $this->json(['error' => 'Non authentifié'], 401);
+        }
+
         $data = json_decode($request->getContent(), true);
 
         if (!$this->citoyenRepo->isCitoyen($data['citoyenId'])) {

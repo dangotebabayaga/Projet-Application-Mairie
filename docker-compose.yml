@@ -17,7 +17,7 @@ services:
       - "4200:4200"
     volumes:
       - ./frontend-angular/app:/app
-    command: bash -c "npm install && npx ng serve --host 0.0.0.0"
+    command: bash -c "npm install && npx ng serve --host 0.0.0.0 --poll 2000"
 
   db:
     image: postgres:15

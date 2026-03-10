@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 interface CityConfig {
   name: string;
@@ -12,7 +14,7 @@ interface CityConfig {
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, HttpClientModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
@@ -20,49 +22,46 @@ export class LoginComponent {
   email: string = '';
   password: string = '';
   loading: boolean = false;
+  error: string = '';
+  showPassword: boolean = false;
 
-  // TODO: À remplacer par AuthService
   cityConfig: CityConfig = {
     name: 'Ma Ville',
     logo: '🏛️',
     slogan: 'Une ville connectée'
   };
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private authService: AuthService) {}
 
-  async onSubmit(): Promise<void> {
-    if (!this.email || !this.password) return;
-
-    this.loading = true;
-    try {
-      // TODO: Appeler AuthService.login() et vérifier le rôle
-      console.log('Login attempt:', this.email);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      // Par défaut, rediriger vers home (citoyen)
-      this.router.navigate(['/home']);
-    } catch (error) {
-      console.error('Login error:', error);
-    } finally {
-      this.loading = false;
-    }
+  isValidEmail(email: string): boolean {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(email);
   }
 
-  async quickLogin(userType: 'citizen' | 'municipal'): Promise<void> {
-    this.loading = true;
+  onSubmit(): void {
+    if (!this.email || !this.password) return;
 
-    try {
-      console.log('Quick login:', userType);
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      // Redirection selon le type d'utilisateur
-      if (userType === 'citizen') {
-        this.router.navigate(['/home']);
-      } else {
-        this.router.navigate(['/backoffice']);
-      }
-    } finally {
-      this.loading = false;
+    if (!this.isValidEmail(this.email)) {
+      this.error = "L'adresse email n'est pas valide";
+      return;
     }
+
+    this.loading = true;
+    this.error = '';
+
+    this.authService.login(this.email, this.password).subscribe({
+      next: (res) => {
+        this.loading = false;
+        localStorage.setItem('userId', res.id);
+        localStorage.setItem('userEmail', res.email);
+        localStorage.setItem('userPrenom', res.prenom);
+        this.router.navigate(['/home']);
+      },
+      error: (err) => {
+        this.loading = false;
+        this.error = err.error?.error || 'Email ou mot de passe incorrect';
+      }
+    });
   }
 
   onRegister(): void {
