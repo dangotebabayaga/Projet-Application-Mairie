@@ -48,15 +48,40 @@
   }
 }
 
-.notification-icon {
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+}
+
+.action-icon {
   padding: $spacing-3;
   background: $blue-50;
   border-radius: $radius-xl;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
 
   svg {
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     color: $blue-600;
+  }
+
+  &:hover {
+    background: #DBEAFE;
+  }
+
+  &.logout {
+    background: $red-50;
+
+    svg {
+      color: $red-500;
+    }
+
+    &:hover {
+      background: #FEE2E2;
+    }
   }
 }
 

@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { AuthGuard } from './guards/auth.guard';
 
 // Pages
-import { LandingComponent } from './pages/landing/landing.component';
 import { LoginComponent } from './pages/login/login.component';
 import { RegisterComponent } from './pages/register/register.component';
 import { HomeComponent } from './pages/home/home.component';
@@ -13,16 +13,16 @@ import { DiscussionComponent } from './pages/discussion/discussion.component';
 import { BackofficeComponent } from './pages/backoffice/backoffice.component';
 
 const routes: Routes = [
-  { path: '', component: LandingComponent },
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-  { path: 'home', component: HomeComponent },
-  { path: 'reports', component: ReportsComponent },
-  { path: 'surveys', component: SurveysComponent },
-  { path: 'events', component: EventsComponent },
-  { path: 'discussion', component: DiscussionComponent },
-  { path: 'backoffice', component: BackofficeComponent },
-  { path: '**', redirectTo: '' }
+  { path: 'home', component: HomeComponent, canActivate: [AuthGuard] },
+  { path: 'reports', component: ReportsComponent, canActivate: [AuthGuard] },
+  { path: 'surveys', component: SurveysComponent, canActivate: [AuthGuard] },
+  { path: 'events', component: EventsComponent, canActivate: [AuthGuard] },
+  { path: 'discussion', component: DiscussionComponent, canActivate: [AuthGuard] },
+  { path: 'backoffice', component: BackofficeComponent, canActivate: [AuthGuard] },
+  { path: '**', redirectTo: 'login' }
 ];
 
 @NgModule({

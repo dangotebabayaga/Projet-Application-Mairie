@@ -1,6 +1,8 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 interface CityConfig {
   name: string;
@@ -9,7 +11,8 @@ interface CityConfig {
 }
 
 interface RegisterForm {
-  name: string;
+  nom: string;
+  prenom: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -21,7 +24,7 @@ interface RegisterForm {
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, HttpClientModule],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss']
 })
@@ -30,7 +33,8 @@ export class RegisterComponent {
   @Output() registerSuccess = new EventEmitter<void>();
 
   formData: RegisterForm = {
-    name: '',
+    nom: '',
+    prenom: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -41,6 +45,9 @@ export class RegisterComponent {
 
   loading: boolean = false;
   error: string = '';
+  successMessage: string = '';
+  showPassword: boolean = false;
+  showConfirmPassword: boolean = false;
 
   // TODO: À remplacer par AuthService
   cityConfig: CityConfig = {
@@ -57,10 +64,19 @@ export class RegisterComponent {
     'Quartier Ouest'
   ];
 
+  constructor(private http: HttpClient, private router: Router) {}
+
   async onSubmit(): Promise<void> {
     this.error = '';
+    this.successMessage = '';
 
     // Validation
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(this.formData.email)) {
+      this.error = "L'adresse email n'est pas valide";
+      return;
+    }
+
     if (this.formData.password !== this.formData.confirmPassword) {
       this.error = 'Les mots de passe ne correspondent pas';
       return;
@@ -72,17 +88,29 @@ export class RegisterComponent {
     }
 
     this.loading = true;
-    try {
-      // TODO: Appeler AuthService.register()
-      console.log('Register attempt:', this.formData);
-      await new Promise(resolve => setTimeout(resolve, 1000));
+
+    const body = {
+      nom: this.formData.nom,
+      prenom: this.formData.prenom,
+      email: this.formData.email,
+      motDePasse: this.formData.password,
+      role: this.formData.role === 'citizen' ? 1 : 2
+    };
+
+    this.http.post<any>('http://localhost:8000/api/utilisateur/register', body).subscribe({
+      next: (res) => {
+        this.loading = false;
+        this.successMessage = 'Votre compte a été créé avec succès ! Vous allez être redirigé vers la page de connexion.';
       this.registerSuccess.emit();
-    } catch (error) {
-      this.error = "Une erreur est survenue lors de l'inscription";
-      console.error('Register error:', error);
-    } finally {
+        setTimeout(() => {
+          this.router.navigate(['/login']);
+        }, 3000);
+      },
+      error: (err) => {
       this.loading = false;
+        this.error = err.error?.error || "Une erreur est survenue lors de l'inscription";
     }
+    });
   }
 
   selectRole(role: 'citizen' | 'municipal'): void {
