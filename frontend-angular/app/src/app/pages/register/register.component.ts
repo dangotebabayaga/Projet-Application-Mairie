@@ -1,8 +1,9 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 interface CityConfig {
   name: string;
@@ -49,7 +50,6 @@ export class RegisterComponent {
   showPassword: boolean = false;
   showConfirmPassword: boolean = false;
 
-  // TODO: À remplacer par AuthService
   cityConfig: CityConfig = {
     name: 'Ma Ville',
     logo: '🏛️',
@@ -64,13 +64,12 @@ export class RegisterComponent {
     'Quartier Ouest'
   ];
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
-  async onSubmit(): Promise<void> {
+  onSubmit(): void {
     this.error = '';
     this.successMessage = '';
 
-    // Validation
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(this.formData.email)) {
       this.error = "L'adresse email n'est pas valide";
@@ -89,7 +88,7 @@ export class RegisterComponent {
 
     this.loading = true;
 
-    const body = {
+    const payload = {
       nom: this.formData.nom,
       prenom: this.formData.prenom,
       email: this.formData.email,
@@ -97,19 +96,19 @@ export class RegisterComponent {
       role: this.formData.role === 'citizen' ? 1 : 2
     };
 
-    this.http.post<any>('http://localhost:8000/api/utilisateur/register', body).subscribe({
-      next: (res) => {
+    this.authService.register(payload).subscribe({
+      next: () => {
         this.loading = false;
         this.successMessage = 'Votre compte a été créé avec succès ! Vous allez être redirigé vers la page de connexion.';
-      this.registerSuccess.emit();
+        this.registerSuccess.emit();
         setTimeout(() => {
           this.router.navigate(['/login']);
         }, 3000);
       },
       error: (err) => {
-      this.loading = false;
+        this.loading = false;
         this.error = err.error?.error || "Une erreur est survenue lors de l'inscription";
-    }
+      }
     });
   }
 
@@ -122,6 +121,6 @@ export class RegisterComponent {
   }
 
   onBackToLogin(): void {
-    this.backToLogin.emit();
+    this.router.navigate(['/login']);
   }
 }

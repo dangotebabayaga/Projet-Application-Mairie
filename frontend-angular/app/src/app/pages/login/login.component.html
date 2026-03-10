@@ -18,10 +18,7 @@
         <h2>Connexion</h2>
       </div>
 
-      <!-- Error message -->
-      <div class="error-message" *ngIf="error">
-        {{ error }}
-      </div>
+      <div class="error-message" *ngIf="error">{{ error }}</div>
 
       <form (ngSubmit)="onSubmit()" class="login-form">
         <div class="form-group">

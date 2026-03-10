@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 interface CityConfig {
   name: string;
@@ -24,14 +25,13 @@ export class LoginComponent {
   error: string = '';
   showPassword: boolean = false;
 
-  // TODO: À remplacer par AuthService
   cityConfig: CityConfig = {
     name: 'Ma Ville',
     logo: '🏛️',
     slogan: 'Une ville connectée'
   };
 
-  constructor(private router: Router, private http: HttpClient) {}
+  constructor(private router: Router, private authService: AuthService) {}
 
   isValidEmail(email: string): boolean {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -49,10 +49,7 @@ export class LoginComponent {
     this.loading = true;
     this.error = '';
 
-    this.http.post<any>('http://localhost:8000/api/utilisateur/login', {
-      email: this.email,
-      motDePasse: this.password
-    }).subscribe({
+    this.authService.login(this.email, this.password).subscribe({
       next: (res) => {
         this.loading = false;
         localStorage.setItem('userId', res.id);

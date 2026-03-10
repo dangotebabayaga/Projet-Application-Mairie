@@ -1,6 +1,6 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 
 interface User {
   name: string;
@@ -20,13 +20,11 @@ interface Module {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent {
-  @Output() navigate = new EventEmitter<string>();
-
   constructor(private router: Router) {}
 
   user: User = {
@@ -42,7 +40,6 @@ export class HomeComponent {
     }
   }
 
-  // Données de démonstration
   activeReportsCount = 12;
   activeSurveysCount = 3;
   upcomingEventsCount = 5;
@@ -84,7 +81,7 @@ export class HomeComponent {
       }
     ];
 
-    if (this.user?.role === 'municipal') {
+    if (this.user.role === 'municipal') {
       return [
         ...citizenModules,
         {
@@ -102,13 +99,13 @@ export class HomeComponent {
   }
 
   get welcomeMessage(): string {
-    return this.user?.role === 'municipal'
+    return this.user.role === 'municipal'
       ? 'Tableau de bord pour la gestion des services municipaux'
       : 'Participez à la vie de votre ville';
   }
 
   onNavigate(pageId: string): void {
-    this.navigate.emit(pageId);
+    this.router.navigate(['/' + pageId]);
   }
 
   onSettings(): void {

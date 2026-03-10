@@ -45,10 +45,11 @@
     <h2>Accès rapide aux services</h2>
     <div class="modules-grid">
       <button
-        *ngFor="let module of modules"
-        class="module-card"
-        (click)="onNavigate(module.id)"
-      >
+  *ngFor="let module of modules"
+  class="module-card"
+  type="button"
+  (click)="onNavigate(module.id)"
+>
         <div class="module-icon" [attr.data-color]="module.color">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <use [attr.href]="'#icon-' + module.icon"></use>
@@ -71,8 +72,8 @@
   <div class="news-card">
     <h2>Actualité de la semaine</h2>
     <p>Les illuminations de Noël sont installées ! Venez les découvrir dès ce soir dans tout le centre-ville.</p>
-    <button class="btn-news" (click)="onNavigate('discussion')">
-      Voir toutes les actualités
+    <button class="btn-news" [routerLink]="'/discussion'" type="button">
+  Voir toutes les actualités
     </button>
   </div>
 
