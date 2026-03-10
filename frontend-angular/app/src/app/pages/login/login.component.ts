@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
@@ -13,7 +14,7 @@ interface CityConfig {
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, HttpClientModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
@@ -22,6 +23,7 @@ export class LoginComponent {
   password: string = '';
   loading: boolean = false;
   error: string = '';
+  showPassword: boolean = false;
 
   cityConfig: CityConfig = {
     name: 'Ma Ville',
@@ -31,36 +33,35 @@ export class LoginComponent {
 
   constructor(private router: Router, private authService: AuthService) {}
 
+  isValidEmail(email: string): boolean {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(email);
+  }
+
   onSubmit(): void {
     if (!this.email || !this.password) return;
 
-    this.error = '';
+    if (!this.isValidEmail(this.email)) {
+      this.error = "L'adresse email n'est pas valide";
+      return;
+    }
+
     this.loading = true;
+    this.error = '';
 
     this.authService.login(this.email, this.password).subscribe({
-      next: () => {
+      next: (res) => {
         this.loading = false;
+        localStorage.setItem('userId', res.id);
+        localStorage.setItem('userEmail', res.email);
+        localStorage.setItem('userPrenom', res.prenom);
         this.router.navigate(['/home']);
       },
-      error: () => {
+      error: (err) => {
         this.loading = false;
-        this.error = 'Email ou mot de passe incorrect';
+        this.error = err.error?.error || 'Email ou mot de passe incorrect';
       }
     });
-  }
-
-  async quickLogin(userType: 'citizen' | 'municipal'): Promise<void> {
-    this.loading = true;
-    try {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      if (userType === 'citizen') {
-        this.router.navigate(['/home']);
-      } else {
-        this.router.navigate(['/backoffice']);
-      }
-    } finally {
-      this.loading = false;
-    }
   }
 
   onRegister(): void {

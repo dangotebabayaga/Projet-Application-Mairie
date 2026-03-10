@@ -65,6 +65,46 @@
   }
 }
 
+// Error message
+.error-message {
+  margin-bottom: $spacing-4;
+  padding: $spacing-3;
+  background: $red-50;
+  border: 1px solid #FECACA;
+  border-radius: $radius-lg;
+  color: #B91C1C;
+  font-size: $text-sm;
+}
+
+.password-wrapper {
+  position: relative;
+
+  input {
+    padding-right: 2.5rem;
+  }
+
+  .toggle-password {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: $spacing-1;
+
+    svg {
+      width: 20px;
+      height: 20px;
+      color: $gray-500;
+    }
+
+    &:hover svg {
+      color: $gray-700;
+    }
+  }
+}
+
 // Form
 .login-form {
   display: flex;

@@ -28,10 +28,17 @@ export class HomeComponent {
   constructor(private router: Router) {}
 
   user: User = {
-    name: 'Jean Dupont',
+    name: '',
     role: 'citizen',
-    neighborhood: 'Centre-ville'
+    neighborhood: ''
   };
+
+  ngOnInit(): void {
+    const prenom = localStorage.getItem('userPrenom');
+    if (prenom) {
+      this.user.name = prenom;
+    }
+  }
 
   activeReportsCount = 12;
   activeSurveysCount = 3;
@@ -99,5 +106,14 @@ export class HomeComponent {
 
   onNavigate(pageId: string): void {
     this.router.navigate(['/' + pageId]);
+  }
+
+  onSettings(): void {
+    this.router.navigate(['/settings']);
+  }
+
+  onLogout(): void {
+    localStorage.clear();
+    this.router.navigate(['/login']);
   }
 }

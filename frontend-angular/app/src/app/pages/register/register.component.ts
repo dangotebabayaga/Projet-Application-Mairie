@@ -1,6 +1,7 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
@@ -24,7 +25,7 @@ interface RegisterForm {
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, HttpClientModule],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss']
 })
@@ -43,12 +44,12 @@ export class RegisterComponent {
     neighborhood: ''
   };
 
-  constructor(private authService: AuthService, private router: Router) {}
-
   loading: boolean = false;
   error: string = '';
+  successMessage: string = '';
+  showPassword: boolean = false;
+  showConfirmPassword: boolean = false;
 
-  // TODO: À remplacer par AuthService
   cityConfig: CityConfig = {
     name: 'Ma Ville',
     logo: '🏛️',
@@ -63,8 +64,17 @@ export class RegisterComponent {
     'Quartier Ouest'
   ];
 
+  constructor(private authService: AuthService, private router: Router) {}
+
   onSubmit(): void {
     this.error = '';
+    this.successMessage = '';
+
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(this.formData.email)) {
+      this.error = "L'adresse email n'est pas valide";
+      return;
+    }
 
     if (this.formData.password !== this.formData.confirmPassword) {
       this.error = 'Les mots de passe ne correspondent pas';
@@ -89,12 +99,15 @@ export class RegisterComponent {
     this.authService.register(payload).subscribe({
       next: () => {
         this.loading = false;
-        this.router.navigate(['/login']);
+        this.successMessage = 'Votre compte a été créé avec succès ! Vous allez être redirigé vers la page de connexion.';
+        this.registerSuccess.emit();
+        setTimeout(() => {
+          this.router.navigate(['/login']);
+        }, 3000);
       },
       error: (err) => {
         this.loading = false;
-        this.error = "Une erreur est survenue lors de l'inscription";
-        console.error('Register error:', err);
+        this.error = err.error?.error || "Une erreur est survenue lors de l'inscription";
       }
     });
   }
