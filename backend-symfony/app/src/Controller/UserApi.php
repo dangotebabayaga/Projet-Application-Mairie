@@ -2,6 +2,8 @@
 namespace App\Controller;
 
 use App\Repository\UtilisateursRepository;
+use App\Repository\AdministrateursRepository;
+use App\Repository\CitoyensRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -13,10 +15,17 @@ class UserApi extends AbstractController
 {
 
     private UtilisateursRepository $userRepo;
+    private AdministrateursRepository $adminRepo;
+    private CitoyensRepository $citoyenRepo;
 
-    public function __construct(UtilisateursRepository $userRepo)
-    {
+    public function __construct(
+        UtilisateursRepository $userRepo,
+        AdministrateursRepository $adminRepo,
+        CitoyensRepository $citoyenRepo
+    ) {
         $this->userRepo = $userRepo;
+        $this->adminRepo = $adminRepo;
+        $this->citoyenRepo = $citoyenRepo;
     }
 
     #[Route('/register', methods:['POST'])]
@@ -78,11 +87,18 @@ class UserApi extends AbstractController
             ], 401);
         }
 
+        // Déterminer le rôle
+        $role = 'citoyen';
+        if ($this->adminRepo->isAdmin($user->getId())) {
+            $role = 'admin';
+        }
+
         return $this->json([
             "message" => "Connexion réussie",
             "id" => $user->getId(),
             "email" => $user->getEmail(),
-            "prenom" => $user->getPrenom()
+            "prenom" => $user->getPrenom(),
+            "role" => $role
         ]);
     }
 

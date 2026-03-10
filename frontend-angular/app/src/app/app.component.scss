@@ -1,0 +1,150 @@
+@import '../styles/variables';
+
+// Navbar
+.navbar {
+  background: $white;
+  border-bottom: 1px solid $gray-200;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: $shadow-sm;
+}
+
+.navbar-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 $spacing-6;
+  height: $navbar-height;
+}
+
+// Logo
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  text-decoration: none;
+  color: $blue-600;
+  font-weight: 700;
+  font-size: $text-lg;
+
+  svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  &:hover {
+    color: $blue-700;
+  }
+}
+
+// Navigation links
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: $spacing-1;
+}
+
+.nav-link {
+  padding: $spacing-2 $spacing-3;
+  border-radius: $radius-lg;
+  font-size: $text-sm;
+  font-weight: 500;
+  color: $gray-600;
+  text-decoration: none;
+  transition: all 0.2s;
+
+  &:hover {
+    background: $gray-100;
+    color: $gray-900;
+  }
+
+  &.active {
+    background: $blue-50;
+    color: $blue-600;
+  }
+}
+
+// User section
+.navbar-user {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: $radius-full;
+  background: $blue-100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 20px;
+    height: 20px;
+    color: $blue-600;
+  }
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.user-name {
+  font-size: $text-sm;
+  font-weight: 600;
+  color: $gray-900;
+}
+
+.user-role {
+  font-size: $text-xs;
+  color: $gray-500;
+}
+
+.btn-logout {
+  padding: $spacing-2;
+  background: none;
+  border: none;
+  border-radius: $radius-lg;
+  cursor: pointer;
+  color: $gray-400;
+  transition: all 0.2s;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    background: $red-50;
+    color: $red-500;
+  }
+}
+
+// Main content
+main.with-navbar {
+  padding: $spacing-6;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+// Responsive
+@media (max-width: $breakpoint-md) {
+  .navbar-links {
+    display: none;
+  }
+
+  .user-info {
+    display: none;
+  }
+
+  .navbar-inner {
+    padding: 0 $spacing-4;
+  }
+}
