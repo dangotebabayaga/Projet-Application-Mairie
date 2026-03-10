@@ -1,11 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
 import { Router, RouterModule } from '@angular/router';
+import { SurveyService } from '../../services/survey.service';
 
 interface User {
   name: string;
-  role: 'citizen' | 'municipal';
-  neighborhood?: string;
+  role: 'citoyen' | 'admin';
 }
 
 interface Module {
@@ -20,30 +21,42 @@ interface Module {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, HttpClientModule],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
-export class HomeComponent {
-  constructor(private router: Router) {}
+export class HomeComponent implements OnInit {
+  constructor(private router: Router, private surveyService: SurveyService) {}
 
   user: User = {
     name: '',
-    role: 'citizen',
-    neighborhood: ''
+    role: 'citoyen'
   };
 
   ngOnInit(): void {
     const prenom = localStorage.getItem('userPrenom');
+    const role = localStorage.getItem('userRole');
     if (prenom) {
       this.user.name = prenom;
     }
+    if (role === 'admin') {
+      this.user.role = 'admin';
+    }
+    this.loadStats();
   }
 
-  activeReportsCount = 12;
-  activeSurveysCount = 3;
-  upcomingEventsCount = 5;
-  totalSurveyResponses = 234;
+  activeSurveysCount = 0;
+
+  loadStats(): void {
+    this.surveyService.getAll().subscribe({
+      next: (surveys) => {
+        this.activeSurveysCount = surveys.length;
+      },
+      error: () => {
+        this.activeSurveysCount = 0;
+      }
+    });
+  }
 
   get modules(): Module[] {
     const citizenModules: Module[] = [
@@ -53,7 +66,7 @@ export class HomeComponent {
         description: 'Signalez un problème dans votre ville',
         icon: 'file-text',
         color: 'blue',
-        stats: `${this.activeReportsCount} signalements actifs`
+        stats: 'Signaler un problème'
       },
       {
         id: 'surveys',
@@ -61,7 +74,7 @@ export class HomeComponent {
         description: 'Participez aux consultations publiques',
         icon: 'bar-chart',
         color: 'purple',
-        stats: `${this.activeSurveysCount} sondages en cours`
+        stats: `${this.activeSurveysCount} sondage(s) en cours`
       },
       {
         id: 'events',
@@ -69,7 +82,7 @@ export class HomeComponent {
         description: 'Découvrez les événements de la ville',
         icon: 'calendar',
         color: 'green',
-        stats: `${this.upcomingEventsCount} événements à venir`
+        stats: 'Voir les événements'
       },
       {
         id: 'discussion',
@@ -77,11 +90,11 @@ export class HomeComponent {
         description: "Suivez l'actualité de votre mairie",
         icon: 'message-square',
         color: 'orange',
-        stats: '3 nouvelles publications'
+        stats: 'Voir les discussions'
       }
     ];
 
-    if (this.user.role === 'municipal') {
+    if (this.user.role === 'admin') {
       return [
         ...citizenModules,
         {
@@ -99,7 +112,7 @@ export class HomeComponent {
   }
 
   get welcomeMessage(): string {
-    return this.user.role === 'municipal'
+    return this.user.role === 'admin'
       ? 'Tableau de bord pour la gestion des services municipaux'
       : 'Participez à la vie de votre ville';
   }
@@ -110,10 +123,5 @@ export class HomeComponent {
 
   onSettings(): void {
     this.router.navigate(['/settings']);
-  }
-
-  onLogout(): void {
-    localStorage.clear();
-    this.router.navigate(['/login']);
   }
 }

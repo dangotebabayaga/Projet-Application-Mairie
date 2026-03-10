@@ -4,6 +4,9 @@
   display: flex;
   flex-direction: column;
   gap: $spacing-6;
+  padding: $spacing-6;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
 // Page Header
@@ -181,6 +184,12 @@ textarea {
   }
 }
 
+.vote-error {
+  color: $red-500;
+  font-size: $text-sm;
+  text-align: center;
+}
+
 .btn-submit {
   width: 100%;
   background: $blue-600;
@@ -249,6 +258,96 @@ textarea {
   height: 32px;
   color: #8B5CF6;
   flex-shrink: 0;
+}
+
+.survey-card.voted {
+  opacity: 0.75;
+  border-left: 4px solid $green-500;
+}
+
+.btn-voted {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-2;
+  width: 100%;
+  padding: $spacing-2 0;
+  background: $green-50;
+  border: none;
+  border-radius: $radius-lg;
+  color: #15803D;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    background: #DCFCE7;
+  }
+}
+
+// Résultats
+.results-section {
+  margin-top: $spacing-4;
+
+  h3 {
+    font-size: $text-lg;
+    font-weight: 600;
+    color: $gray-900;
+    margin: 0 0 $spacing-4;
+  }
+}
+
+.results-loading {
+  text-align: center;
+  color: $gray-500;
+  padding: $spacing-4;
+}
+
+.results-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+}
+
+.result-item {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-1;
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.result-label {
+  font-weight: 500;
+  color: $gray-800;
+}
+
+.result-count {
+  font-size: $text-sm;
+  color: $gray-500;
+}
+
+.result-bar {
+  height: 8px;
+  background: $gray-200;
+  border-radius: $radius-full;
+  overflow: hidden;
+}
+
+.result-fill {
+  height: 100%;
+  background: $blue-500;
+  border-radius: $radius-full;
+  transition: width 0.5s ease;
 }
 
 .btn-participate {

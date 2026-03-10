@@ -55,6 +55,7 @@ export class LoginComponent {
         localStorage.setItem('userId', res.id);
         localStorage.setItem('userEmail', res.email);
         localStorage.setItem('userPrenom', res.prenom);
+        localStorage.setItem('userRole', res.role);
         this.router.navigate(['/home']);
       },
       error: (err) => {

@@ -30,8 +30,7 @@ use App\Service\AuthChecker;
         ChoixRepository $choixRepo,
         VotesSondageRepository $votesRepo,
         AdministrateursRepository $adminRepo,
-        CitoyensRepository $citoyenRepo
-        ) { 
+        CitoyensRepository $citoyenRepo,
         AuthChecker $auth
         ) {
             $this->em = $em;
@@ -46,10 +45,12 @@ use App\Service\AuthChecker;
     #[Route('', name: 'api_get_sondages', methods: ['GET'])]
     public function getAll(Request $request): JsonResponse
     {
-        if (!$this->auth->getUser($request)) {
+        $user = $this->auth->getUser($request);
+        if (!$user) {
             return $this->json(['error' => 'Non authentifié'], 401);
         }
         $sondages = $this->em->getRepository(Sondages::class)->findAll();
+        $userId = $user->getId();
 
         $data = [];
 
@@ -67,6 +68,12 @@ use App\Service\AuthChecker;
                 ];
             }, $relations);
 
+            // Vérifier si l'utilisateur a déjà voté
+            $hasVoted = $this->votesRepo->findOneBy([
+                'citoyen' => $userId,
+                'sondage' => $s->getId()
+            ]) !== null;
+
             $data[] = [
                 'id' => $s->getId(),
                 'titre' => $s->getTitre(),
@@ -74,7 +81,8 @@ use App\Service\AuthChecker;
                 'dateDebut' => $s->getDateDebut(),
                 'dateFin' => $s->getDateFin(),
                 'idAdmin' => $s->getAdministrateur(),
-                'choix' => $choix
+                'choix' => $choix,
+                'hasVoted' => $hasVoted
             ];
         }
 
