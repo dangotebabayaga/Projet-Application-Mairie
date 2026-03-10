@@ -29,7 +29,7 @@ use App\Repository\EvenementRepository;
          
          // Vérifie que l'utilisateur est admin dans la table Administrateurs
          if (!$this->adminRepo->isAdmin($data['adminId'])) {
-             return $this->json(['error' => 'Accès interdit : vous n’êtes pas administrateur'], 403);
+             return $this->json(['error' => "Accès interdit : vous n'êtes pas administrateur"], 403);
          }
 
          $ev=$this->evenRepo->crea($data);

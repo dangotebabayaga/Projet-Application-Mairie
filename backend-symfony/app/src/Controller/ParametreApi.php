@@ -36,7 +36,7 @@ use Doctrine\ORM\EntityManagerInterface;
         $data = json_decode($request->getContent(), true);
 
         if (!$this->adminRepo->isAdmin($data['administrateur_Id'])) {
-            return $this->json(['error' => 'Accès interdit : vous n’êtes pas administrateur'], 403);
+            return $this->json(['error' => "Accès interdit : vous n'êtes pas administrateur"], 403);
         }
 
         $ville=$this->em->getRepository(Ville::class)->findOneBy(['id'=>$data['id']]);

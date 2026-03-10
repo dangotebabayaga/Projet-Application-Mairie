@@ -26,7 +26,7 @@
   align-items: center;
   gap: $spacing-2;
   text-decoration: none;
-  color: $blue-600;
+  color: var(--color-primary);
   font-weight: 700;
   font-size: $text-lg;
 
@@ -35,8 +35,15 @@
     height: 28px;
   }
 
+  .brand-logo {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    border-radius: 6px;
+  }
+
   &:hover {
-    color: $blue-700;
+    color: var(--color-primary-dark);
   }
 }
 
@@ -44,17 +51,29 @@
 .navbar-links {
   display: flex;
   align-items: center;
-  gap: $spacing-1;
+  gap: 2px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
 }
 
 .nav-link {
-  padding: $spacing-2 $spacing-3;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: $spacing-2 $spacing-2;
   border-radius: $radius-lg;
-  font-size: $text-sm;
+  font-size: $text-xs;
   font-weight: 500;
   color: $gray-600;
   text-decoration: none;
   transition: all 0.2s;
+  white-space: nowrap;
+
+  svg {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+  }
 
   &:hover {
     background: $gray-100;
@@ -62,8 +81,8 @@
   }
 
   &.active {
-    background: $blue-50;
-    color: $blue-600;
+    background: var(--color-primary-light);
+    color: var(--color-primary);
   }
 }
 
@@ -78,7 +97,7 @@
   width: 36px;
   height: 36px;
   border-radius: $radius-full;
-  background: $blue-100;
+  background: var(--color-primary-light);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -86,7 +105,7 @@
   svg {
     width: 20px;
     height: 20px;
-    color: $blue-600;
+    color: var(--color-primary);
   }
 }
 
