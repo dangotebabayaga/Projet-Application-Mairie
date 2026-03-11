@@ -1,0 +1,106 @@
+<div class="settings-page">
+  <div class="page-header">
+    <h1>Configuration de la mairie</h1>
+    <p>Personnalisez l'apparence et les informations de votre ville</p>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-container" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Chargement de la configuration...</p>
+  </div>
+
+  <!-- Error global -->
+  <div class="alert alert-error" *ngIf="error && !loading">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="15" y1="9" x2="9" y2="15"></line>
+      <line x1="9" y1="9" x2="15" y2="15"></line>
+    </svg>
+    {{ error }}
+  </div>
+
+  <!-- Success -->
+  <div class="alert alert-success" *ngIf="success">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+    </svg>
+    {{ success }}
+  </div>
+
+  <div class="settings-content" *ngIf="!loading">
+    <!-- Informations de la ville -->
+    <div class="settings-card">
+      <h2>Informations de la ville</h2>
+      <div class="form-group">
+        <label>Nom de la ville *</label>
+        <input type="text" [(ngModel)]="villeConfig.nom" placeholder="Ex: Montpellier" />
+      </div>
+      <div class="form-group">
+        <label>Slogan</label>
+        <input type="text" [(ngModel)]="villeConfig.slogan" placeholder="Ex: Une ville connectée à ses citoyens" />
+      </div>
+      <div class="form-group">
+        <label>Logo (URL)</label>
+        <input type="text" [(ngModel)]="villeConfig.logo" placeholder="https://..." />
+        <div class="logo-preview" *ngIf="villeConfig.logo">
+          <img [src]="villeConfig.logo" alt="Aperçu du logo" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Sélection du thème -->
+    <div class="settings-card">
+      <h2>Thème de couleur</h2>
+      <p class="card-description">Choisissez un thème pour personnaliser l'apparence de votre plateforme</p>
+
+      <div class="themes-grid">
+        <div
+          class="theme-card"
+          *ngFor="let theme of themes"
+          [class.selected]="selectedTheme === theme.id"
+          (click)="selectTheme(theme.id)"
+        >
+          <div class="theme-preview">
+            <div class="theme-header" [style.background]="theme.primary">
+              <div class="theme-dot"></div>
+              <div class="theme-dot"></div>
+              <div class="theme-dot"></div>
+            </div>
+            <div class="theme-body" [style.background]="theme.primaryLight">
+              <div class="theme-bar" [style.background]="theme.primary"></div>
+              <div class="theme-bar short" [style.background]="theme.primaryDark"></div>
+              <div class="theme-bar shorter" [style.background]="theme.primary" style="opacity: 0.5"></div>
+            </div>
+          </div>
+          <div class="theme-info">
+            <span class="theme-name">{{ theme.name }}</span>
+            <div class="theme-colors">
+              <span class="color-dot" [style.background]="theme.primary"></span>
+              <span class="color-dot" [style.background]="theme.primaryDark"></span>
+              <span class="color-dot" [style.background]="theme.primaryLight" style="border: 1px solid #ddd"></span>
+            </div>
+          </div>
+          <div class="theme-check" *ngIf="selectedTheme === theme.id">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bouton sauvegarder -->
+    <div class="save-section">
+      <button class="btn-save" (click)="onSave()" [disabled]="saving">
+        <svg *ngIf="!saving" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+          <polyline points="17 21 17 13 7 13 7 21"></polyline>
+          <polyline points="7 3 7 8 15 8"></polyline>
+        </svg>
+        {{ saving ? 'Sauvegarde en cours...' : 'Sauvegarder la configuration' }}
+      </button>
+    </div>
+  </div>
+</div>

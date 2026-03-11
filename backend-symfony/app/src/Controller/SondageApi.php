@@ -99,7 +99,7 @@ use App\Service\AuthChecker;
         $data = json_decode($request->getContent(), true);
         // Vérifie que l'utilisateur est admin dans la table Administrateurs
         if (!$this->adminRepo->isAdmin($data['administrateur_Id'])) {
-            return $this->json(['error' => 'Accès interdit : vous n’êtes pas administrateur'], 403);
+            return $this->json(['error' => "Accès interdit : vous n'êtes pas administrateur"], 403);
         }
 
         // Création du sondage via le repository
@@ -143,7 +143,7 @@ use App\Service\AuthChecker;
         $data = json_decode($request->getContent(), true);
 
         if (!$this->citoyenRepo->isCitoyen($data['citoyenId'])) {
-            return $this->json(['error' => 'Accès interdit : vous n’êtes pas citoyen'], 403);
+            return $this->json(['error' => "Accès interdit : vous n'êtes pas citoyen"], 403);
         }
     
         // Vérifie que les champs nécessaires sont présents

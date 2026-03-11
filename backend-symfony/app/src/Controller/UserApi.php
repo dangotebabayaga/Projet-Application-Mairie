@@ -98,7 +98,8 @@ class UserApi extends AbstractController
             "id" => $user->getId(),
             "email" => $user->getEmail(),
             "prenom" => $user->getPrenom(),
-            "role" => $role
+            "role" => $role,
+            "villeId" => $user->getVileId()
         ]);
     }
 
