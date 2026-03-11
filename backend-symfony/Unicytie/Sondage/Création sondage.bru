@@ -7,12 +7,16 @@ meta {
 post {
   url: http://localhost:8000/api/sondages
   body: json
-  auth: inherit
+  auth: none
+}
+
+headers {
+  Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiaXJvbm1hbkBtYWlsLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3MzI1OTA4MywiZXhwIjoxNzczMjYyNjgzfQ.007mCwon0OT7ObD8JsbuO9fWo2LQpAuaEZzmSdKXFqQ
 }
 
 body:json {
   {
-    "administrateur_Id":14,
+    "administrateur_Id":1,
     "titre": "Quel est ton fruit préféré ?",
     "description": "Vote pour ton fruit favori",
     "dateDebut": "2026-03-05T09:00:00",

@@ -5,9 +5,17 @@ meta {
 }
 
 get {
-  url: http://localhost:8000/api/signalements
+  url: http://localhost:8000/api/signalements?Authorization
   body: none
   auth: inherit
+}
+
+params:query {
+  Authorization: 
+}
+
+headers {
+  Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiaXJvbm1hbkBtYWlsLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3MzI1OTE4MCwiZXhwIjoxNzczMjYyNzgwfQ.vhCUQEPNRIC_wmNeCQVdDIDYiLc5aclfrXIiLNsrErA
 }
 
 settings {

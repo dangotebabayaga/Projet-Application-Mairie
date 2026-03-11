@@ -135,5 +135,4 @@ class Utilisateurs
         $this->compteActif = $compteActif;
     }
 
-
 }

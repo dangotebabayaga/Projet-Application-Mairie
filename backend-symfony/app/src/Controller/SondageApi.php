@@ -10,7 +10,7 @@ use App\Entity\ListeChoixSondage;
 use App\Repository\CitoyensRepository;
 use App\Service\AuthChecker;
  use Doctrine\ORM\EntityManagerInterface;
- use Symfony\Component\Routing\Annotation\Route;
+ use Symfony\Component\Routing\Attribute\Route;
  use Symfony\Component\HttpFoundation\Request;
  use Symfony\Component\HttpFoundation\JsonResponse;
  use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -23,13 +23,15 @@ use App\Service\AuthChecker;
     private VotesSondageRepository $votesRepo;
     private AdministrateursRepository $adminRepo;
     private CitoyensRepository $citoyenRepo;
+    private AuthChecker $auth;
     public function __construct(
         EntityManagerInterface $em,
         SondagesRepository $sondageRepo,
         ChoixRepository $choixRepo,
         VotesSondageRepository $votesRepo,
         AdministrateursRepository $adminRepo,
-        CitoyensRepository $citoyenRepo
+        CitoyensRepository $citoyenRepo,
+        AuthChecker $auth
         ) { 
             $this->em = $em;
             $this->sondageRepo=$sondageRepo;
@@ -37,12 +39,17 @@ use App\Service\AuthChecker;
             $this->votesRepo=$votesRepo;
             $this->adminRepo=$adminRepo;
             $this->citoyenRepo = $citoyenRepo;
+            $this->auth=$auth;
         } 
 
     #[Route('', name: 'api_get_sondages', methods: ['GET'])]
     public function getAll(Request $request): JsonResponse
     {
-        //Mettre JWT
+        $user = $this->auth->getUserFromRequest($request);
+        if (!$user) {
+            return $this->json(["error" => "Token manquant ou invalide"], 401);
+        }
+
         $sondages = $this->em->getRepository(Sondages::class)->findAll();
 
         $data = [];
@@ -78,11 +85,15 @@ use App\Service\AuthChecker;
     #[Route('', name: 'api_post_sondage', methods: ['POST'])]
     public function create(Request $request): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
-        // Vérifie que l'utilisateur est admin dans la table Administrateurs
-        if (!$this->adminRepo->isAdmin($data['administrateur_Id'])) {
-            return $this->json(['error' => 'Accès interdit : vous n’êtes pas administrateur'], 403);
+         $user = $this->auth->getuserfromrequest($request);
+        if (!$user) {
+            return $this->json(["error" => "token manquant ou invalide"], 401);
         }
+
+        if (!$this->auth->checkrole($user, 'admin')) {
+            return $this->json(["error" => "accès interdit"], 403);
+        }
+        $data = json_decode($request->getContent(), true);
 
         // Création du sondage via le repository
         $sondage = $this->sondageRepo->createSondageFromData($data);
@@ -113,15 +124,18 @@ use App\Service\AuthChecker;
     }
 
     #[Route('/vote', name: 'api_vote_sondage', methods: ['POST'])]
-   public function vote(Request $request): JsonResponse
+    public function vote(Request $request): JsonResponse
     {
+         $user = $this->auth->getuserfromrequest($request);
+        if (!$user) {
+            return $this->json(["error" => "token manquant ou invalide"], 401);
+        }
+        if (!$this->auth->checkrole($user, 'citoyen')) {
+            return $this->json(["error" => "accès interdit"], 403);
+        }
 
         $data = json_decode($request->getContent(), true);
 
-        if (!$this->citoyenRepo->isCitoyen($data['citoyenId'])) {
-            return $this->json(['error' => 'Accès interdit : vous n’êtes pas citoyen'], 403);
-        }
-    
         // Vérifie que les champs nécessaires sont présents
         if (empty($data['citoyenId']) || empty($data['sondageId']) || empty($data['choixIds'])) {
             return $this->json(['error' => 'Données manquantes'], 400);

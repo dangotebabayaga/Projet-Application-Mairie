@@ -5,18 +5,21 @@ use App\Repository\UtilisateursRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Service\JwtService;
 
 #[Route('/api/utilisateur')]
 class UserApi extends AbstractController
 {
 
     private UtilisateursRepository $userRepo;
+    private JwtService $jwtService;
 
-    public function __construct(UtilisateursRepository $userRepo)
+    public function __construct(UtilisateursRepository $userRepo, JwtService $jwtService)
     {
         $this->userRepo = $userRepo;
+        $this->jwtService = $jwtService;
     }
 
     #[Route('/register', methods:['POST'])]
@@ -58,18 +61,6 @@ class UserApi extends AbstractController
 
         $data = json_decode($request->getContent(), true);
 
-        if (empty($data['email']) || empty($data['motDePasse'])) {
-            return $this->json([
-                "error" => "Email ou mot de passe manquant"
-            ], 400);
-        }
-
-        if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-            return $this->json([
-                "error" => "L'adresse email n'est pas valide"
-            ], 400);
-        }
-
         $user = $this->userRepo->verifierConnexion($data['email'], $data['motDePasse']);
 
         if (!$user) {
@@ -78,12 +69,44 @@ class UserApi extends AbstractController
             ], 401);
         }
 
+        $data2 = $this->userRepo->infoUser($user->getId());
+
+        // génération du token
+        $token = $this->jwtService->generateToken(
+            $user->getId(),
+            $user->getEmail(),
+            $this->userRepo->getRole($user)
+        );
+
+
         return $this->json([
             "message" => "Connexion réussie",
-            "id" => $user->getId(),
-            "email" => $user->getEmail(),
-            "prenom" => $user->getPrenom()
+            "token" => $token,
+            "infoUser" => $data2
         ]);
+    }
+
+    public function getUserFromToken(Request $request)
+    {
+    
+        $header = $request->headers->get('Authorization');
+    
+        if (!$header) {
+            return null;
+        }
+    
+        $token = str_replace("Bearer ", "", $header);
+    
+        try {
+        
+            $decoded = $this->jwtService->decodeToken($token);
+        
+            return $this->userRepo->find($decoded->userId);
+        
+        } catch (\Exception $e) {
+        
+            return null;
+        }
     }
 
 }

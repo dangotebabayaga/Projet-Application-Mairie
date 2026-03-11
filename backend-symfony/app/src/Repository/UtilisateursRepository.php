@@ -9,6 +9,9 @@ use App\Repository\VilleRepository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class UtilisateursRepository extends ServiceEntityRepository
 {
@@ -96,5 +99,38 @@ class UtilisateursRepository extends ServiceEntityRepository
         $this->em->flush();
     
         return $user;
+    }
+
+    public function infoUser(int $id): array{
+        $user=$this->em->getRepository(Utilisateurs::class)->findOneBy(['id'=>$id]);
+        $data=[];
+        $data=[
+            "id" => $user->getId(),
+            "nom"=>$user->getNom(),
+            "prenom"=>$user->getPrenom(),
+            "email" => $user->getEmail(),
+            "telephonne" => $user->getTelephone(),
+            "date Naissance"=> $user->getDateNaissance(),
+            "villeId" => $user->getVileId()
+        ];
+
+        return $data;
+    }
+
+    public function getRole(Utilisateurs $user): string
+    {
+        $em = $this->getEntityManager();
+
+        $isAdmin = $em->getRepository(Admin::class)
+                      ->find($user->getId());
+
+        if ($isAdmin) return 'admin';
+
+        $isCitoyen = $em->getRepository(Citoyens::class)
+                         ->find($user->getId());
+
+        if ($isCitoyen) return 'citoyen';
+
+        return 'unknown';
     }
 }
