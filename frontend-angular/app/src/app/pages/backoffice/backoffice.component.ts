@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { SurveyService, Survey } from '../../services/survey.service';
 
 type ReportStatus = 'registered' | 'in_progress' | 'resolved';
@@ -39,10 +41,11 @@ interface Tab {
 }
 
 interface SurveyForm {
-  title: string;
+  titre: string;
   description: string;
-  endDate: string;
-  neighborhood: string;
+  dateDebut: string;
+  dateFin: string;
+  choix: string[];
 }
 
 interface EventForm {
@@ -58,16 +61,28 @@ interface EventForm {
 @Component({
   selector: 'app-backoffice',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, HttpClientModule],
   templateUrl: './backoffice.component.html',
   styleUrls: ['./backoffice.component.scss']
 })
-export class BackofficeComponent {
+export class BackofficeComponent implements OnInit {
   activeTab: TabId = 'overview';
   showSurveyForm = false;
   showEventForm = false;
+  surveysList: Survey[] = [];
 
-  constructor(private surveyService: SurveyService) {}
+  constructor(private surveyService: SurveyService, private http: HttpClient) {}
+
+  ngOnInit(): void {
+    this.loadSurveys();
+  }
+
+  loadSurveys(): void {
+    this.surveyService.getAll().subscribe({
+      next: (data) => this.surveysList = data,
+      error: (err) => console.error('Erreur chargement sondages', err)
+    });
+  }
 
   tabs: Tab[] = [
     { id: 'overview', label: "Vue d'ensemble", icon: 'trending-up' },
@@ -77,11 +92,15 @@ export class BackofficeComponent {
   ];
 
   surveyForm: SurveyForm = {
-    title: '',
+    titre: '',
     description: '',
-    endDate: '',
-    neighborhood: ''
+    dateDebut: '',
+    dateFin: '',
+    choix: ['', '']
   };
+  surveyLoading = false;
+  surveyError = '';
+  surveySuccess = '';
 
   eventForm: EventForm = {
     title: '',
@@ -94,7 +113,7 @@ export class BackofficeComponent {
   };
 
   get surveys(): Survey[] {
-    return this.surveyService.getAll();
+    return this.surveysList;
   }
 
   // Données de démonstration
@@ -161,8 +180,8 @@ export class BackofficeComponent {
       reportsTotal: this.reports.length,
       reportsInProgress: this.reports.filter(r => r.status === 'in_progress').length,
       reportsRegistered: this.reports.filter(r => r.status === 'registered').length,
-      surveysActive: this.surveys.filter(s => s.isActive).length,
-      surveyResponses: this.surveys.reduce((sum, s) => sum + s.responses, 0),
+      surveysActive: this.surveys.length,
+      surveyResponses: 0,
       eventsUpcoming: this.events.filter(e => new Date(e.date) > new Date()).length
     };
   }
@@ -196,27 +215,73 @@ export class BackofficeComponent {
   }
 
   resetSurveyForm(): void {
-    this.surveyForm = { title: '', description: '', endDate: '', neighborhood: '' };
+    this.surveyForm = { titre: '', description: '', dateDebut: '', dateFin: '', choix: ['', ''] };
+    this.surveyError = '';
+    this.surveySuccess = '';
+  }
+
+  trackByIndex(index: number): number {
+    return index;
+  }
+
+  updateChoix(index: number, value: string): void {
+    this.surveyForm.choix[index] = value;
+  }
+
+  addChoix(): void {
+    this.surveyForm.choix.push('');
+  }
+
+  removeChoix(index: number): void {
+    this.surveyForm.choix.splice(index, 1);
   }
 
   onCreateSurvey(): void {
-    if (!this.surveyForm.title || !this.surveyForm.description || !this.surveyForm.endDate) return;
+    if (!this.surveyForm.titre || !this.surveyForm.description || !this.surveyForm.dateDebut || !this.surveyForm.dateFin) {
+      this.surveyError = 'Veuillez remplir tous les champs obligatoires';
+      return;
+    }
 
-    const newSurvey: Survey = {
-      id: Date.now().toString(),
-      title: this.surveyForm.title,
+    const choixNonVides = this.surveyForm.choix.filter(c => c.trim() !== '');
+    if (choixNonVides.length < 2) {
+      this.surveyError = 'Veuillez ajouter au moins 2 choix';
+      return;
+    }
+
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      this.surveyError = 'Vous devez être connecté';
+      return;
+    }
+
+    this.surveyLoading = true;
+    this.surveyError = '';
+    this.surveySuccess = '';
+
+    const payload = {
+      titre: this.surveyForm.titre,
       description: this.surveyForm.description,
-      questions: [],
-      createdAt: new Date(),
-      endDate: new Date(this.surveyForm.endDate),
-      neighborhood: this.surveyForm.neighborhood || undefined,
-      isActive: true,
-      responses: 0
+      dateDebut: this.surveyForm.dateDebut,
+      dateFin: this.surveyForm.dateFin,
+      administrateur_Id: parseInt(userId),
+      choix: choixNonVides
     };
 
-    this.surveyService.add(newSurvey);
-    this.showSurveyForm = false;
-    this.resetSurveyForm();
+    this.http.post('http://localhost:8000/api/sondages', payload).subscribe({
+      next: () => {
+        this.surveyLoading = false;
+        this.surveySuccess = 'Sondage créé avec succès !';
+        this.loadSurveys();
+        setTimeout(() => {
+          this.showSurveyForm = false;
+          this.resetSurveyForm();
+        }, 1500);
+      },
+      error: (err) => {
+        this.surveyLoading = false;
+        this.surveyError = err.error?.error || 'Erreur lors de la création du sondage';
+      }
+    });
   }
 
   toggleEventForm(): void {
@@ -257,7 +322,7 @@ export class BackofficeComponent {
     this.resetEventForm();
   }
 
-  formatDate(date: Date): string {
+  formatDate(date: Date | string): string {
     return new Date(date).toLocaleDateString('fr-FR');
   }
 }

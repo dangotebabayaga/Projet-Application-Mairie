@@ -2,6 +2,8 @@
 namespace App\Controller;
 
 use App\Repository\UtilisateursRepository;
+use App\Repository\AdministrateursRepository;
+use App\Repository\CitoyensRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;

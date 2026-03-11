@@ -1,0 +1,169 @@
+@import '../styles/variables';
+
+// Navbar
+.navbar {
+  background: $white;
+  border-bottom: 1px solid $gray-200;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: $shadow-sm;
+}
+
+.navbar-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 $spacing-6;
+  height: $navbar-height;
+}
+
+// Logo
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  text-decoration: none;
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: $text-lg;
+
+  svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .brand-logo {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    border-radius: 6px;
+  }
+
+  &:hover {
+    color: var(--color-primary-dark);
+  }
+}
+
+// Navigation links
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: $spacing-2 $spacing-2;
+  border-radius: $radius-lg;
+  font-size: $text-xs;
+  font-weight: 500;
+  color: $gray-600;
+  text-decoration: none;
+  transition: all 0.2s;
+  white-space: nowrap;
+
+  svg {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    background: $gray-100;
+    color: $gray-900;
+  }
+
+  &.active {
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+  }
+}
+
+// User section
+.navbar-user {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: $radius-full;
+  background: var(--color-primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 20px;
+    height: 20px;
+    color: var(--color-primary);
+  }
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.user-name {
+  font-size: $text-sm;
+  font-weight: 600;
+  color: $gray-900;
+}
+
+.user-role {
+  font-size: $text-xs;
+  color: $gray-500;
+}
+
+.btn-logout {
+  padding: $spacing-2;
+  background: none;
+  border: none;
+  border-radius: $radius-lg;
+  cursor: pointer;
+  color: $gray-400;
+  transition: all 0.2s;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    background: $red-50;
+    color: $red-500;
+  }
+}
+
+// Main content
+main.with-navbar {
+  padding: $spacing-6;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+// Responsive
+@media (max-width: $breakpoint-md) {
+  .navbar-links {
+    display: none;
+  }
+
+  .user-info {
+    display: none;
+  }
+
+  .navbar-inner {
+    padding: 0 $spacing-4;
+  }
+}

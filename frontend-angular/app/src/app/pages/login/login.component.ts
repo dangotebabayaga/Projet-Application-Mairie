@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { AppComponent } from '../../app.component';
 
 interface CityConfig {
   name: string;
@@ -18,7 +19,7 @@ interface CityConfig {
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   email: string = '';
   password: string = '';
   loading: boolean = false;
@@ -27,11 +28,25 @@ export class LoginComponent {
 
   cityConfig: CityConfig = {
     name: 'Ma Ville',
-    logo: '🏛️',
+    logo: '',
     slogan: 'Une ville connectée'
   };
 
-  constructor(private router: Router, private authService: AuthService) {}
+  constructor(private router: Router, private authService: AuthService, private http: HttpClient) {}
+
+  ngOnInit(): void {
+    this.http.get<any>('http://localhost:8000/api/paramettre/1/info').subscribe({
+      next: (data) => {
+        this.cityConfig.name = data.nom || 'Ma Ville';
+        this.cityConfig.slogan = data.slogan || 'Une ville connectée';
+        this.cityConfig.logo = data.logo || '';
+        if (data.theme) {
+          AppComponent.applyTheme(data.theme);
+        }
+      },
+      error: () => {}
+    });
+  }
 
   isValidEmail(email: string): boolean {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -55,6 +70,8 @@ export class LoginComponent {
         localStorage.setItem('userId', res.id);
         localStorage.setItem('userEmail', res.email);
         localStorage.setItem('userPrenom', res.prenom);
+        localStorage.setItem('userRole', res.role);
+        if (res.villeId) localStorage.setItem('villeId', res.villeId);
         this.router.navigate(['/home']);
       },
       error: (err) => {

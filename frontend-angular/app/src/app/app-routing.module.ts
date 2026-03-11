@@ -12,6 +12,7 @@ const routes: Routes = [
   { path: 'events', loadComponent: () => import('./pages/events/events.component').then(m => m.EventsComponent), canActivate: [AuthGuard] },
   { path: 'discussion', loadComponent: () => import('./pages/discussion/discussion.component').then(m => m.DiscussionComponent), canActivate: [AuthGuard] },
   { path: 'backoffice', loadComponent: () => import('./pages/backoffice/backoffice.component').then(m => m.BackofficeComponent), canActivate: [AuthGuard] },
+  { path: 'settings', loadComponent: () => import('./pages/settings/settings.component').then(m => m.SettingsComponent), canActivate: [AuthGuard] },
   { path: '**', redirectTo: 'login' }
 ];
 

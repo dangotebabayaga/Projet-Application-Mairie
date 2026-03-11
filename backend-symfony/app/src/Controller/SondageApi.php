@@ -51,6 +51,7 @@ use App\Service\AuthChecker;
         }
 
         $sondages = $this->em->getRepository(Sondages::class)->findAll();
+        $userId = $user->getId();
 
         $data = [];
 
@@ -68,6 +69,12 @@ use App\Service\AuthChecker;
                 ];
             }, $relations);
 
+            // Vérifier si l'utilisateur a déjà voté
+            $hasVoted = $this->votesRepo->findOneBy([
+                'citoyen' => $userId,
+                'sondage' => $s->getId()
+            ]) !== null;
+
             $data[] = [
                 'id' => $s->getId(),
                 'titre' => $s->getTitre(),
@@ -75,7 +82,8 @@ use App\Service\AuthChecker;
                 'dateDebut' => $s->getDateDebut(),
                 'dateFin' => $s->getDateFin(),
                 'idAdmin' => $s->getAdministrateur(),
-                'choix' => $choix
+                'choix' => $choix,
+                'hasVoted' => $hasVoted
             ];
         }
 

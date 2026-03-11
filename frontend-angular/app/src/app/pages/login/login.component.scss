@@ -2,7 +2,7 @@
 
 .login-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, $blue-50, #E0E7FF);
+  background: linear-gradient(135deg, var(--color-primary-light), #E0E7FF);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -20,9 +20,22 @@
   margin-bottom: $spacing-8;
 }
 
-.city-logo {
-  font-size: 3.75rem;
+.city-logo-img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
   margin-bottom: $spacing-4;
+  border-radius: $radius-lg;
+}
+
+.city-logo-default {
+  margin-bottom: $spacing-4;
+
+  svg {
+    width: 60px;
+    height: 60px;
+    color: var(--color-primary);
+  }
 }
 
 .city-name {
@@ -54,7 +67,7 @@
   .header-icon {
     width: 24px;
     height: 24px;
-    color: $blue-600;
+    color: var(--color-primary);
   }
 
   h2 {
@@ -135,7 +148,7 @@
 
     &:focus {
       border-color: transparent;
-      box-shadow: 0 0 0 2px $blue-500;
+      box-shadow: 0 0 0 2px var(--color-primary);
     }
 
     &:disabled {
@@ -151,7 +164,7 @@
 
 .btn-submit {
   width: 100%;
-  background: $blue-600;
+  background: var(--color-primary);
   color: $white;
   padding: $spacing-3 0;
   border: none;
@@ -162,7 +175,7 @@
   transition: background-color 0.2s;
 
   &:hover:not(:disabled) {
-    background: $blue-700;
+    background: var(--color-primary-dark);
   }
 
   &:disabled {
@@ -232,7 +245,7 @@
     background: none;
     border: none;
     font-size: $text-sm;
-    color: $blue-600;
+    color: var(--color-primary);
     cursor: pointer;
     padding: 0;
 
