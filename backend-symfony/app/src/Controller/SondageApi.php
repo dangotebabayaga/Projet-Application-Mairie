@@ -51,7 +51,8 @@ use App\Service\AuthChecker;
         }
 
         $sondages = $this->em->getRepository(Sondages::class)->findAll();
-        $userId = $user->getId();
+        //$userId = $user->getId();
+        $userId=1;
 
         $data = [];
 
