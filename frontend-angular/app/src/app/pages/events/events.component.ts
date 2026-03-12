@@ -1,22 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-type EventTheme = 'sport' | 'culture' | 'citoyennete' | 'environnement';
-
-interface Event {
-  id: string;
-  title: string;
-  description: string;
-  date: Date;
-  endDate?: Date;
-  location: string;
-  theme: EventTheme;
-  organizer: string;
-  imageUrl?: string;
-}
+import { FormsModule } from '@angular/forms';
+import { EventService, EventItem } from '../../services/event.service';
 
 interface ThemeFilter {
-  id: EventTheme | 'all';
+  id: string;
   label: string;
   colorClass: string;
 }
@@ -24,130 +12,90 @@ interface ThemeFilter {
 @Component({
   selector: 'app-events',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './events.component.html',
   styleUrls: ['./events.component.scss']
 })
-export class EventsComponent {
-  selectedTheme: EventTheme | 'all' = 'all';
+export class EventsComponent implements OnInit {
+  selectedTheme: string = 'all';
   savedEvents: string[] = [];
+  events: EventItem[] = [];
+  userRole: string;
 
   themes: ThemeFilter[] = [
-    { id: 'all', label: 'Tous', colorClass: 'theme-all' },
-    { id: 'sport', label: 'Sport', colorClass: 'theme-sport' },
-    { id: 'culture', label: 'Culture', colorClass: 'theme-culture' },
-    { id: 'citoyennete', label: 'Citoyenneté', colorClass: 'theme-citoyennete' },
-    { id: 'environnement', label: 'Environnement', colorClass: 'theme-environnement' }
+    { id: 'all', label: 'Tous', colorClass: 'theme-all' }
   ];
 
-  // Données de démonstration
-  events: Event[] = [
-    {
-      id: '1',
-      title: 'Marathon de la ville',
-      description: 'Course à pied ouverte à tous les niveaux. Parcours de 5km, 10km et 21km à travers les plus beaux quartiers de la ville.',
-      date: new Date('2024-03-15'),
-      location: 'Place de la Mairie',
-      theme: 'sport',
-      organizer: 'Club Athlétique Municipal',
-      imageUrl: 'https://images.unsplash.com/photo-1532444458054-01a7dd3e9fca?w=400'
-    },
-    {
-      id: '2',
-      title: 'Festival des Arts',
-      description: 'Exposition d\'artistes locaux, concerts et spectacles de rue pendant tout le week-end.',
-      date: new Date('2024-03-20'),
-      location: 'Centre Culturel',
-      theme: 'culture',
-      organizer: 'Association Culturelle',
-      imageUrl: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400'
-    },
-    {
-      id: '3',
-      title: 'Réunion citoyenne',
-      description: 'Débat public sur le budget participatif 2024. Venez proposer vos idées et voter pour vos projets préférés.',
-      date: new Date('2024-02-28'),
-      location: 'Salle des fêtes',
-      theme: 'citoyennete',
-      organizer: 'Mairie',
-      imageUrl: 'https://images.unsplash.com/photo-1577563908411-5077b6dc7624?w=400'
-    },
-    {
-      id: '4',
-      title: 'Plantation d\'arbres',
-      description: 'Journée de plantation participative au parc municipal. Arbres et outils fournis.',
-      date: new Date('2024-03-10'),
-      location: 'Parc Municipal',
-      theme: 'environnement',
-      organizer: 'Service Espaces Verts',
-      imageUrl: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=400'
-    },
-    {
-      id: '5',
-      title: 'Tournoi de football inter-quartiers',
-      description: 'Compétition amicale entre les équipes des différents quartiers de la ville.',
-      date: new Date('2024-04-05'),
-      location: 'Stade Municipal',
-      theme: 'sport',
-      organizer: 'Association Sportive',
-      imageUrl: 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=400'
-    },
-    {
-      id: '6',
-      title: 'Conférence climat',
-      description: 'Intervention d\'experts sur les enjeux climatiques locaux et les actions possibles.',
-      date: new Date('2024-03-25'),
-      location: 'Médiathèque',
-      theme: 'environnement',
-      organizer: 'Collectif Éco-citoyen'
+  constructor(private eventService: EventService) {
+    this.userRole = localStorage.getItem('userRole') || 'citoyen';
+  }
+
+  get isAdmin(): boolean {
+    return this.userRole === 'admin';
+  }
+
+  ngOnInit(): void {
+    this.loadEvents();
+    this.loadTypes();
+  }
+
+  loadEvents(): void {
+    this.eventService.getAll().subscribe({
+      next: (data: EventItem[]) => this.events = data,
+      error: (err: any) => console.error('Erreur chargement événements', err)
+    });
+  }
+
+  loadTypes(): void {
+    this.eventService.getTypes().subscribe({
+      next: (types: { type: string }[]) => {
+        this.themes = [
+          { id: 'all', label: 'Tous', colorClass: 'theme-all' },
+          ...types.map(t => ({
+            id: t.type,
+            label: t.type,
+            colorClass: 'theme-' + t.type.toLowerCase().replace(/\s+/g, '-')
+          }))
+        ];
+      },
+      error: (err: any) => console.error('Erreur chargement types', err)
+    });
+  }
+
+  get filteredEvents(): EventItem[] {
+    if (this.selectedTheme === 'all') {
+      return this.events;
     }
-  ];
-
-  get filteredEvents(): Event[] {
-    let filtered = this.selectedTheme === 'all'
-      ? this.events
-      : this.events.filter(e => e.theme === this.selectedTheme);
-
-    return filtered.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    return this.events.filter(e => e.type === this.selectedTheme);
   }
 
-  get savedEventsList(): Event[] {
-    return this.events.filter(e => this.savedEvents.includes(e.id));
-  }
-
-  selectTheme(theme: EventTheme | 'all'): void {
+  selectTheme(theme: string): void {
     this.selectedTheme = theme;
   }
 
-  isThemeSelected(theme: EventTheme | 'all'): boolean {
+  isThemeSelected(theme: string): boolean {
     return this.selectedTheme === theme;
   }
 
-  toggleSaveEvent(eventId: string): void {
-    if (this.savedEvents.includes(eventId)) {
-      this.savedEvents = this.savedEvents.filter(id => id !== eventId);
+  toggleSaveEvent(index: number): void {
+    const key = index.toString();
+    if (this.savedEvents.includes(key)) {
+      this.savedEvents = this.savedEvents.filter(id => id !== key);
     } else {
-      this.savedEvents = [...this.savedEvents, eventId];
+      this.savedEvents = [...this.savedEvents, key];
     }
   }
 
-  isEventSaved(eventId: string): boolean {
-    return this.savedEvents.includes(eventId);
+  isEventSaved(index: number): boolean {
+    return this.savedEvents.includes(index.toString());
   }
 
-  addToCalendar(event: Event): void {
-    alert(`"${event.title}" ajouté à votre calendrier personnel !`);
+  getThemeClass(type: string): string {
+    return 'theme-' + (type || '').toLowerCase().replace(/\s+/g, '-');
   }
 
-  getThemeClass(theme: EventTheme): string {
-    return `theme-${theme}`;
-  }
-
-  getThemeLabel(theme: EventTheme): string {
-    return this.themes.find(t => t.id === theme)?.label || theme;
-  }
-
-  formatDate(date: Date): string {
+  formatDate(date: string): string {
+    if (!date) return '';
     return new Date(date).toLocaleDateString('fr-FR', {
       weekday: 'long',
       year: 'numeric',

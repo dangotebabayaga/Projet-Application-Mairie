@@ -32,12 +32,9 @@
     </div>
 
     <div class="events-grid">
-      <div class="event-card" *ngFor="let event of filteredEvents">
-        <!-- Image -->
-        <div class="event-image" *ngIf="event.imageUrl">
-          <img [src]="event.imageUrl" [alt]="event.title" />
-        </div>
-        <div class="event-image placeholder" *ngIf="!event.imageUrl">
+      <div class="event-card" *ngFor="let event of filteredEvents; let i = index">
+        <!-- Image placeholder -->
+        <div class="event-image placeholder">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
             <line x1="16" y1="2" x2="16" y2="6"></line>
@@ -49,54 +46,46 @@
         <!-- Contenu -->
         <div class="event-content">
           <div class="event-header">
-            <span class="event-theme" [ngClass]="getThemeClass(event.theme)">
-              {{ getThemeLabel(event.theme) }}
+            <span class="event-theme" *ngIf="event.type" [ngClass]="getThemeClass(event.type)">
+              {{ event.type }}
             </span>
             <button
               class="btn-favorite"
-              [class.saved]="isEventSaved(event.id)"
-              (click)="toggleSaveEvent(event.id)"
+              [class.saved]="isEventSaved(i)"
+              (click)="toggleSaveEvent(i)"
             >
-              {{ isEventSaved(event.id) ? '❤️' : '🤍' }}
+              {{ isEventSaved(i) ? '❤️' : '🤍' }}
             </button>
           </div>
 
-          <h3>{{ event.title }}</h3>
-          <p class="event-description">{{ event.description }}</p>
+          <h3>{{ event.titre }}</h3>
+          <p class="event-description">{{ event.commentaire }}</p>
 
           <div class="event-details">
-            <div class="detail-item">
+            <div class="detail-item" *ngIf="event['date Evenement']">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                 <line x1="16" y1="2" x2="16" y2="6"></line>
                 <line x1="8" y1="2" x2="8" y2="6"></line>
                 <line x1="3" y1="10" x2="21" y2="10"></line>
               </svg>
-              <span>{{ formatDate(event.date) }}</span>
+              <span>{{ formatDate(event['date Evenement']) }}</span>
             </div>
-            <div class="detail-item">
+            <div class="detail-item" *ngIf="event['Heure début'] || event['Heure fin']">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              <span>{{ event['Heure début'] }} - {{ event['Heure fin'] }}</span>
+            </div>
+            <div class="detail-item" *ngIf="event.lieux">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                 <circle cx="12" cy="10" r="3"></circle>
               </svg>
-              <span>{{ event.location }}</span>
-            </div>
-            <div class="detail-item">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-              </svg>
-              <span>{{ event.organizer }}</span>
+              <span>{{ event.lieux }}</span>
             </div>
           </div>
-
-          <button class="btn-calendar" (click)="addToCalendar(event)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-            Ajouter à mon calendrier
-          </button>
         </div>
       </div>
     </div>
@@ -117,7 +106,7 @@
   <div class="favorites-section" *ngIf="savedEvents.length > 0">
     <h2>Mes événements favoris ({{ savedEvents.length }})</h2>
     <div class="favorites-banner">
-      <p>💡 Vous avez {{ savedEvents.length }} événement(s) dans vos favoris</p>
+      <p>Vous avez {{ savedEvents.length }} événement(s) dans vos favoris</p>
     </div>
   </div>
 </div>
