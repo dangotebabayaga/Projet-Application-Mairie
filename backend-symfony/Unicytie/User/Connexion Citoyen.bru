@@ -1,0 +1,23 @@
+meta {
+  name: Connexion Citoyen
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:8000/api/utilisateur/login
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+      "email": "Croftn@mail.com",
+      "motDePasse": "45*1mpj@Hj"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

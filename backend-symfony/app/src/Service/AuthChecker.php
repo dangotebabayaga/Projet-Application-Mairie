@@ -1,25 +1,42 @@
 <?php
 namespace App\Service;
-
-use App\Repository\UtilisateursRepository;
-use App\Entity\Utilisateurs;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use Symfony\Component\HttpFoundation\Request;
 
 class AuthChecker
 {
-    private UtilisateursRepository $userRepo;
+    private string $jwtSecret;
 
-    public function __construct(UtilisateursRepository $userRepo)
+    public function __construct()
     {
-        $this->userRepo = $userRepo;
+        $this->jwtSecret = $_ENV['JWT_SECRET'] ?? 'change_me';
     }
 
-    public function getUser(Request $request): ?Utilisateurs
+    /**
+     * Vérifie le token et retourne le payload ou null si invalide
+     */
+    public function getUserFromRequest(Request $request): ?array
     {
-        $userId = $request->headers->get('X-User-Id');
-        if (!$userId) {
+        $authHeader = $request->headers->get('Authorization');
+        if (!$authHeader || !str_starts_with($authHeader, 'Bearer ')) {
             return null;
         }
-        return $this->userRepo->find((int) $userId);
+
+        $token = substr($authHeader, 7); // enlève "Bearer "
+        try {
+            $payload = JWT::decode($token, new Key($this->jwtSecret, 'HS256'));
+            return (array) $payload;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Vérifie que l'utilisateur a le rôle attendu
+     */
+    public function checkRole(array $payload, string $role): bool
+    {
+        return isset($payload['role']) && $payload['role'] === $role;
     }
 }

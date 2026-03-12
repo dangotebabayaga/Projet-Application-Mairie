@@ -5,7 +5,7 @@
  use App\Service\AuthChecker;
  use App\Entity\Signalements;
  use Doctrine\ORM\EntityManagerInterface;
- use Symfony\Component\Routing\Annotation\Route;
+ use Symfony\Component\Routing\Attribute\Route;
  use Symfony\Component\HttpFoundation\Request;
  use Symfony\Component\HttpFoundation\JsonResponse;
  use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -25,9 +25,6 @@
     #[Route('', name: 'api_get_signalement', methods: ['GET'])]
     public function getAll(Request $request): JsonResponse
     {
-        if (!$this->auth->getUser($request)) {
-            return $this->json(['error' => 'Non authentifié'], 401);
-        }
         $sondages = $this->em->getRepository(Signalements::class)->findAll();
     
         $data = array_map(function($s) {
@@ -58,9 +55,6 @@
 
     #[Route('', name: 'api_post_signalement', methods: ['POST'])] 
     public function create(Request $request): JsonResponse{
-        if (!$this->auth->getUser($request)) {
-            return $this->json(['error' => 'Non authentifié'], 401);
-        }
 
          $data = json_decode($request->getContent(), true);
 
