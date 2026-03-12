@@ -101,42 +101,41 @@
         <div class="report-header">
           <div class="report-info">
             <div class="report-badges">
-              <span class="badge-category">{{ report.category }}</span>
-              <span class="badge-status" [ngClass]="getStatusInfo(report.status).colorClass">
-                <svg *ngIf="report.status === 'registered'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <span class="badge-category">{{ report.titre }}</span>
+              <span class="badge-status" [ngClass]="getStatusInfo(report.etat).colorClass">
+                <svg *ngIf="report.etat === 'enregistré'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <circle cx="12" cy="12" r="10"></circle>
                   <polyline points="12 6 12 12 16 14"></polyline>
                 </svg>
-                <svg *ngIf="report.status === 'in_progress'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg *ngIf="report.etat === 'en cours'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <circle cx="12" cy="12" r="10"></circle>
                   <line x1="12" y1="8" x2="12" y2="12"></line>
                   <line x1="12" y1="16" x2="12.01" y2="16"></line>
                 </svg>
-                <svg *ngIf="report.status === 'resolved'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg *ngIf="report.etat === 'résolu'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                   <polyline points="22 4 12 14.01 9 11.01"></polyline>
                 </svg>
-                {{ getStatusInfo(report.status).label }}
+                {{ getStatusInfo(report.etat).label }}
               </span>
             </div>
             <p class="report-description">{{ report.description }}</p>
           </div>
-          <img *ngIf="report.photo" [src]="report.photo" alt="Signalement" class="report-photo" />
         </div>
         <div class="report-footer">
-          <div class="report-meta">
+          <div class="report-meta" *ngIf="report.adresse">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
               <circle cx="12" cy="10" r="3"></circle>
             </svg>
-            {{ report.location.address }}
+            {{ report.adresse }}
           </div>
           <div class="report-meta">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="10"></circle>
               <polyline points="12 6 12 12 16 14"></polyline>
             </svg>
-            {{ formatDate(report.createdAt) }}
+            {{ formatDate(report.dateCrea) }}
           </div>
         </div>
       </div>
@@ -153,31 +152,31 @@
     <div class="reports-grid">
       <div class="report-card-small" *ngFor="let report of otherReports">
         <div class="report-badges">
-          <span class="badge-category small">{{ report.category }}</span>
-          <span class="badge-status small" [ngClass]="getStatusInfo(report.status).colorClass">
-            <svg *ngIf="report.status === 'registered'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <span class="badge-category small">{{ report.titre }}</span>
+          <span class="badge-status small" [ngClass]="getStatusInfo(report.etat).colorClass">
+            <svg *ngIf="report.etat === 'enregistré'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="10"></circle>
               <polyline points="12 6 12 12 16 14"></polyline>
             </svg>
-            <svg *ngIf="report.status === 'in_progress'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg *ngIf="report.etat === 'en cours'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="10"></circle>
               <line x1="12" y1="8" x2="12" y2="12"></line>
               <line x1="12" y1="16" x2="12.01" y2="16"></line>
             </svg>
-            <svg *ngIf="report.status === 'resolved'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg *ngIf="report.etat === 'résolu'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
               <polyline points="22 4 12 14.01 9 11.01"></polyline>
             </svg>
-            {{ getStatusInfo(report.status).label }}
+            {{ getStatusInfo(report.etat).label }}
           </span>
         </div>
         <p class="report-description">{{ report.description }}</p>
-        <div class="report-meta">
+        <div class="report-meta" *ngIf="report.adresse">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
             <circle cx="12" cy="10" r="3"></circle>
           </svg>
-          {{ report.location.address }}
+          {{ report.adresse }}
         </div>
       </div>
     </div>
