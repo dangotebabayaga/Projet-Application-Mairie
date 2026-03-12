@@ -46,6 +46,7 @@
                 'citoyenId' => $s->getCitoyenId(),
                 'dateCrea' => $s->getDateCreation(),
                 'dateModif' => $s->getDateModification()
+                
             ];
         }, $sondages);
     
