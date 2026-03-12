@@ -1,5 +1,7 @@
 <?php
 namespace App\Entity;
+
+use App\Enum\EtatSignalement;
 use App\Repository\SignalementsRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -15,9 +17,9 @@ class Signalements
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $titre = null;
     
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $etat = null;
-    
+    #[ORM\Column(type: "string", length: 20)]
+    private EtatSignalement $etat; 
+
     #[ORM\Column(type: "text", nullable: true)]
     private ?string $description = null;
     
@@ -54,14 +56,15 @@ class Signalements
         $this->titre = $titre;
     }
 
-    public function getEtat(): ?string
+    public function getEtat(): EtatSignalement
     {
         return $this->etat;
     }
-
-    public function setEtat(?string $etat)
+    
+    public function setEtat(EtatSignalement $etat): self
     {
         $this->etat = $etat;
+        return $this;
     }
 
     public function getDescription(): ?string

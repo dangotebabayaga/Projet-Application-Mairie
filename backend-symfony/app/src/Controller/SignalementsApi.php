@@ -25,17 +25,40 @@
     #[Route('', name: 'api_get_signalement', methods: ['GET'])]
     public function getAll(Request $request): JsonResponse
     {
-        $sondages = $this->em->getRepository(Signalements::class)->findAll();
-    
-        $data = array_map(function($s) {
-            $lat = $s->getLatitude() ?? null;
-            $lng = $s->getLongitude() ?? null;
-        
-            // Adresse via OpenStreetMap
-            $adresse = ($lat !== null && $lng !== null) 
+        $user = $this->auth->getUserFromRequest($request);
+
+        if (!$user) {
+            return $this->json(["error"=>"Token invalide"],401);
+        }
+
+        $userId = $user['id'];
+        $role = $user['role'];
+
+        if ($role === 'admin') {
+            $signalement = $this->em
+                ->getRepository(Signalements::class)
+                ->findAll();
+        } else {
+            $signalement = $this->em
+                ->getRepository(Signalements::class)
+                ->createQueryBuilder('s')
+                ->where('s.etat != :etat')
+                ->orWhere('s.citoyen = :userId')
+                ->setParameter('etat', 'enregistre')
+                ->setParameter('userId', $userId)
+                ->getQuery()
+                ->getResult();
+        }
+
+        $data = array_map(function($s) use ($userId) {
+
+            $lat = $s->getLatitude();
+            $lng = $s->getLongitude();
+
+            $adresse = ($lat && $lng)
                 ? $this->convertAdresse->coordinatesToAddress($lat, $lng)
                 : null;
-        
+
             return [
                 'id' => $s->getId(),
                 'titre' => $s->getTitre(),
@@ -44,12 +67,13 @@
                 'adresse' => $adresse,
                 'typeId' => $s->getTypeId(),
                 'citoyenId' => $s->getCitoyenId(),
+                'auteur?' => $s->getCitoyenId() === $userId,
                 'dateCrea' => $s->getDateCreation(),
                 'dateModif' => $s->getDateModification()
-                
             ];
-        }, $sondages);
-    
+
+        }, $signalement);
+
         return $this->json($data);
     }
 
@@ -57,6 +81,14 @@
     #[Route('', name: 'api_post_signalement', methods: ['POST'])] 
     public function create(Request $request): JsonResponse{
 
+         $user = $this->auth->getuserfromrequest($request);
+        if (!$user) {
+            return $this->json(["error" => "token manquant ou invalide"], 401);
+        }
+
+        if (!$this->auth->checkrole($user, 'citoyen')) {
+            return $this->json(["error" => "accès interdit"], 403);
+        }
          $data = json_decode($request->getContent(), true);
 
          $dateCrea = isset($data['dateCrea']) ? new \DateTime($data['dateCrea']) : new \DateTime();
@@ -91,5 +123,41 @@
              'message' => 'Signalement créé',
              'id' => $s->getId()
          ]);
+    }
+
+    #[Route('/{id}', name: 'ChangeEtat', methods: ['GET'])] 
+    public function changeEtat(Request $request, int $id): JsonResponse
+    {
+         $user = $this->auth->getuserfromrequest($request);
+        if (!$user) {
+            return $this->json(["error" => "token manquant ou invalide"], 401);
+        }
+
+        if (!$this->auth->checkrole($user, 'admin')) {
+            return $this->json(["error" => "accès interdit"], 403);
+        }
+        $signalement = $this->em
+            ->getRepository(Signalements::class)
+            ->find($id);
+
+        if (!$signalement) {
+            return $this->json(["error" => "signalement introuvable"],404);
+        }
+
+        $etatActuel = $signalement->getEtat();
+        $etatSuivant = $etatActuel->next();
+
+        if (!$etatSuivant) {
+            return $this->json(["error"=>"déjà résolu"],400);
+        }
+
+        $signalement->setEtat($etatSuivant);
+
+        $this->em->flush();
+
+        return $this->json([
+            "message"=>"etat modifié",
+            "nouvelEtat"=>$etatSuivant->value
+        ]);
     }
  }
