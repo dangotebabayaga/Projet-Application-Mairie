@@ -1,10 +1,12 @@
 <?php
  namespace App\Controller;
 
- use App\Service\ConvertAdresse;
+use App\Entity\Citoyens;
+use App\Service\ConvertAdresse;
  use App\Service\AuthChecker;
  use App\Entity\Signalements;
- use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\Utilisateurs;
+use Doctrine\ORM\EntityManagerInterface;
  use Symfony\Component\Routing\Attribute\Route;
  use Symfony\Component\HttpFoundation\Request;
  use Symfony\Component\HttpFoundation\JsonResponse;
@@ -31,7 +33,7 @@
             return $this->json(["error"=>"Token invalide"],401);
         }
 
-        $userId = $user['id'];
+        $userId = $user['userId'];
         $role = $user['role'];
 
         if ($role === 'admin') {
@@ -66,8 +68,8 @@
                 'description' => $s->getDescription(),
                 'adresse' => $adresse,
                 'typeId' => $s->getTypeId(),
-                'citoyenId' => $s->getCitoyenId(),
-                'auteur?' => $s->getCitoyenId() === $userId,
+                'citoyenId' => $s->getCitoyen()->getUtilisateurId(),
+                'auteur?' => $s->getCitoyen()->getUtilisateurId() === $userId,
                 'dateCrea' => $s->getDateCreation(),
                 'dateModif' => $s->getDateModification()
             ];
@@ -94,13 +96,14 @@
          $dateCrea = isset($data['dateCrea']) ? new \DateTime($data['dateCrea']) : new \DateTime();
          $dateModif = isset($data['dateModif']) ? new \DateTime($data['dateModif']) : new \DateTime();
 
+         $citoyen= $this->em->getRepository(Citoyens::class)->findOneBy(['id' => $data['citoyenId']]);
          $s = new Signalements();
          $s->setTitre($data['titre'] ?? 'Sans titre');
          $s->setEtat($data['etat'] ?? 'nouveau');
          $s->setDescription($data['description'] ?? null);
          $s->setDateCreation($dateCrea);
          $s->setDateModification($dateModif);
-         $s->setCitoyenId($data['citoyenId']);
+         $s->setCitoyen($citoyen);
          $s->setTypeId($data['typeId']);
 
          // Si on a une adresse, on convertit en coordonnées
