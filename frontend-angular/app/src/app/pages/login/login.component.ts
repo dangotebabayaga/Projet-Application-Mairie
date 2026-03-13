@@ -67,11 +67,7 @@ export class LoginComponent implements OnInit {
     this.authService.login(this.email, this.password).subscribe({
       next: (res) => {
         this.loading = false;
-        localStorage.setItem('userId', res.id);
-        localStorage.setItem('userEmail', res.email);
-        localStorage.setItem('userPrenom', res.prenom);
-        localStorage.setItem('userRole', res.role);
-        if (res.villeId) localStorage.setItem('villeId', res.villeId);
+        this.authService.saveSession(res.token, res.infoUser);
         this.router.navigate(['/home']);
       },
       error: (err) => {
