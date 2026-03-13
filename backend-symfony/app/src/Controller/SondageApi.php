@@ -124,6 +124,10 @@ use App\Service\AuthChecker;
     #[Route('/{id}/resultat', name: 'sondage_resultat', methods: ['GET'])]
     public function resultat(int $id, Request $request, VotesSondageRepository $votesRepo): JsonResponse
     {
+        $user = $this->auth->getuserfromrequest($request);
+        if (!$user) {
+            return $this->json(["error" => "token manquant ou invalide"], 401);
+        }
         $result = $votesRepo->resultatSondage($id);
 
         return $this->json([
