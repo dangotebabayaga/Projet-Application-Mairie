@@ -30,7 +30,7 @@ interface VilleConfig {
 })
 export class SettingsComponent implements OnInit {
   villeConfig: VilleConfig = {
-    id: 0,
+    id: 1,
     nom: '',
     slogan: '',
     logo: '',
