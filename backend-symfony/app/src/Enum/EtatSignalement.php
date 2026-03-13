@@ -4,9 +4,9 @@ namespace App\Enum;
 
 enum EtatSignalement: string
 {
-    case ENREGISTRE = 'enregistre';
-    case EN_COURS = 'en_cours';
-    case RESOLU = 'resolu';
+    case ENREGISTRE = 'enregistré';
+    case EN_COURS = 'en cours';
+    case RESOLU = 'résolu';
 
     public function next(): ?self
     {
