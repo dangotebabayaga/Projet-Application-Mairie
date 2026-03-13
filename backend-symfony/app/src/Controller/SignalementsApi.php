@@ -100,6 +100,8 @@
          $s->setDescription($data['description'] ?? null);
          $s->setDateCreation($dateCrea);
          $s->setDateModification($dateModif);
+         $s->setCitoyenId($data['citoyenId']);
+         $s->setTypeId($data['typeId']);
 
          // Si on a une adresse, on convertit en coordonnées
          if (!empty($data['adresse'])) {
