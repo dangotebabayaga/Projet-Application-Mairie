@@ -4,10 +4,16 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { HttpClient } from '@angular/common/http';
 import { SurveyService, Survey } from '../../services/survey.service';
+import { SocialService, ReseauSocial } from '../../services/social.service';
 
 type ReportStatus = 'registered' | 'in_progress' | 'resolved';
 type EventTheme = 'sport' | 'culture' | 'citoyennete' | 'environnement';
-type TabId = 'overview' | 'reports' | 'surveys' | 'events';
+type TabId = 'overview' | 'reports' | 'surveys' | 'events' | 'social';
+
+interface SocialForm {
+  plateform: string;
+  lien: string;
+}
 
 interface Report {
   id: string;
@@ -71,10 +77,62 @@ export class BackofficeComponent implements OnInit {
   showEventForm = false;
   surveysList: Survey[] = [];
 
-  constructor(private surveyService: SurveyService, private http: HttpClient) {}
+  socials: ReseauSocial[] = [];
+  socialForm: SocialForm = { plateform: '', lien: '' };
+  socialLoading = false;
+  socialError = '';
+  socialSuccess = '';
+
+  constructor(
+    private surveyService: SurveyService,
+    private socialService: SocialService,
+    private http: HttpClient
+  ) {}
 
   ngOnInit(): void {
     this.loadSurveys();
+    this.loadSocials();
+  }
+
+  loadSocials(): void {
+    this.socialService.getAll().subscribe({
+      next: (data) => this.socials = data,
+      error: (err) => console.error('Erreur chargement réseaux sociaux', err)
+    });
+  }
+
+  onCreateSocial(): void {
+    this.socialError = '';
+    this.socialSuccess = '';
+    if (!this.socialForm.plateform.trim() || !this.socialForm.lien.trim()) {
+      this.socialError = 'Plateforme et lien obligatoires';
+      return;
+    }
+
+    this.socialLoading = true;
+    this.socialService.create({
+      plateform: this.socialForm.plateform.trim(),
+      lien: this.socialForm.lien.trim(),
+      villeId: 1
+    }).subscribe({
+      next: () => {
+        this.socialLoading = false;
+        this.socialSuccess = 'Réseau social ajouté';
+        this.socialForm = { plateform: '', lien: '' };
+        this.loadSocials();
+      },
+      error: (err) => {
+        this.socialLoading = false;
+        this.socialError = err.error?.error || 'Erreur lors de la création';
+      }
+    });
+  }
+
+  onDeleteSocial(id: number): void {
+    this.socialService.delete(id).subscribe({
+      next: () => this.loadSocials(),
+      error: (err) => console.error('Erreur suppression réseau', err)
+    });
   }
 
   loadSurveys(): void {
@@ -88,7 +146,8 @@ export class BackofficeComponent implements OnInit {
     { id: 'overview', label: "Vue d'ensemble", icon: 'trending-up' },
     { id: 'reports', label: 'Signalements', icon: 'file-text' },
     { id: 'surveys', label: 'Sondages', icon: 'bar-chart' },
-    { id: 'events', label: 'Événements', icon: 'calendar' }
+    { id: 'events', label: 'Événements', icon: 'calendar' },
+    { id: 'social', label: 'Réseaux sociaux', icon: 'share' }
   ];
 
   surveyForm: SurveyForm = {
