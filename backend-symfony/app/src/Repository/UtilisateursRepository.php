@@ -111,7 +111,7 @@ class UtilisateursRepository extends ServiceEntityRepository
             "email" => $user->getEmail(),
             "telephonne" => $user->getTelephone(),
             "date Naissance"=> $user->getDateNaissance(),
-            "villeId" => $user->getVileId()
+            "role" => $this->getRole($user)
         ];
 
         return $data;

@@ -1,5 +1,7 @@
 <?php
 namespace App\Entity;
+
+use App\Enum\EtatSignalement;
 use App\Repository\SignalementsRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -15,9 +17,9 @@ class Signalements
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $titre = null;
     
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $etat = null;
-    
+    #[ORM\Column(type: "string", enumType: EtatSignalement::class)]
+    private EtatSignalement $etat;
+
     #[ORM\Column(type: "text", nullable: true)]
     private ?string $description = null;
     
@@ -30,9 +32,9 @@ class Signalements
     #[ORM\Column(nullable: true)]
     private ?int $typeId = null;
     
-    #[ORM\Column(nullable: true)]
-    private ?int $citoyenId = null;
-    
+    #[ORM\ManyToOne(targetEntity: Citoyens::class)]
+    #[ORM\JoinColumn(name: "citoyen_id", referencedColumnName: "utilisateur_id")]
+    private ?Citoyens $citoyen = null; 
     // **Ajoute explicitement le type datetime**
     #[ORM\Column(type: "datetime", nullable: true)]
     private ?\DateTimeInterface $dateCreation = null;
@@ -54,14 +56,15 @@ class Signalements
         $this->titre = $titre;
     }
 
-    public function getEtat(): ?string
+    public function getEtat(): EtatSignalement
     {
         return $this->etat;
     }
-
-    public function setEtat(?string $etat)
+    
+    public function setEtat(EtatSignalement $etat): self
     {
         $this->etat = $etat;
+        return $this;
     }
 
     public function getDescription(): ?string
@@ -104,14 +107,16 @@ class Signalements
         $this->typeId = $typeId;
     }
 
-    public function getCitoyenId(): ?int
+    // getter et setter
+    public function getCitoyen(): ?Citoyens
     {
-        return $this->citoyenId;
+        return $this->citoyen;
     }
-
-    public function setCitoyenId(?int $citoyenId)
+    
+    public function setCitoyen(?Citoyens $citoyen): self
     {
-        $this->citoyenId = $citoyenId;
+        $this->citoyen = $citoyen;
+        return $this;
     }
 
     public function getDateCreation(): ?\DateTimeInterface

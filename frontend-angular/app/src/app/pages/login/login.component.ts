@@ -35,7 +35,7 @@ export class LoginComponent implements OnInit {
   constructor(private router: Router, private authService: AuthService, private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.http.get<any>('http://localhost:8000/api/paramettre/1/info').subscribe({
+    this.http.get<any>('http://localhost:8000/api/paramettre/info').subscribe({
       next: (data) => {
         this.cityConfig.name = data.nom || 'Ma Ville';
         this.cityConfig.slogan = data.slogan || 'Une ville connectée';
@@ -67,16 +67,7 @@ export class LoginComponent implements OnInit {
     this.authService.login(this.email, this.password).subscribe({
       next: (res) => {
         this.loading = false;
-        const info = res?.infoUser || {};
-        const payload = this.decodeJwtPayload(res?.token);
-
-        if (res?.token) localStorage.setItem('authToken', res.token);
-        if (info.id != null) localStorage.setItem('userId', String(info.id));
-        if (info.email) localStorage.setItem('userEmail', info.email);
-        if (info.prenom) localStorage.setItem('userPrenom', info.prenom);
-        if (info.villeId != null) localStorage.setItem('villeId', String(info.villeId));
-        if (payload?.role) localStorage.setItem('userRole', payload.role);
-
+        this.authService.saveSession(res.token, res.infoUser);
         this.router.navigate(['/home']);
       },
       error: (err) => {
@@ -84,19 +75,6 @@ export class LoginComponent implements OnInit {
         this.error = err.error?.error || 'Email ou mot de passe incorrect';
       }
     });
-  }
-
-  private decodeJwtPayload(token: string | undefined | null): any | null {
-    if (!token) return null;
-    const parts = token.split('.');
-    if (parts.length < 2) return null;
-    try {
-      const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
-      const padded = base64 + '==='.slice((base64.length + 3) % 4);
-      return JSON.parse(atob(padded));
-    } catch {
-      return null;
-    }
   }
 
   onRegister(): void {

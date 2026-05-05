@@ -30,7 +30,7 @@ interface VilleConfig {
 })
 export class SettingsComponent implements OnInit {
   villeConfig: VilleConfig = {
-    id: 0,
+    id: 1,
     nom: '',
     slogan: '',
     logo: '',
@@ -71,7 +71,7 @@ export class SettingsComponent implements OnInit {
       return;
     }
 
-    this.http.get<any>(`http://localhost:8000/api/paramettre/${villeId}/info`).subscribe({
+    this.http.get<any>(`http://localhost:8000/api/paramettre/info`).subscribe({
       next: (data) => {
         this.villeConfig = {
           id: data.id,

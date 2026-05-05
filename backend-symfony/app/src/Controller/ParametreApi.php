@@ -23,12 +23,8 @@ use Doctrine\ORM\EntityManagerInterface;
     }
 
     
-    #[Route('/{id}/theme', name: 'get_theme', methods: ['GET'])]
+    #[Route('/theme', name: 'get_theme', methods: ['GET'])]
     public function getTheme(Request $request,int $id): JsonResponse{
-         $user = $this->auth->getUserFromRequest($request);
-        if (!$user) {
-            return $this->json(["error" => "Token manquant ou invalide"], 401);
-        }
         $ville=$this->em->getRepository(Ville::class)->findOneBy(['id'=>$id]);
         return $this->json([
             'slogan' => $ville->getSlogan(),
@@ -64,13 +60,9 @@ use Doctrine\ORM\EntityManagerInterface;
         ]);
     }
 
-    #[Route('/{id}/info', name: 'get_info', methods: ['GET'])]
-    public function getInfo(Request $request,int $id): JsonResponse{
-         $user = $this->auth->getUserFromRequest($request);
-        if (!$user) {
-            return $this->json(["error" => "Token manquant ou invalide"], 401);
-        }
-        $ville=$this->em->getRepository(Ville::class)->findOneBy(['id'=>$id]);
+    #[Route('/info', name: 'get_info', methods: ['GET'])]
+    public function getInfo(): JsonResponse{
+        $ville=$this->em->getRepository(Ville::class)->findOneBy(['id'=>'1']);
         return $this->json([
             'id' => $ville->getId(),
             'nom' => $ville->getNom(),
