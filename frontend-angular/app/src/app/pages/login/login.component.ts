@@ -67,11 +67,16 @@ export class LoginComponent implements OnInit {
     this.authService.login(this.email, this.password).subscribe({
       next: (res) => {
         this.loading = false;
-        localStorage.setItem('userId', res.id);
-        localStorage.setItem('userEmail', res.email);
-        localStorage.setItem('userPrenom', res.prenom);
-        localStorage.setItem('userRole', res.role);
-        if (res.villeId) localStorage.setItem('villeId', res.villeId);
+        const info = res?.infoUser || {};
+        const payload = this.decodeJwtPayload(res?.token);
+
+        if (res?.token) localStorage.setItem('authToken', res.token);
+        if (info.id != null) localStorage.setItem('userId', String(info.id));
+        if (info.email) localStorage.setItem('userEmail', info.email);
+        if (info.prenom) localStorage.setItem('userPrenom', info.prenom);
+        if (info.villeId != null) localStorage.setItem('villeId', String(info.villeId));
+        if (payload?.role) localStorage.setItem('userRole', payload.role);
+
         this.router.navigate(['/home']);
       },
       error: (err) => {
@@ -79,6 +84,19 @@ export class LoginComponent implements OnInit {
         this.error = err.error?.error || 'Email ou mot de passe incorrect';
       }
     });
+  }
+
+  private decodeJwtPayload(token: string | undefined | null): any | null {
+    if (!token) return null;
+    const parts = token.split('.');
+    if (parts.length < 2) return null;
+    try {
+      const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+      const padded = base64 + '==='.slice((base64.length + 3) % 4);
+      return JSON.parse(atob(padded));
+    } catch {
+      return null;
+    }
   }
 
   onRegister(): void {
