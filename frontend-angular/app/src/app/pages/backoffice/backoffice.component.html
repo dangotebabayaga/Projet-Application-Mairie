@@ -108,44 +108,37 @@
           <img *ngIf="report.photo" [src]="report.photo" alt="" class="report-photo" />
           <div class="report-details">
             <div class="report-badges">
-              <span class="badge-category">{{ report.category }}</span>
-              <span class="badge-status" [ngClass]="getStatusConfig(report.status).colorClass">
-                {{ getStatusConfig(report.status).label }}
+              <span class="badge-category">{{ report.typeNom || report.titre }}</span>
+              <span class="badge-status" [ngClass]="getStatusConfig(report.etat).colorClass">
+                {{ getStatusConfig(report.etat).label }}
               </span>
             </div>
             <p class="report-description">{{ report.description }}</p>
             <div class="report-meta">
-              <span>
+              <span *ngIf="report.adresse">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                   <circle cx="12" cy="10" r="3"></circle>
                 </svg>
-                {{ report.location.address }}
+                {{ report.adresse }}
               </span>
-              <span>•</span>
-              <span>Par {{ report.userName }}</span>
-              <span>•</span>
-              <span>{{ formatDate(report.createdAt) }}</span>
+              <span *ngIf="report.adresse">•</span>
+              <span>{{ formatDate(report.dateCrea) }}</span>
             </div>
-            <div class="report-actions">
+            <div class="report-actions" *ngIf="report.etat !== 'résolu'">
               <button
-                *ngIf="report.status !== 'in_progress'"
                 class="btn-status orange"
-                (click)="updateReportStatus(report.id, 'in_progress')"
+                (click)="advanceReportState(report.id)"
               >
-                Marquer en cours
-              </button>
-              <button
-                *ngIf="report.status !== 'resolved'"
-                class="btn-status green"
-                (click)="updateReportStatus(report.id, 'resolved')"
-              >
-                Marquer résolu
+                {{ report.etat === 'enregistré' ? 'Marquer en cours' : 'Marquer résolu' }}
               </button>
             </div>
           </div>
         </div>
       </div>
+      <p *ngIf="reports.length === 0" style="color: #6B7280;">
+        Aucun signalement pour le moment.
+      </p>
     </div>
   </div>
 

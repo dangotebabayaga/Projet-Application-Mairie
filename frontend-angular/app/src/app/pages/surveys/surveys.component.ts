@@ -4,6 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { SurveyService, Survey } from '../../services/survey.service';
 
+interface StatusInfo {
+  label: string;
+  colorClass: string;
+}
+
+type SurveyStatus = 'all' | 'available' | 'voted' | 'closed';
+
 @Component({
   selector: 'app-surveys',
   standalone: true,
@@ -21,6 +28,16 @@ export class SurveysComponent implements OnInit {
   voteError = '';
   results: any[] = [];
   resultsLoading = false;
+
+  selectedStatus: SurveyStatus = 'all';
+  sortDesc = true;
+
+  statusFilters: { id: SurveyStatus; label: string }[] = [
+    { id: 'all', label: 'Tous' },
+    { id: 'available', label: 'À voter' },
+    { id: 'voted', label: 'Déjà votés' },
+    { id: 'closed', label: 'Terminés' }
+  ];
 
   constructor(private surveyService: SurveyService) {}
 
@@ -44,12 +61,44 @@ export class SurveysComponent implements OnInit {
     });
   }
 
-  get activeSurveys(): Survey[] {
-    return this.surveys.filter(s => !s.hasVoted && !this.submitted.includes(s.id));
+  get filteredSurveys(): Survey[] {
+    const filtered = this.surveys.filter(s => {
+      switch (this.selectedStatus) {
+        case 'available': return !this.isVoted(s) && !this.isClosed(s);
+        case 'voted':     return this.isVoted(s);
+        case 'closed':    return this.isClosed(s) && !this.isVoted(s);
+        default:          return true;
+      }
+    });
+
+    return [...filtered].sort((a, b) => {
+      const da = a.dateDebut ? new Date(a.dateDebut).getTime() : 0;
+      const db = b.dateDebut ? new Date(b.dateDebut).getTime() : 0;
+      return this.sortDesc ? db - da : da - db;
+    });
   }
 
-  get votedSurveys(): Survey[] {
-    return this.surveys.filter(s => s.hasVoted || this.submitted.includes(s.id));
+  isVoted(survey: Survey): boolean {
+    return survey.hasVoted || this.submitted.includes(survey.id);
+  }
+
+  isClosed(survey: Survey): boolean {
+    if (!survey.dateFin) return false;
+    return new Date(survey.dateFin).getTime() < Date.now();
+  }
+
+  getStatusInfo(survey: Survey): StatusInfo {
+    if (this.isVoted(survey)) return { label: 'Voté', colorClass: 'status-voted' };
+    if (this.isClosed(survey)) return { label: 'Terminé', colorClass: 'status-closed' };
+    return { label: 'À voter', colorClass: 'status-active' };
+  }
+
+  selectStatus(status: SurveyStatus): void {
+    this.selectedStatus = status;
+  }
+
+  toggleSort(): void {
+    this.sortDesc = !this.sortDesc;
   }
 
   selectSurvey(survey: Survey): void {

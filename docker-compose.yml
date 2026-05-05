@@ -6,6 +6,10 @@ services:
       - "8000:8000"
     volumes:
       - ./backend-symfony/app:/var/www
+      # Volumes nommés pour vendor/ et var/cache/ : évite le bind mount Windows
+      # qui est extrêmement lent (FUSE), gain de perf majeur
+      - symfony_vendor:/var/www/vendor
+      - symfony_cache:/var/www/var/cache
     depends_on:
       - db
     command: bash -c "php -S 0.0.0.0:8000 -t public"
@@ -34,4 +38,6 @@ services:
 
 volumes:
   pgdata:
+  symfony_vendor:
+  symfony_cache:
 

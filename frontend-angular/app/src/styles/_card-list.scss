@@ -1,0 +1,329 @@
+// ===========================================
+// CARD LIST - Pattern réutilisable
+// Liste paginée de cartes avec filtres + tri
+// Utilisé par : surveys (et reports à terme)
+// ===========================================
+
+@import 'variables';
+
+// ----- PAGE & EN-TÊTE -----
+.card-list-page {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-6;
+}
+
+.card-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: $spacing-4;
+
+  .header-text {
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: $gray-900;
+      margin: 0;
+    }
+    p {
+      color: $gray-600;
+      margin: $spacing-1 0 0;
+    }
+  }
+}
+
+.card-list-section {
+  h2 {
+    font-size: $text-lg;
+    font-weight: 600;
+    color: $gray-900;
+    margin: 0 0 $spacing-4;
+  }
+}
+
+// ----- FILTRES (style Agenda) + TRI à droite -----
+.card-list-filter-card {
+  background: $white;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-sm;
+  padding: $spacing-4;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+}
+
+.card-list-filter-section + .card-list-filter-section {
+  border-top: 1px solid $gray-100;
+  padding-top: $spacing-4;
+}
+
+.card-list-filter-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-3;
+  flex-wrap: wrap;
+  margin-bottom: $spacing-3;
+}
+
+.card-list-filter-label {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+
+  svg {
+    width: 20px;
+    height: 20px;
+    color: $gray-600;
+  }
+
+  span {
+    font-weight: 500;
+    color: $gray-900;
+  }
+}
+
+.card-filter-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-2;
+}
+
+.card-filter-btn {
+  padding: $spacing-2 $spacing-4;
+  border-radius: $radius-lg;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  opacity: 0.6;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  &.active {
+    opacity: 1;
+    box-shadow: 0 0 0 2px $white, 0 0 0 4px $blue-500;
+  }
+
+  // Variantes statut sondages
+  &.filter-status-all {
+    background: $gray-200;
+    color: $gray-800;
+  }
+  &.filter-status-available {
+    background: $blue-100;
+    color: #1E40AF;
+  }
+  &.filter-status-voted {
+    background: #DCFCE7;
+    color: #166534;
+  }
+  &.filter-status-closed {
+    background: $gray-100;
+    color: $gray-600;
+  }
+}
+
+.card-sort-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-2;
+  padding: $spacing-2 $spacing-4;
+  border-radius: $radius-lg;
+  border: 1px solid $gray-300;
+  background: $white;
+  color: $gray-700;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: $gray-50;
+  }
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+// ----- GRILLE RESPONSIVE -----
+.cards-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-4;
+
+  @media (min-width: $breakpoint-md) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: $breakpoint-lg) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+// ----- CARTE COMPACTE -----
+.card-item {
+  background: $white;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-sm;
+  padding: $spacing-4;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-badges {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  flex-wrap: wrap;
+  margin-bottom: $spacing-2;
+}
+
+.card-badge-category {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-1;
+  padding: $spacing-1 $spacing-2;
+  background: $gray-100;
+  color: $gray-700;
+  border-radius: 9999px;
+  font-size: $text-xs;
+
+  svg {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+.card-badge-status {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-1;
+  padding: $spacing-1 $spacing-2;
+  border-radius: 9999px;
+  font-size: $text-xs;
+
+  svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  // Sondages
+  &.status-active {
+    background: $blue-50;
+    color: $blue-600;
+  }
+  &.status-voted {
+    background: $green-50;
+    color: $green-600;
+  }
+  &.status-closed {
+    background: $gray-100;
+    color: $gray-600;
+  }
+
+  // Signalements
+  &.status-registered {
+    background: $blue-50;
+    color: $blue-600;
+  }
+  &.status-in-progress {
+    background: #FFF7ED;
+    color: #EA580C;
+  }
+  &.status-resolved {
+    background: $green-50;
+    color: $green-600;
+  }
+}
+
+.card-title {
+  font-size: $text-base;
+  font-weight: 600;
+  color: $gray-900;
+  margin: 0 0 $spacing-1;
+}
+
+.card-description {
+  font-size: $text-sm;
+  color: $gray-700;
+  margin: 0 0 $spacing-2;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-meta {
+  display: flex;
+  align-items: center;
+  gap: $spacing-1;
+  font-size: $text-xs;
+  color: $gray-500;
+  margin-top: $spacing-1;
+
+  svg {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+// ----- ACTIONS DE CARTE -----
+.card-action {
+  width: 100%;
+  margin-top: $spacing-3;
+  padding: $spacing-2 0;
+  border: none;
+  border-radius: $radius-lg;
+  font-size: $text-sm;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-2;
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  &.primary {
+    background: $blue-600;
+    color: $white;
+
+    &:hover { background: $blue-700; }
+  }
+
+  &.secondary {
+    background: $green-50;
+    color: #15803D;
+
+    &:hover { background: #DCFCE7; }
+  }
+
+  &.disabled {
+    background: $gray-100;
+    color: $gray-500;
+    cursor: not-allowed;
+  }
+}
+
+// ----- ÉTAT VIDE -----
+.card-list-empty {
+  text-align: center;
+  padding: $spacing-8;
+  color: $gray-500;
+  grid-column: 1 / -1;
+
+  p {
+    margin: 0;
+  }
+}

@@ -8,7 +8,11 @@ export interface Report {
   etat: string;
   description: string;
   adresse: string | null;
+  latitude: number | null;
+  longitude: number | null;
   typeId: number | null;
+  typeNom: string | null;
+  photo: string | null;
   citoyenId: number | null;
   dateCrea: string;
   dateModif: string;
@@ -18,7 +22,8 @@ export interface ReportPayload {
   titre: string;
   description: string;
   adresse: string;
-  etat?: string;
+  typeId: number | null;
+  photo?: File | null;
 }
 
 @Injectable({
@@ -34,6 +39,20 @@ export class ReportService {
   }
 
   create(payload: ReportPayload): Observable<any> {
-    return this.http.post(this.apiUrl, payload);
+    const fd = new FormData();
+    fd.append('titre', payload.titre);
+    fd.append('description', payload.description);
+    fd.append('adresse', payload.adresse);
+    if (payload.typeId !== null && payload.typeId !== undefined) {
+      fd.append('typeId', String(payload.typeId));
+    }
+    if (payload.photo) {
+      fd.append('photo', payload.photo);
+    }
+    return this.http.post(this.apiUrl, fd);
+  }
+
+  advanceState(id: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/${id}`);
   }
 }

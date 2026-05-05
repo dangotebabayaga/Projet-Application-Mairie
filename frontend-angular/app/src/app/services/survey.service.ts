@@ -16,6 +16,7 @@ export interface Survey {
   idAdmin: number;
   choix: Choix[];
   hasVoted: boolean;
+  nbVotants?: number;
 }
 
 export interface VotePayload {

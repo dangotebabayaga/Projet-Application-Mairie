@@ -5,8 +5,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { HttpClient } from '@angular/common/http';
 import { SurveyService, Survey } from '../../services/survey.service';
 import { SocialService, ReseauSocial } from '../../services/social.service';
+import { ReportService, Report } from '../../services/report.service';
 
-type ReportStatus = 'registered' | 'in_progress' | 'resolved';
 type EventTheme = 'sport' | 'culture' | 'citoyennete' | 'environnement';
 type TabId = 'overview' | 'reports' | 'surveys' | 'events' | 'social';
 
@@ -14,20 +14,6 @@ interface SocialForm {
   plateform: string;
   lien: string;
 }
-
-interface Report {
-  id: string;
-  userId: string;
-  userName: string;
-  category: string;
-  description: string;
-  photo?: string;
-  location: { address: string; lat: number; lng: number };
-  status: ReportStatus;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
 
 interface Event {
   id: string;
@@ -83,15 +69,33 @@ export class BackofficeComponent implements OnInit {
   socialError = '';
   socialSuccess = '';
 
+  reports: Report[] = [];
+
   constructor(
     private surveyService: SurveyService,
     private socialService: SocialService,
+    private reportService: ReportService,
     private http: HttpClient
   ) {}
 
   ngOnInit(): void {
     this.loadSurveys();
     this.loadSocials();
+    this.loadReports();
+  }
+
+  loadReports(): void {
+    this.reportService.getAll().subscribe({
+      next: (data) => this.reports = data,
+      error: (err) => console.error('Erreur chargement signalements', err)
+    });
+  }
+
+  advanceReportState(id: number): void {
+    this.reportService.advanceState(id).subscribe({
+      next: () => this.loadReports(),
+      error: (err) => console.error('Erreur changement état', err)
+    });
   }
 
   loadSocials(): void {
@@ -175,43 +179,6 @@ export class BackofficeComponent implements OnInit {
     return this.surveysList;
   }
 
-  // Données de démonstration
-  reports: Report[] = [
-    {
-      id: '1',
-      userId: 'user-1',
-      userName: 'Jean Dupont',
-      category: 'Voirie',
-      description: 'Nid de poule important devant le 15 rue de la Mairie',
-      location: { address: '15 rue de la Mairie', lat: 48.8566, lng: 2.3522 },
-      status: 'registered',
-      createdAt: new Date('2024-01-14'),
-      updatedAt: new Date('2024-01-14')
-    },
-    {
-      id: '2',
-      userId: 'user-2',
-      userName: 'Marie Martin',
-      category: 'Éclairage',
-      description: 'Lampadaire défaillant près de l\'école',
-      location: { address: 'Rue de l\'École', lat: 48.8567, lng: 2.3523 },
-      status: 'in_progress',
-      createdAt: new Date('2024-01-10'),
-      updatedAt: new Date('2024-01-12')
-    },
-    {
-      id: '3',
-      userId: 'user-3',
-      userName: 'Pierre Bernard',
-      category: 'Propreté',
-      description: 'Dépôt sauvage de déchets',
-      location: { address: 'Rue Victor Hugo', lat: 48.8568, lng: 2.3524 },
-      status: 'resolved',
-      createdAt: new Date('2024-01-05'),
-      updatedAt: new Date('2024-01-08')
-    }
-  ];
-
   events: Event[] = [
     {
       id: '1',
@@ -237,8 +204,8 @@ export class BackofficeComponent implements OnInit {
   get stats() {
     return {
       reportsTotal: this.reports.length,
-      reportsInProgress: this.reports.filter(r => r.status === 'in_progress').length,
-      reportsRegistered: this.reports.filter(r => r.status === 'registered').length,
+      reportsInProgress: this.reports.filter(r => r.etat === 'en cours').length,
+      reportsRegistered: this.reports.filter(r => r.etat === 'enregistré').length,
       surveysActive: this.surveys.length,
       surveyResponses: 0,
       eventsUpcoming: this.events.filter(e => new Date(e.date) > new Date()).length
@@ -249,21 +216,13 @@ export class BackofficeComponent implements OnInit {
     this.activeTab = tabId;
   }
 
-  getStatusConfig(status: ReportStatus) {
-    const configs = {
-      registered: { colorClass: 'status-registered', label: 'Enregistré' },
-      in_progress: { colorClass: 'status-in-progress', label: 'En cours' },
-      resolved: { colorClass: 'status-resolved', label: 'Résolu' }
+  getStatusConfig(etat: string) {
+    const configs: Record<string, { colorClass: string; label: string }> = {
+      'enregistré': { colorClass: 'status-registered', label: 'Enregistré' },
+      'en cours': { colorClass: 'status-in-progress', label: 'En cours' },
+      'résolu': { colorClass: 'status-resolved', label: 'Résolu' }
     };
-    return configs[status];
-  }
-
-  updateReportStatus(reportId: string, newStatus: ReportStatus): void {
-    const report = this.reports.find(r => r.id === reportId);
-    if (report) {
-      report.status = newStatus;
-      report.updatedAt = new Date();
-    }
+    return configs[etat] || { colorClass: 'status-registered', label: etat };
   }
 
   toggleSurveyForm(): void {

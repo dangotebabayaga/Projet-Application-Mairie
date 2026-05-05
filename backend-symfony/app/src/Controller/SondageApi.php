@@ -76,6 +76,8 @@ use App\Service\AuthChecker;
                 'sondage' => $s->getId()
             ]) !== null;
 
+            $nbVotants = $this->votesRepo->count(['sondage' => $s->getId()]);
+
             $data[] = [
                 'id' => $s->getId(),
                 'titre' => $s->getTitre(),
@@ -84,7 +86,8 @@ use App\Service\AuthChecker;
                 'dateFin' => $s->getDateFin(),
                 'idAdmin' => $s->getAdministrateur(),
                 'choix' => $choix,
-                'hasVoted' => $hasVoted
+                'hasVoted' => $hasVoted,
+                'nbVotants' => $nbVotants
             ];
         }
 

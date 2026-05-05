@@ -3,9 +3,10 @@
   <div class="page-header">
     <div class="header-text">
       <h1>Signalements citoyens</h1>
-      <p>Signalez un problème dans votre ville</p>
+      <p *ngIf="!isAdmin">Signalez un problème dans votre ville</p>
+      <p *ngIf="isAdmin">Consultation des signalements de la ville</p>
     </div>
-    <button class="btn-primary" (click)="toggleForm()">
+    <button *ngIf="!isAdmin" class="btn-primary" (click)="toggleForm()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <line x1="12" y1="5" x2="12" y2="19"></line>
         <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -23,10 +24,11 @@
         <label for="category">Catégorie</label>
         <select
           id="category"
-          [(ngModel)]="formData.category"
-          name="category"
+          [(ngModel)]="formData.typeId"
+          name="typeId"
+          required
         >
-          <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+          <option *ngFor="let t of types" [ngValue]="t.id">{{ t.nom }}</option>
         </select>
       </div>
 
@@ -69,79 +71,133 @@
             <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
             <circle cx="12" cy="13" r="4"></circle>
           </svg>
-          Photo (URL)
+          Photo
         </label>
         <input
-          type="text"
+          type="file"
           id="photo"
-          [(ngModel)]="formData.photo"
           name="photo"
-          placeholder="https://..."
+          accept="image/*"
+          (change)="onFileChange($event)"
         />
-        <p class="form-hint">Optionnel : ajoutez une photo du problème</p>
+        <p class="form-hint">Optionnel : JPG, PNG, WEBP — max 5 Mo</p>
+        <div class="photo-preview" *ngIf="photoPreview">
+          <img [src]="photoPreview" alt="Aperçu" />
+          <button type="button" class="btn-remove-photo" (click)="removePhoto()">Retirer</button>
+        </div>
       </div>
+
+      <p class="form-error" *ngIf="uploadError">{{ uploadError }}</p>
 
       <!-- Boutons -->
       <div class="form-actions">
-        <button type="submit" class="btn-submit" [disabled]="!formData.description || !formData.address">
-          Envoyer le signalement
+        <button type="submit" class="btn-submit"
+          [disabled]="!formData.description || !formData.address || submitting">
+          {{ submitting ? 'Envoi…' : 'Envoyer le signalement' }}
         </button>
-        <button type="button" class="btn-cancel" (click)="toggleForm()">
+        <button type="button" class="btn-cancel" (click)="toggleForm()" [disabled]="submitting">
           Annuler
         </button>
       </div>
     </form>
   </div>
 
-  <!-- Mes signalements -->
-  <div class="section">
+  <!-- Carte des signalements (repliable) -->
+  <div class="map-card">
+    <button type="button" class="map-toggle" (click)="toggleMap()" [attr.aria-expanded]="showMap">
+      <span class="map-toggle-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+          <circle cx="12" cy="10" r="3"></circle>
+        </svg>
+        Carte des signalements
+      </span>
+      <svg class="chevron" [class.open]="showMap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="6 9 12 15 18 9"></polyline>
+      </svg>
+    </button>
+    <div id="reports-map" *ngIf="showMap"></div>
+  </div>
+
+  <!-- Mes signalements (citoyen uniquement) -->
+  <div class="section" *ngIf="!isAdmin">
     <h2>Mes signalements ({{ myReports.length }})</h2>
-    <div class="reports-list">
-      <div class="report-card" *ngFor="let report of myReports">
-        <div class="report-header">
-          <div class="report-info">
-            <div class="report-badges">
-              <span class="badge-category">{{ report.titre }}</span>
-              <span class="badge-status" [ngClass]="getStatusInfo(report.etat).colorClass">
-                <svg *ngIf="report.etat === 'enregistré'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <polyline points="12 6 12 12 16 14"></polyline>
-                </svg>
-                <svg *ngIf="report.etat === 'en cours'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <line x1="12" y1="8" x2="12" y2="12"></line>
-                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                </svg>
-                <svg *ngIf="report.etat === 'résolu'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                </svg>
-                {{ getStatusInfo(report.etat).label }}
-              </span>
-            </div>
-            <p class="report-description">{{ report.description }}</p>
-          </div>
-        </div>
-        <div class="report-footer">
-          <div class="report-meta" *ngIf="report.adresse">
+
+    <!-- Filtres (style sondages) -->
+    <div class="card-list-filter-card">
+      <div class="card-list-filter-section">
+        <div class="card-list-filter-section-header">
+          <div class="card-list-filter-label">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-              <circle cx="12" cy="10" r="3"></circle>
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
             </svg>
-            {{ report.adresse }}
+            <span>Filtrer par état</span>
           </div>
-          <div class="report-meta">
+          <button type="button" class="card-sort-btn" (click)="toggleSort()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path *ngIf="sortDesc" d="M3 6h18M6 12h12M10 18h4"></path>
+              <path *ngIf="!sortDesc" d="M10 6h4M6 12h12M3 18h18"></path>
+            </svg>
+            {{ sortDesc ? 'Plus récent' : 'Plus ancien' }}
+          </button>
+        </div>
+        <div class="card-filter-buttons">
+          <button
+            *ngFor="let s of statusFilters"
+            type="button"
+            class="card-filter-btn"
+            [ngClass]="'filter-report-status-' + s.id.replace(' ', '-')"
+            [class.active]="selectedStatus === s.id"
+            (click)="selectStatus(s.id)"
+          >
+            {{ s.label }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="reports-grid">
+      <div class="report-card-small" *ngFor="let report of myReports">
+        <img *ngIf="report.photo" [src]="report.photo" alt="Photo signalement" class="report-photo small" />
+        <div class="report-badges">
+          <span class="badge-category small">{{ report.typeNom || report.titre }}</span>
+          <span class="badge-status small" [ngClass]="getStatusInfo(report.etat).colorClass">
+            <svg *ngIf="report.etat === 'enregistré'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="10"></circle>
               <polyline points="12 6 12 12 16 14"></polyline>
             </svg>
-            {{ formatDate(report.dateCrea) }}
-          </div>
+            <svg *ngIf="report.etat === 'en cours'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <svg *ngIf="report.etat === 'résolu'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            {{ getStatusInfo(report.etat).label }}
+          </span>
+        </div>
+        <p class="report-description">{{ report.description }}</p>
+        <div class="report-meta" *ngIf="report.adresse">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          {{ report.adresse }}
+        </div>
+        <div class="report-meta">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          {{ formatDate(report.dateCrea) }}
         </div>
       </div>
 
       <div class="empty-state" *ngIf="myReports.length === 0">
-        <p>Vous n'avez pas encore de signalements</p>
+        <p *ngIf="selectedStatus === 'all'">Vous n'avez pas encore de signalements</p>
+        <p *ngIf="selectedStatus !== 'all'">Aucun signalement avec ce filtre</p>
       </div>
     </div>
   </div>
@@ -151,8 +207,9 @@
     <h2>Signalements de la ville ({{ reports.length }})</h2>
     <div class="reports-grid">
       <div class="report-card-small" *ngFor="let report of otherReports">
+        <img *ngIf="report.photo" [src]="report.photo" alt="Photo signalement" class="report-photo small" />
         <div class="report-badges">
-          <span class="badge-category small">{{ report.titre }}</span>
+          <span class="badge-category small">{{ report.typeNom || report.titre }}</span>
           <span class="badge-status small" [ngClass]="getStatusInfo(report.etat).colorClass">
             <svg *ngIf="report.etat === 'enregistré'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="10"></circle>

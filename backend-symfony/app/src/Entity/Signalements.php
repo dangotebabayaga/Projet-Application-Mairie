@@ -34,7 +34,10 @@ class Signalements
     
     #[ORM\ManyToOne(targetEntity: Citoyens::class)]
     #[ORM\JoinColumn(name: "citoyen_id", referencedColumnName: "utilisateur_id")]
-    private ?Citoyens $citoyen = null; 
+    private ?Citoyens $citoyen = null;
+
+    #[ORM\Column(length: 500, nullable: true)]
+    private ?string $photo = null;
     // **Ajoute explicitement le type datetime**
     #[ORM\Column(type: "datetime", nullable: true)]
     private ?\DateTimeInterface $dateCreation = null;
@@ -139,5 +142,14 @@ class Signalements
         $this->dateModification = $dateModification;
     }
 
+    public function getPhoto(): ?string
+    {
+        return $this->photo;
+    }
 
+    public function setPhoto(?string $photo): self
+    {
+        $this->photo = $photo;
+        return $this;
+    }
 }
