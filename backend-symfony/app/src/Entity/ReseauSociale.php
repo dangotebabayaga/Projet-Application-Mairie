@@ -15,7 +15,7 @@ class ReseauSociale
     #[ORM\Column(nullable: true)]
     private ?int $villeId = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(name: 'plateforme', nullable: true)]
     private ?string $plateform = null;
 
     #[ORM\Column(nullable: true)]
