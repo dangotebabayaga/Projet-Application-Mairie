@@ -83,7 +83,7 @@ use App\Repository\EvenementRepository;
 
         return $this->json($data);
     }
-    #[Route('/listeType', name: 'get_all_Even', methods: ['GET'])]
+    #[Route('/listeType', name: 'get_all_Type_Even', methods: ['GET'])]
     public function getallType(Request $request): JsonResponse
     {
          $user = $this->auth->getUserFromRequest($request);
