@@ -10,6 +10,10 @@ doctrine:
                 url: '%env(resolve:DATABASE_URL_CITOYEN)%'
                 server_version: '15'
                 profiling_collect_backtrace: '%kernel.debug%'
+            elu:
+                url: '%env(resolve:DATABASE_URL_ELU)%'
+                server_version: '15'
+                profiling_collect_backtrace: '%kernel.debug%'
     orm:
         default_entity_manager: admin
         entity_managers:
@@ -33,6 +37,16 @@ doctrine:
                         dir: '%kernel.project_dir%/src/Entity'
                         prefix: 'App\Entity'
                         alias: App
+            elu:
+                connection: elu
+                naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
+                mappings:
+                    App:
+                        is_bundle: false
+                        type: attribute
+                        dir: '%kernel.project_dir%/src/Entity'
+                        prefix: 'App\Entity'
+                        alias: App
 
 when@test:
     doctrine:
@@ -41,6 +55,8 @@ when@test:
                 admin:
                     dbname_suffix: '_test%env(default::TEST_TOKEN)%'
                 citoyen:
+                    dbname_suffix: '_test%env(default::TEST_TOKEN)%'
+                elu:
                     dbname_suffix: '_test%env(default::TEST_TOKEN)%'
 
 when@prod:
@@ -57,6 +73,13 @@ when@prod:
                         type: pool
                         pool: doctrine.result_cache_pool
                 citoyen:
+                    query_cache_driver:
+                        type: pool
+                        pool: doctrine.system_cache_pool
+                    result_cache_driver:
+                        type: pool
+                        pool: doctrine.result_cache_pool
+                elu:
                     query_cache_driver:
                         type: pool
                         pool: doctrine.system_cache_pool

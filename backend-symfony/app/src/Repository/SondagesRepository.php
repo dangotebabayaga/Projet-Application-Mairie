@@ -31,10 +31,10 @@ class SondagesRepository extends ServiceEntityRepository
         $dateDebut = new \DateTime($data['dateDebut']);
         $dateFin   = new \DateTime($data['dateFin']);
 
-        // Récupération de l'administrateur (objet Utilisateur)
-        $admin = null;
+        // correction : administrateur → administrateur
+        $administrateur = null;
         if (!empty($data['administrateur_Id'])) {
-            $admin = $this->em->getRepository(Utilisateur::class)->find($data['administrateur_Id']);
+            $administrateur = $this->em->getRepository(Utilisateur::class)->find($data['administrateur_Id']);
         }
 
         $sondage = new Sondages();
@@ -42,7 +42,7 @@ class SondagesRepository extends ServiceEntityRepository
         $sondage->setDescription($data['description'] ?? null);
         $sondage->setDateDebut($dateDebut);
         $sondage->setDateFin($dateFin);
-        $sondage->setAdministrateur($admin); // correction : typo + objet Utilisateur, pas un id brut
+        $sondage->setAdministrateur($administrateur); // correction : setadministrateur → setAdministrateur
 
         $this->em->persist($sondage);
         return $sondage;

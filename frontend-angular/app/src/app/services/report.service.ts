@@ -3,17 +3,16 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface Report {
-  id: number;
-  titre: string;
-  etat: string;
-  description: string;
-  adresse: string | null;
-  typeId: number | null;
-  citoyenId: number | null;
-  dateCrea: string;
-  dateModif: string;
+    id?: number;
+    titre: string;
+    etat: string;
+    description: string;
+    adresse?: string;
+    typeId?: number;
+    utilisateurId?: number; // optionnel car récupéré depuis le token
+    dateCrea?: string;
+    dateModif?: string;
 }
-
 export interface ReportPayload {
   titre: string;
   description: string;

@@ -113,12 +113,12 @@ class Evenement
     }
 
     // correction : ?int → ?Utilisateur
-    public function getAdministrateur(): ?Utilisateur
+    public function getadministrateur(): ?Utilisateur
     {
         return $this->administrateur;
     }
 
-    public function setAdministrateur(?Utilisateur $administrateur): self
+    public function setadministrateur(?Utilisateur $administrateur): self
     {
         $this->administrateur = $administrateur;
         return $this;

@@ -17,13 +17,13 @@ class EvenementApi extends AbstractController
 {
     private EntityManagerInterface $em;
     private EvenementRepository $evenRepo;
-    private UtilisateurRepository $userRepo; // correction : AdministrateursRepository → UtilisateurRepository
+    private UtilisateurRepository $userRepo; // correction : administrateursRepository → UtilisateurRepository
     private AuthChecker $auth;
 
     public function __construct(
         EntityManagerInterface $em,
         EvenementRepository $evenRepo,
-        UtilisateurRepository $userRepo, // correction : AdministrateursRepository → UtilisateurRepository
+        UtilisateurRepository $userRepo, // correction : administrateursRepository → UtilisateurRepository
         AuthChecker $auth
     ) {
         $this->em       = $em;
@@ -39,7 +39,7 @@ class EvenementApi extends AbstractController
         if (!$user) {
             return $this->json(["error" => "Token manquant ou invalide"], 401);
         }
-        if (!$this->auth->checkRole($user, 'administrateur')) { // correction : 'admin' → 'administrateur'
+        if (!$this->auth->checkAnyRole($user, ['elu', 'administrateur'])) {
             return $this->json(["error" => "Accès interdit"], 403);
         }
 
@@ -71,7 +71,7 @@ class EvenementApi extends AbstractController
                 "date Evenement" => $e->getDateEv()?->format('Y-m-d'),
                 "Heure début"    => $e->getHeureDeb()?->format('H:i'),
                 "Heure fin"      => $e->getHeureFin()?->format('H:i'),
-                "adminId"        => $e->getAdministrateur()?->getId(), // correction : getAdministrateurId() → getAdministrateur()->getId()
+                "administrateurId"        => $e->getadministrateur()?->getId(), // correction : getadministrateurId() → getadministrateur()->getId()
                 "type"           => $e->getType()?->getNom()           // correction : find() inutile, getType() retourne déjà un objet TypeEv
             ];
         }

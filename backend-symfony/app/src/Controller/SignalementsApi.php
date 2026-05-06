@@ -55,6 +55,14 @@
 
     #[Route('', name: 'api_post_signalement', methods: ['POST'])] 
     public function create(Request $request): JsonResponse{
+        
+        $user = $this->auth->getUserFromRequest($request); 
+        if (!$user) {
+            return $this->json(["error" => "Token manquant ou invalide"], 401);
+        }
+        if (!$this->auth->checkAnyRole($user, ['citoyen', 'administrateur'])) {
+            return $this->json(["error" => "Accès interdit"], 403);
+        }
 
          $data = json_decode($request->getContent(), true);
 

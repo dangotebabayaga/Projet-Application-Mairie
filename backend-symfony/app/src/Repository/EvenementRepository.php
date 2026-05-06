@@ -41,9 +41,9 @@ class EvenementRepository extends ServiceEntityRepository
         }
 
         // Récupération de l'administrateur (objet Utilisateur)
-        $admin = null;
-        if (!empty($data['adminId'])) {
-            $admin = $this->em->getRepository(Utilisateur::class)->find($data['adminId']);
+        $administrateur = null;
+        if (!empty($data['administrateurId'])) {
+            $administrateur = $this->em->getRepository(Utilisateur::class)->find($data['administrateurId']);
         }
 
         // Création de l'événement
@@ -54,7 +54,7 @@ class EvenementRepository extends ServiceEntityRepository
         $evenement->setDateEv($dateEv);
         $evenement->setHeureDeb($heureDeb);
         $evenement->setHeureFin($heureFin);
-        $evenement->setAdministrateur($admin);  // correction : objet Utilisateur, pas un id brut
+        $evenement->setadministrateur($administrateur);  // correction : objet Utilisateur, pas un id brut
         $evenement->setType($type);             // correction : objet TypeEv, pas un id brut
 
         $this->em->persist($evenement);

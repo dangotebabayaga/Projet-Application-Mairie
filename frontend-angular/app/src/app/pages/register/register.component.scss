@@ -194,7 +194,7 @@
     cursor: not-allowed;
   }
 
-  &.active.citizen {
+  &.active.citoyen {
     border-color: $blue-600;
     background: $blue-50;
 
@@ -203,7 +203,7 @@
     }
   }
 
-  &.active.municipal {
+  &.active.elu {
     border-color: $green-600;
     background: $green-50;
 

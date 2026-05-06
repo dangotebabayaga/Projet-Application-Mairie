@@ -3,6 +3,8 @@ namespace App\Entity;
 
 use App\Repository\UtilisateurRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
 #[ORM\Table(name: 'Utilisateurs')]
@@ -42,10 +44,45 @@ class Utilisateur // correction : 'Utilisateur' → 'Utilisateur'
     #[ORM\Column(name: 'compte_actif', nullable: true)]
     private ?bool $compteActif = null;
 
-    // correction : champ role ajouté (remplace les anciennes tables administrateurs/citoyens)
-    #[ORM\Column(length: 20, nullable: false, options: ['default' => 'citoyen'])]
-    private string $role = 'citoyen';
+    #[ORM\ManyToMany(targetEntity: Role::class)]
+    #[ORM\JoinTable(
+        name: 'utilisateur_roles',
+        joinColumns: [new ORM\JoinColumn(name: 'utilisateur_id', referencedColumnName: 'id')],
+        inverseJoinColumns: [new ORM\JoinColumn(name: 'role_id', referencedColumnName: 'id')]
+    )]
+    private Collection $roles;
 
+    public function __construct()
+    {
+        $this->roles = new ArrayCollection();
+    }
+
+    public function getRoles(): Collection
+    {
+        return $this->roles;
+    }
+
+    public function hasRole(string $nomRole): bool
+    {
+        foreach ($this->roles as $role) {
+            if ($role->getNom() === $nomRole) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function addRole(Role $role): void
+    {
+        if (!$this->roles->contains($role)) {
+            $this->roles->add($role);
+        }
+    }
+
+    public function removeRole(Role $role): void
+    {
+        $this->roles->removeElement($role);
+    }
     public function getId(): ?int
     {
         return $this->id;
@@ -142,16 +179,4 @@ class Utilisateur // correction : 'Utilisateur' → 'Utilisateur'
         $this->compteActif = $compteActif;
     }
 
-    public function getRole(): string
-    {
-        return $this->role;
-    }
-
-    public function setRole(string $role): void
-    {
-        if (!in_array($role, ['citoyen', 'administrateur'])) {
-            throw new \InvalidArgumentException('Rôle invalide : ' . $role);
-        }
-        $this->role = $role;
-    }
 }

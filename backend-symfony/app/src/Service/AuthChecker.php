@@ -23,21 +23,31 @@ class AuthChecker
         if (!$authHeader || !str_starts_with($authHeader, 'Bearer ')) {
             return null;
         }
-    
+
         $token = substr($authHeader, 7);
-    
+
         try {
             $payload = JWT::decode($token, new Key($this->jwtSecret, 'HS256'));
-            return $this->userRepo->findByEmail($payload->email); // email est bien présent
+            return $this->userRepo->findByEmail($payload->email);
         } catch (\Exception $e) {
             return null;
         }
     }
 
+    // Vérifie un seul rôle
     public function checkRole(mixed $user, string $role): bool
     {
         if ($user === null) return false;
-        // correction : utilise getRole() sur l'objet Utilisateur
-        return $user->getRole() === $role;
+        return $user->hasRole($role);
+    }
+
+    // Vérifie si l'utilisateur a au moins un des rôles donnés
+    public function checkAnyRole(mixed $user, array $roles): bool
+    {
+        if ($user === null) return false;
+        foreach ($roles as $role) {
+            if ($user->hasRole($role)) return true;
+        }
+        return false;
     }
 }

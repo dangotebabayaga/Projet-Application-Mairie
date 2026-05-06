@@ -63,7 +63,7 @@ class UserApi extends AbstractController
         $token = $this->jwtService->generateToken(
             $user->getId(),
             $user->getEmail(),
-            $user->getRole()
+            array_map(fn($r) => $r->getNom(), $user->getRoles()->toArray())
         );
 
         return $this->json([
@@ -88,5 +88,60 @@ class UserApi extends AbstractController
         } catch (\Exception $e) {
             return null;
         }
+    }
+    #[Route('/{id}/roles', name: 'api_add_role', methods: ['POST'])]
+    public function addRole(int $id, Request $request): JsonResponse
+    {
+        $user = $this->auth->getUserFromRequest($request);
+        if (!$user) {
+            return $this->json(["error" => "Token manquant ou invalide"], 401);
+        }
+        if (!$this->auth->checkRole($user, 'administrateur')) {
+            return $this->json(["error" => "Accès interdit"], 403);
+        }
+
+        $data      = json_decode($request->getContent(), true);
+        $cible     = $this->userRepo->find($id);
+        if (!$cible) {
+            return $this->json(["error" => "Utilisateur introuvable"], 404);
+        }
+
+        $role = $this->em->getRepository(Role::class)->findOneBy(['nom' => $data['role']]);
+        if (!$role) {
+            return $this->json(["error" => "Rôle introuvable"], 404);
+        }
+
+        $cible->addRole($role);
+        $this->em->flush();
+
+        return $this->json(['message' => "Rôle ajouté avec succès"]);
+    }
+
+    #[Route('/{id}/roles', name: 'api_remove_role', methods: ['DELETE'])]
+    public function removeRole(int $id, Request $request): JsonResponse
+    {
+        $user = $this->auth->getUserFromRequest($request);
+        if (!$user) {
+            return $this->json(["error" => "Token manquant ou invalide"], 401);
+        }
+        if (!$this->auth->checkRole($user, 'administrateur')) {
+            return $this->json(["error" => "Accès interdit"], 403);
+        }
+
+        $data  = json_decode($request->getContent(), true);
+        $cible = $this->userRepo->find($id);
+        if (!$cible) {
+            return $this->json(["error" => "Utilisateur introuvable"], 404);
+        }
+
+        $role = $this->em->getRepository(Role::class)->findOneBy(['nom' => $data['role']]);
+        if (!$role) {
+            return $this->json(["error" => "Rôle introuvable"], 404);
+        }
+
+        $cible->removeRole($role);
+        $this->em->flush();
+
+        return $this->json(['message' => "Rôle retiré avec succès"]);
     }
 }

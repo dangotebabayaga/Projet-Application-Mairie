@@ -17,7 +17,7 @@ interface RegisterForm {
   email: string;
   password: string;
   confirmPassword: string;
-  role: 'citizen' | 'municipal';
+  role: 'citoyen' | 'elu';
   address: string;
   neighborhood: string;
 }
@@ -39,7 +39,7 @@ export class RegisterComponent {
     email: '',
     password: '',
     confirmPassword: '',
-    role: 'citizen',
+    role: 'citoyen',
     address: '',
     neighborhood: ''
   };
@@ -93,7 +93,7 @@ export class RegisterComponent {
       prenom: this.formData.prenom,
       email: this.formData.email,
       motDePasse: this.formData.password,
-      role: this.formData.role === 'citizen' ? 1 : 2
+      role: [this.formData.role]
     };
 
     this.authService.register(payload).subscribe({
@@ -112,9 +112,9 @@ export class RegisterComponent {
     });
   }
 
-  selectRole(role: 'citizen' | 'municipal'): void {
+  selectRole(role: 'citoyen' | 'elu'): void {
     this.formData.role = role;
-    if (role === 'municipal') {
+    if (role === 'elu') {
       this.formData.address = '';
       this.formData.neighborhood = '';
     }

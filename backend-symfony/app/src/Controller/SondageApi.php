@@ -5,7 +5,7 @@ use App\Entity\Sondages;
 use App\Repository\ChoixRepository;
 use App\Repository\SondagesRepository;
 use App\Repository\VotesSondageRepository;
-use App\Repository\UtilisateurRepository; // correction : Administrateurs/CitoyensRepository → UtilisateurRepository
+use App\Repository\UtilisateurRepository; // correction : administrateurs/CitoyensRepository → UtilisateurRepository
 use App\Entity\ListeChoixSondage;
 use App\Service\AuthChecker;
 use Doctrine\ORM\EntityManagerInterface;
@@ -40,18 +40,16 @@ class SondageApi extends AbstractController
         $this->auth        = $auth;
     }
 
-   #[Route('', name: 'api_get_sondages', methods: ['GET'])]
+    #[Route('', name: 'api_get_sondages', methods: ['GET'])]
     public function getAll(Request $request): JsonResponse
     {
-        $user = $this->auth->getUserFromRequest($request); // null si non connecté
+        $user = $this->auth->getUserFromRequest($request);
 
-        $sondages = $this->em->getRepository(Sondages::class)->findAll();
+        $sondages = $this->sondageRepo->findAll(); // correction : em->getRepository → sondageRepo injecté
         $data     = [];
 
         foreach ($sondages as $s) {
-            $relations = $this->em
-                ->getRepository(ListeChoixSondage::class)
-                ->findBy(['sondage' => $s]);
+            $relations = $this->em->getRepository(ListeChoixSondage::class)->findBy(['sondage' => $s]);
 
             $choix = array_map(function ($relation) {
                 $c = $relation->getChoix();
@@ -61,7 +59,6 @@ class SondageApi extends AbstractController
                 ];
             }, $relations);
 
-            // hasVoted uniquement si l'utilisateur est connecté
             $hasVoted = $user ? $this->votesRepo->findOneBy([
                 'utilisateur' => $user,
                 'sondage'     => $s
@@ -73,14 +70,14 @@ class SondageApi extends AbstractController
                 'description' => $s->getDescription(),
                 'dateDebut'   => $s->getDateDebut()?->format('Y-m-d H:i:s'),
                 'dateFin'     => $s->getDateFin()?->format('Y-m-d H:i:s'),
-                'idAdmin'     => $s->getAdministrateur()?->getId(),
+                'idAdmin'     => $s->getAdministrateur()?->getId(), // correction : getadministrateur → getAdministrateur
                 'choix'       => $choix,
                 'hasVoted'    => $hasVoted
             ];
         }
 
         return $this->json($data);
-    } 
+    }
 
     #[Route('', name: 'api_post_sondage', methods: ['POST'])]
     public function create(Request $request): JsonResponse
@@ -89,7 +86,7 @@ class SondageApi extends AbstractController
         if (!$user) {
             return $this->json(["error" => "Token manquant ou invalide"], 401);
         }
-        if (!$this->auth->checkRole($user, 'administrateur')) { 
+        if (!$this->auth->checkAnyRole($user, ['elu', 'administrateur'])) {
             return $this->json(["error" => "Accès interdit"], 403);
         }
 

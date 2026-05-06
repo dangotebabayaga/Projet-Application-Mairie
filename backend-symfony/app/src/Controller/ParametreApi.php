@@ -3,7 +3,7 @@ namespace App\Controller;
 
 use App\Service\AuthChecker;
 use App\Entity\Ville;
-use App\Repository\UtilisateurRepository; // correction : AdministrateursRepository → UtilisateurRepository
+use App\Repository\UtilisateurRepository; // correction : administrateursRepository → UtilisateurRepository
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,12 +14,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class ParametreApi extends AbstractController
 {
     private EntityManagerInterface $em;
-    private UtilisateurRepository $userRepo; // correction : adminRepo → userRepo
+    private UtilisateurRepository $userRepo; // correction : administrateurRepo → userRepo
     private AuthChecker $auth;
 
     public function __construct(
         EntityManagerInterface $em,
-        UtilisateurRepository $userRepo, // correction : AdministrateursRepository → UtilisateurRepository
+        UtilisateurRepository $userRepo, // correction : administrateursRepository → UtilisateurRepository
         AuthChecker $auth
     ) {
         $this->em       = $em;
@@ -48,7 +48,7 @@ class ParametreApi extends AbstractController
         if (!$user) {
             return $this->json(["error" => "Token manquant ou invalide"], 401);
         }
-        if (!$this->auth->checkRole($user, 'administrateur')) { // correction : checkrole/'admin' → checkRole/'administrateur'
+        if (!$this->auth->checkAnyRole($user, ['elu', 'administrateur'])) {
             return $this->json(["error" => "Accès interdit"], 403);
         }
 
@@ -75,7 +75,7 @@ class ParametreApi extends AbstractController
         if (!$ville) {
             return $this->json(["error" => "Ville introuvable"], 404);
         }
-    
+
         return $this->json([
             'id'       => $ville->getId(),
             'nom'      => $ville->getNom(),

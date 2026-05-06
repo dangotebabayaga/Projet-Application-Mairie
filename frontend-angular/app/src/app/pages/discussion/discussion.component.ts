@@ -61,7 +61,7 @@ export class DiscussionComponent {
     {
       id: '4',
       platform: 'facebook',
-      content: '🏛️ Conseil municipal ce soir à 18h30\n\nOrdre du jour :\n- Budget 2024\n- Projet de réaménagement du centre-ville\n- Questions diverses\n\nOuvert au public ! Salle du Conseil, Mairie.',
+      content: '🏛️ Conseil elu ce soir à 18h30\n\nOrdre du jour :\n- Budget 2024\n- Projet de réaménagement du centre-ville\n- Questions diverses\n\nOuvert au public ! Salle du Conseil, Mairie.',
       postedAt: new Date('2024-01-10T09:00:00'),
       link: 'https://facebook.com/post/4'
     },

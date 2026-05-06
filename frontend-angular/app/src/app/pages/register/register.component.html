@@ -133,9 +133,9 @@
             <button
               type="button"
               class="role-btn"
-              [class.active]="formData.role === 'citizen'"
-              [class.citizen]="formData.role === 'citizen'"
-              (click)="selectRole('citizen')"
+              [class.active]="formData.role === 'citoyen'"
+              [class.citoyen]="formData.role === 'citoyen'"
+              (click)="selectRole('citoyen')"
               [disabled]="loading"
             >
               <div class="role-title">Citoyen</div>
@@ -144,19 +144,19 @@
             <button
               type="button"
               class="role-btn"
-              [class.active]="formData.role === 'municipal'"
-              [class.municipal]="formData.role === 'municipal'"
-              (click)="selectRole('municipal')"
+              [class.active]="formData.role === 'elu'"
+              [class.elu]="formData.role === 'elu'"
+              (click)="selectRole('elu')"
               [disabled]="loading"
             >
               <div class="role-title">Élu/Agent</div>
-              <div class="role-desc">Personnel municipal</div>
+              <div class="role-desc">Personnel elu</div>
             </button>
           </div>
         </div>
 
         <!-- Champs spécifiques citoyen -->
-        <ng-container *ngIf="formData.role === 'citizen'">
+        <ng-container *ngIf="formData.role === 'citoyen'">
           <!-- Adresse -->
           <div class="form-group">
             <label for="address">Adresse</label>

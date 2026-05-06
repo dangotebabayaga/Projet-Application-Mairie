@@ -9,7 +9,7 @@ export interface EventItem {
   'date Evenement': string;
   'Heure début': string;
   'Heure fin': string;
-  adminId: number;
+  administrateurId: number;
   type: string;
 }
 

@@ -4,7 +4,7 @@ namespace App\Entity;
 use App\Repository\SondagesRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: SondagesRepository::class)]
+#[ORM\Entity(repositoryClass: Sondages::class)]
 #[ORM\Table(name: 'sondages')]
 class Sondages
 {
@@ -25,6 +25,7 @@ class Sondages
     #[ORM\Column(name: 'date_fin', type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $dateFin = null;
 
+    // correction : administrateur → administrateur
     #[ORM\ManyToOne(targetEntity: Utilisateur::class)]
     #[ORM\JoinColumn(name: 'administrateur_id', referencedColumnName: 'id', nullable: true)]
     private ?Utilisateur $administrateur = null;
@@ -43,6 +44,7 @@ class Sondages
     public function getDateFin(): ?\DateTimeInterface { return $this->dateFin; }
     public function setDateFin(?\DateTimeInterface $dateFin): void { $this->dateFin = $dateFin; }
 
+    // correction : getadministrateur → getAdministrateur
     public function getAdministrateur(): ?Utilisateur { return $this->administrateur; }
     public function setAdministrateur(?Utilisateur $administrateur): void { $this->administrateur = $administrateur; }
 }

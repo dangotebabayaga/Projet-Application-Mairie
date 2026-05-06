@@ -3,12 +3,13 @@ namespace App\Repository;
 
 use App\Entity\Utilisateur;
 use App\Entity\Ville;
+use App\Entity\Role;
 use App\Repository\VilleRepository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 
-class UtilisateurRepository extends ServiceEntityRepository // correction : Utilisateurs → Utilisateur
+class UtilisateurRepository extends ServiceEntityRepository
 {
     private EntityManagerInterface $em;
     private VilleRepository $villeRepo;
@@ -16,7 +17,7 @@ class UtilisateurRepository extends ServiceEntityRepository // correction : Util
     public function __construct(ManagerRegistry $registry, EntityManagerInterface $em, VilleRepository $villeRepo)
     {
         parent::__construct($registry, Utilisateur::class);
-        $this->em       = $em;
+        $this->em        = $em;
         $this->villeRepo = $villeRepo;
     }
 
@@ -49,11 +50,35 @@ class UtilisateurRepository extends ServiceEntityRepository // correction : Util
             $this->em->flush();
         }
 
-        $role = match((int) $data['role']) {
-            1 => 'citoyen',
-            2 => 'administrateur',
-            default => throw new \InvalidArgumentException('Rôle invalide : ' . $data['role']),
-        };
+        // correction : tableau de rôles au lieu d'un seul rôle
+        $rolesNoms = $data['role'] ?? [];
+
+        // compatibilité avec l'ancien champ 'role' (int)
+        if (empty($rolesNoms) && isset($data['role'])) {
+            $roleVal = $data['role'];
+
+            // si role est une string JSON
+            if (is_string($roleVal) && str_starts_with($roleVal, '[')) {
+                $rolesNoms = json_decode($roleVal, true) ?? [];
+            }
+            // si c'est une string directe 'elu'
+            elseif (is_string($roleVal) && !is_numeric($roleVal)) {
+                $rolesNoms = [$roleVal];
+            }
+            // si c'est un entier (ancienne API)
+            else {
+                $rolesNoms = match((int) $roleVal) {
+                    1 => ['citoyen'],
+                    2 => ['elu'],
+                    3 => ['administrateur'],
+                    default => throw new \InvalidArgumentException('Rôle invalide : ' . $roleVal),
+                };
+            }
+        }
+
+        if (empty($rolesNoms)) {
+            throw new \InvalidArgumentException('Au moins un rôle est requis');
+        }
 
         $user = new Utilisateur();
         $user->setNom($data['nom']);
@@ -63,7 +88,6 @@ class UtilisateurRepository extends ServiceEntityRepository // correction : Util
         $user->setDateCreation(new \DateTime());
         $user->setVille($ville);
         $user->setCompteActif(true);
-        $user->setRole($role);
 
         if (!empty($data['dateNaissance'])) {
             $user->setDateNaissance(new \DateTime($data['dateNaissance']));
@@ -71,6 +95,16 @@ class UtilisateurRepository extends ServiceEntityRepository // correction : Util
 
         $hash = password_hash($data['motDePasse'], PASSWORD_BCRYPT);
         $user->setMotDePasseHash($hash);
+
+        // correction : ajout des rôles via la table de liaison
+        foreach ($rolesNoms as $nomRole) {
+            $role = $this->em->getRepository(Role::class)->findOneBy(['nom' => $nomRole]);
+            if (!$role) {
+                throw new \InvalidArgumentException('Rôle introuvable : ' . $nomRole);
+            }
+            $user->addRole($role);
+        }
+
         $this->em->persist($user);
         $this->em->flush();
 
@@ -87,19 +121,19 @@ class UtilisateurRepository extends ServiceEntityRepository // correction : Util
             'email'          => $user->getEmail(),
             'telephone'      => $user->getTelephone(),
             'date Naissance' => $user->getDateNaissance(),
-            'role'           => $user->getRole(),
+            'role'          => array_map(fn($r) => $r->getNom(), $user->getRoles()->toArray()), // correction : getRole() → getRoles()
         ];
     }
 
-    public function isAdmin(int $userId): bool
+    public function isadministrateur(int $userId): bool
     {
-        $utilisateur = $this->find($userId); // correction : $utilisateur → $utilisateur
-        return $utilisateur !== null && $utilisateur->getRole() === 'administrateur';
+        $utilisateur = $this->find($userId);
+        return $utilisateur !== null && $utilisateur->hasRole('administrateur'); // correction : getRole() → hasRole()
     }
 
     public function isCitoyen(int $userId): bool
     {
-        $utilisateur = $this->find($userId); // correction : $utilisateur → $utilisateur
-        return $utilisateur !== null && $utilisateur->getRole() === 'citoyen';
+        $utilisateur = $this->find($userId);
+        return $utilisateur !== null && $utilisateur->hasRole('citoyen'); // correction : getRole() → hasRole()
     }
 }

@@ -6,7 +6,7 @@ import { SurveyService } from '../../services/survey.service';
 
 interface User {
   name: string;
-  role: 'citoyen' | 'admin';
+  roles: string[];
 }
 
 interface Module {
@@ -30,18 +30,18 @@ export class HomeComponent implements OnInit {
 
   user: User = {
     name: '',
-    role: 'citoyen'
+    roles: ['citoyen']
   };
 
   ngOnInit(): void {
     const prenom = localStorage.getItem('userPrenom');
-    const role = localStorage.getItem('userRole');
+    const roles: string[] = JSON.parse(localStorage.getItem('userRole') || '["citoyen"]');
     if (prenom) {
       this.user.name = prenom;
     }
-    if (role === 'admin') {
-      this.user.role = 'admin';
-    }
+    //if (role === 'administrateur') {
+      this.user.roles = roles;
+    //}
     this.loadStats();
   }
 
@@ -59,7 +59,7 @@ export class HomeComponent implements OnInit {
   }
 
   get modules(): Module[] {
-    const citizenModules: Module[] = [
+    const citoyenModules: Module[] = [
       {
         id: 'reports',
         title: 'Signalements',
@@ -94,9 +94,9 @@ export class HomeComponent implements OnInit {
       }
     ];
 
-    if (this.user.role === 'admin') {
+    if (this.user.roles.includes('administrateur') || this.user.roles.includes('elu')) {
       return [
-        ...citizenModules,
+        ...citoyenModules,
         {
           id: 'backoffice',
           title: 'Back-Office',
@@ -108,11 +108,11 @@ export class HomeComponent implements OnInit {
       ];
     }
 
-    return citizenModules;
+    return citoyenModules;
   }
 
   get welcomeMessage(): string {
-    return this.user.role === 'admin'
+    return this.user.roles.includes('administrateur') || this.user.roles.includes('elu')
       ? 'Tableau de bord pour la gestion des services municipaux'
       : 'Participez à la vie de votre ville';
   }
