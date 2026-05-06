@@ -21,10 +21,11 @@ export interface EventPayload {
   titre: string;
   lieux: string;
   commentaire: string;
-  dateEv: string;
-  heureDeb: string;
-  heureFin: string;
-  type: number;
+  'date Evenement': string;
+  'Heure début': string;
+  'Heure fin': string;
+  adminId: number;
+  type: string;
 }
 
 @Injectable({

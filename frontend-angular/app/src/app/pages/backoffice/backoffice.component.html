@@ -35,6 +35,13 @@
           <line x1="8" y1="2" x2="8" y2="6"></line>
           <line x1="3" y1="10" x2="21" y2="10"></line>
         </svg>
+        <svg *ngIf="tab.icon === 'share'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="18" cy="5" r="3"></circle>
+          <circle cx="6" cy="12" r="3"></circle>
+          <circle cx="18" cy="19" r="3"></circle>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+        </svg>
         <span>{{ tab.label }}</span>
       </button>
     </div>
@@ -320,6 +327,68 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- RÉSEAUX SOCIAUX -->
+  <div class="tab-content" *ngIf="activeTab === 'social'">
+    <div class="section-header">
+      <h2>Réseaux sociaux ({{ socials.length }})</h2>
+    </div>
+
+    <!-- Formulaire d'ajout -->
+    <div class="form-card">
+      <h3>Ajouter un réseau social</h3>
+      <form (ngSubmit)="onCreateSocial()" class="admin-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Plateforme</label>
+            <select [(ngModel)]="socialForm.plateform" name="plateform" required>
+              <option value="" disabled>Choisir…</option>
+              <option value="Facebook">Facebook</option>
+              <option value="Twitter">Twitter / X</option>
+              <option value="Instagram">Instagram</option>
+              <option value="LinkedIn">LinkedIn</option>
+              <option value="YouTube">YouTube</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Lien (URL complète)</label>
+            <input
+              type="url"
+              [(ngModel)]="socialForm.lien"
+              name="lien"
+              placeholder="https://www.facebook.com/MaVille"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="form-error" *ngIf="socialError">{{ socialError }}</div>
+        <div class="form-success" *ngIf="socialSuccess">{{ socialSuccess }}</div>
+
+        <button type="submit" class="btn-submit" [disabled]="socialLoading">
+          {{ socialLoading ? 'Ajout en cours…' : 'Ajouter' }}
+        </button>
+      </form>
+    </div>
+
+    <!-- Liste -->
+    <div class="surveys-list">
+      <div class="survey-admin-card" *ngFor="let s of socials">
+        <div class="survey-info">
+          <h3>{{ s.plateform }}</h3>
+          <p>
+            <a [href]="s.lien" target="_blank" rel="noopener noreferrer">{{ s.lien }}</a>
+          </p>
+        </div>
+        <button class="btn-status orange" (click)="onDeleteSocial(s.id)">
+          Supprimer
+        </button>
+      </div>
+      <p *ngIf="socials.length === 0" style="color: #6B7280;">
+        Aucun réseau social configuré.
+      </p>
     </div>
   </div>
 </div>

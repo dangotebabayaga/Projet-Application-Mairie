@@ -59,7 +59,7 @@ class Signalements
         $this->titre = $titre;
     }
 
-    public function getEtat(): ?string
+    public function getEtat(): EtatSignalement
     {
         return $this->etat;
     }
@@ -67,6 +67,7 @@ class Signalements
     public function setEtat(?string $etat): void
     {
         $this->etat = $etat;
+        return $this;
     }
 
     public function getDescription(): ?string

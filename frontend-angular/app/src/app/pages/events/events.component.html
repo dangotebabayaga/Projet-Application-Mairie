@@ -1,27 +1,125 @@
 <div class="events-page">
   <!-- En-tête -->
   <div class="page-header">
-    <h1>Agenda participatif</h1>
-    <p>Découvrez les événements de la ville et des associations locales</p>
+    <div>
+      <h1>Agenda participatif</h1>
+      <p>Découvrez les événements de la ville et des associations locales</p>
+    </div>
+    <button *ngIf="isAdmin" class="btn-create" (click)="toggleCreateForm()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+      <span>{{ showCreateForm ? 'Annuler' : 'Nouvel événement' }}</span>
+    </button>
   </div>
 
-  <!-- Filtres par thématique -->
+  <!-- Formulaire de création (admin) -->
+  <div class="create-card" *ngIf="isAdmin && showCreateForm">
+    <h2>Créer un événement</h2>
+    <form (ngSubmit)="submitCreate()" #f="ngForm" class="create-form">
+      <div class="form-row">
+        <label>
+          <span>Titre *</span>
+          <input type="text" name="titre" [(ngModel)]="form.titre" required />
+        </label>
+        <label>
+          <span>Lieu</span>
+          <input type="text" name="lieux" [(ngModel)]="form.lieux" />
+        </label>
+      </div>
+
+      <label class="full">
+        <span>Description</span>
+        <textarea name="commentaire" rows="3" [(ngModel)]="form.commentaire"></textarea>
+      </label>
+
+      <div class="form-row">
+        <label>
+          <span>Date</span>
+          <input type="date" name="dateEv" [(ngModel)]="form.dateEv" />
+        </label>
+        <label>
+          <span>Heure début</span>
+          <input type="time" name="heureDeb" [(ngModel)]="form.heureDeb" />
+        </label>
+        <label>
+          <span>Heure fin</span>
+          <input type="time" name="heureFin" [(ngModel)]="form.heureFin" />
+        </label>
+      </div>
+
+      <div class="form-row">
+        <label>
+          <span>Type *</span>
+          <select name="type" [(ngModel)]="form.type" required>
+            <option value="" disabled>Choisir un type…</option>
+            <option *ngFor="let t of themes" [value]="t.id" [hidden]="t.id === 'all'">
+              {{ t.label }}
+            </option>
+            <option value="__new__">+ Nouveau type…</option>
+          </select>
+        </label>
+        <label *ngIf="form.type === '__new__'">
+          <span>Nom du nouveau type</span>
+          <input type="text" name="newType" [(ngModel)]="form.newType" />
+        </label>
+      </div>
+
+      <p class="form-error" *ngIf="formError">{{ formError }}</p>
+
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="toggleCreateForm()" [disabled]="submitting">
+          Annuler
+        </button>
+        <button type="submit" class="btn-primary" [disabled]="submitting">
+          {{ submitting ? 'Création…' : 'Créer' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Filtres -->
   <div class="filter-card">
-    <div class="filter-header">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-      </svg>
-      <span>Filtrer par thématique</span>
+    <div class="filter-section">
+      <div class="filter-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        <span>Filtrer par date</span>
+      </div>
+      <div class="filter-buttons">
+        <button
+          *ngFor="let range of dateRanges"
+          (click)="selectDateRange(range.id)"
+          class="filter-btn theme-all"
+          [class.active]="isDateRangeSelected(range.id)"
+        >
+          {{ range.label }}
+        </button>
+      </div>
     </div>
-    <div class="filter-buttons">
-      <button
-        *ngFor="let theme of themes"
-        (click)="selectTheme(theme.id)"
-        class="filter-btn"
-        [ngClass]="[theme.colorClass, isThemeSelected(theme.id) ? 'active' : '']"
-      >
-        {{ theme.label }}
-      </button>
+
+    <div class="filter-section">
+      <div class="filter-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+        </svg>
+        <span>Filtrer par thématique</span>
+      </div>
+      <div class="filter-buttons">
+        <button
+          *ngFor="let theme of themes"
+          (click)="selectTheme(theme.id)"
+          class="filter-btn"
+          [ngClass]="[theme.colorClass, isThemeSelected(theme.id) ? 'active' : '']"
+        >
+          {{ theme.label }}
+        </button>
+      </div>
     </div>
   </div>
 
@@ -32,7 +130,7 @@
     </div>
 
     <div class="events-grid">
-      <div class="event-card" *ngFor="let event of filteredEvents; let i = index">
+      <div class="event-card" *ngFor="let event of filteredEvents">
         <!-- Image placeholder -->
         <div class="event-image placeholder">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -51,10 +149,10 @@
             </span>
             <button
               class="btn-favorite"
-              [class.saved]="isEventSaved(i)"
-              (click)="toggleSaveEvent(i)"
+              [class.saved]="isEventSaved(event)"
+              (click)="toggleSaveEvent(event)"
             >
-              {{ isEventSaved(i) ? '❤️' : '🤍' }}
+              {{ isEventSaved(event) ? '❤️' : '🤍' }}
             </button>
           </div>
 
@@ -86,6 +184,15 @@
               <span>{{ event.lieux }}</span>
             </div>
           </div>
+
+          <button class="btn-calendar" (click)="addToCalendar(event)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>Ajouter à Google Calendar</span>
+          </button>
         </div>
       </div>
     </div>

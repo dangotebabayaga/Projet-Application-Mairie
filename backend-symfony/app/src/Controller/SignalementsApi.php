@@ -1,10 +1,12 @@
 <?php
  namespace App\Controller;
 
- use App\Service\ConvertAdresse;
+use App\Entity\Citoyens;
+use App\Service\ConvertAdresse;
  use App\Service\AuthChecker;
  use App\Entity\Signalements;
- use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\Utilisateurs;
+use Doctrine\ORM\EntityManagerInterface;
  use Symfony\Component\Routing\Attribute\Route;
  use Symfony\Component\HttpFoundation\Request;
  use Symfony\Component\HttpFoundation\JsonResponse;
@@ -64,17 +66,28 @@
             return $this->json(["error" => "Accès interdit"], 403);
         }
 
+         $user = $this->auth->getuserfromrequest($request);
+        if (!$user) {
+            return $this->json(["error" => "token manquant ou invalide"], 401);
+        }
+
+        if (!$this->auth->checkrole($user, 'citoyen')) {
+            return $this->json(["error" => "accès interdit"], 403);
+        }
          $data = json_decode($request->getContent(), true);
 
          $dateCrea = isset($data['dateCrea']) ? new \DateTime($data['dateCrea']) : new \DateTime();
          $dateModif = isset($data['dateModif']) ? new \DateTime($data['dateModif']) : new \DateTime();
 
+         $citoyen= $this->em->getRepository(Citoyens::class)->findOneBy(['id' => $data['citoyenId']]);
          $s = new Signalements();
          $s->setTitre($data['titre'] ?? 'Sans titre');
          $s->setEtat($data['etat'] ?? 'nouveau');
          $s->setDescription($data['description'] ?? null);
          $s->setDateCreation($dateCrea);
          $s->setDateModification($dateModif);
+         $s->setCitoyen($citoyen);
+         $s->setTypeId($data['typeId']);
 
          // Si on a une adresse, on convertit en coordonnées
          if (!empty($data['adresse'])) {
@@ -98,5 +111,41 @@
              'message' => 'Signalement créé',
              'id' => $s->getId()
          ]);
+    }
+
+    #[Route('/{id}', name: 'ChangeEtat', methods: ['GET'])] 
+    public function changeEtat(Request $request, int $id): JsonResponse
+    {
+         $user = $this->auth->getuserfromrequest($request);
+        if (!$user) {
+            return $this->json(["error" => "token manquant ou invalide"], 401);
+        }
+
+        if (!$this->auth->checkrole($user, 'admin')) {
+            return $this->json(["error" => "accès interdit"], 403);
+        }
+        $signalement = $this->em
+            ->getRepository(Signalements::class)
+            ->find($id);
+
+        if (!$signalement) {
+            return $this->json(["error" => "signalement introuvable"],404);
+        }
+
+        $etatActuel = $signalement->getEtat();
+        $etatSuivant = $etatActuel->next();
+
+        if (!$etatSuivant) {
+            return $this->json(["error"=>"déjà résolu"],400);
+        }
+
+        $signalement->setEtat($etatSuivant);
+
+        $this->em->flush();
+
+        return $this->json([
+            "message"=>"etat modifié",
+            "nouvelEtat"=>$etatSuivant->value
+        ]);
     }
  }
