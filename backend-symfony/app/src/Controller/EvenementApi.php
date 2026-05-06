@@ -69,6 +69,7 @@ class EvenementApi extends AbstractController
                 "lieux"          => $e->getLieux(),
                 "commentaire"    => $e->getCommentaire(),
                 "date Evenement" => $e->getDateEv()?->format('Y-m-d'),
+                "image" => $e->getImage(),
                 "Heure début"    => $e->getHeureDeb()?->format('H:i'),
                 "Heure fin"      => $e->getHeureFin()?->format('H:i'),
                 "administrateurId"        => $e->getadministrateur()?->getId(), // correction : getadministrateurId() → getadministrateur()->getId()

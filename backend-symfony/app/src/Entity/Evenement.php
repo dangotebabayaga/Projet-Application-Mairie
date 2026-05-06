@@ -31,6 +31,9 @@ class Evenement
     #[ORM\Column(type: 'time', name: 'heurefin', nullable: true)]
     private ?\DateTimeInterface $heureFin = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $img = null;
+
     // correction : id brut → relation ManyToOne vers Utilisateur
     #[ORM\ManyToOne(targetEntity: Utilisateur::class)]
     #[ORM\JoinColumn(name: 'administrateur_id', referencedColumnName: 'id', nullable: true)]
@@ -76,6 +79,17 @@ class Evenement
     public function setLieux(?string $lieux): self
     {
         $this->lieux = $lieux;
+        return $this;
+    }
+
+    public function getImage(): ?string
+    {
+        return $this->img;
+    }
+
+    public function setImage(?string $img): self
+    {
+        $this->img = $img;
         return $this;
     }
 

@@ -52,6 +52,7 @@ class EvenementRepository extends ServiceEntityRepository
         $evenement->setLieux($data['lieux'] ?? null);
         $evenement->setCommentaire($data['commentaire'] ?? null);
         $evenement->setDateEv($dateEv);
+        $evenement->setImage($img);
         $evenement->setHeureDeb($heureDeb);
         $evenement->setHeureFin($heureFin);
         $evenement->setadministrateur($administrateur);  // correction : objet Utilisateur, pas un id brut
