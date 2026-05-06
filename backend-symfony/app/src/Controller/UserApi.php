@@ -46,6 +46,36 @@ class UserApi extends AbstractController
             "id"      => $user->getId()
         ]);
     }
+    #[Route('/{id}', name: 'api_update_user', methods: ['PUT'])]
+    public function update(Request $request, int $id): JsonResponse
+    {
+        $user = $this->auth->getUserFromRequest($request);
+        if (!$user) {
+            return $this->json(["error" => "Token manquant ou invalide"], 401);
+        }
+
+        // Seul l'utilisateur peut modifier
+        if ($id === $user->getId()) {
+            return $this->json(["error" => "Accès interdit"], 403);
+        }
+
+        $data = json_decode($request->getContent(), true);
+
+        $existingUser = $this->userRepo->findByEmail($data['email']);
+        if ($existingUser) {
+            return $this->json(["error" => "Un compte avec cet email existe déjà"], 409);
+        }
+
+        
+        $user = $this->userRepo->updateUtilisateur($data,$user);
+
+        return $this->json([
+            "message" => "Utilisateur Modifié",
+            "id"      => $user->getId()
+        ]);
+
+    }
+
 
     #[Route('/login', name: 'api_login', methods: ['POST'])]
     public function login(Request $request): JsonResponse
@@ -117,31 +147,55 @@ class UserApi extends AbstractController
         return $this->json(['message' => "Rôle ajouté avec succès"]);
     }
 
-    #[Route('/{id}/roles', name: 'api_remove_role', methods: ['DELETE'])]
-    public function removeRole(int $id, Request $request): JsonResponse
+    #[route('/{id}/roles', name: 'api_remove_role', methods: ['delete'])]
+    public function removerole(int $id, request $request): jsonresponse
     {
-        $user = $this->auth->getUserFromRequest($request);
+        $user = $this->auth->getuserfromrequest($request);
         if (!$user) {
-            return $this->json(["error" => "Token manquant ou invalide"], 401);
+            return $this->json(["error" => "token manquant ou invalide"], 401);
         }
-        if (!$this->auth->checkRole($user, 'administrateur')) {
-            return $this->json(["error" => "Accès interdit"], 403);
+        if (!$this->auth->checkrole($user, 'administrateur')) {
+            return $this->json(["error" => "accès interdit"], 403);
         }
 
-        $data  = json_decode($request->getContent(), true);
-        $cible = $this->userRepo->find($id);
+        $data  = json_decode($request->getcontent(), true);
+        $cible = $this->userrepo->find($id);
         if (!$cible) {
-            return $this->json(["error" => "Utilisateur introuvable"], 404);
+            return $this->json(["error" => "utilisateur introuvable"], 404);
         }
 
-        $role = $this->em->getRepository(Role::class)->findOneBy(['nom' => $data['role']]);
+        $role = $this->em->getrepository(role::class)->findoneby(['nom' => $data['role']]);
         if (!$role) {
-            return $this->json(["error" => "Rôle introuvable"], 404);
+            return $this->json(["error" => "rôle introuvable"], 404);
         }
 
-        $cible->removeRole($role);
+        $cible->removerole($role);
         $this->em->flush();
 
-        return $this->json(['message' => "Rôle retiré avec succès"]);
+        return $this->json(['message' => "rôle retiré avec succès"]);
+    }
+
+    #[route('/{id}/user', name: 'api_remove_user', methods: ['delete'])]
+    public function removeUser(int $id, request $request): jsonresponse
+    {
+        $user = $this->auth->getuserfromrequest($request);
+        if (!$user) {
+            return $this->json(["error" => "token manquant ou invalide"], 401);
+        }
+        if (!$this->auth->checkrole($user, 'administrateur')) {
+            return $this->json(["error" => "accès interdit"], 403);
+        }
+
+        $data  = json_decode($request->getcontent(), true);
+        $cible = $this->userrepo->find($id);
+        if (!$cible) {
+            return $this->json(["error" => "utilisateur introuvable"], 404);
+        }
+
+        $this->em->remove($cible);
+        $this->em->flush();
+
+        return $this->json(['message' => 'Utilisateur supprimé']);
+
     }
 }

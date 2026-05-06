@@ -111,6 +111,29 @@ class UtilisateurRepository extends ServiceEntityRepository
         return $user;
     }
 
+    public function updateUtilisateur(array $data, Utilisateur $user): Utilisateur
+    {
+        $user->setNom($data['nom']);
+        $user->setPrenom($data['prenom']);
+        $user->setEmail($data['email']);
+        $user->setTelephone($data['telephone'] ?? null);
+        $user->setVille($ville);
+        $user->setCompteActif(true);
+
+        if (!empty($data['dateNaissance'])) {
+            $user->setDateNaissance(new \DateTime($data['dateNaissance']));
+        }
+
+        $hash = password_hash($data['motDePasse'], PASSWORD_BCRYPT);
+        $user->setMotDePasseHash($hash);
+
+
+        $this->em->persist($user);
+        $this->em->flush();
+
+        return $user;
+    }
+
     public function infoUser(int $id): array
     {
         $user = $this->find($id);
