@@ -1,17 +1,26 @@
 meta {
-  name: Récupération Signalement
+  name: Modifier Signalement
   type: http
   seq: 2
 }
 
-get {
-  url: http://localhost:8000/api/signalements
-  body: none
+put {
+  url: http://localhost:8000/api/signalements/3
+  body: json
   auth: inherit
 }
 
 headers {
   Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MywiZW1haWwiOiJDcm9mdG5AbWFpbC5jb20iLCJyb2xlcyI6WyJjaXRveWVuIl0sImlhdCI6MTc3ODA3MjQ4MSwiZXhwIjoxNzc4MDc2MDgxfQ.VumVgOEWgixkLTaqQWpxbovfs4CRwuMro-Uh_ktRtfs
+}
+
+body:json {
+  {
+    "titre": "Lampadaire cassé - mise à jour",
+    "description": "Le lampadaire devant le numéro 5 ne fonctionne toujours plus",
+    "adresse": "5 Rue de la Paix, Nantes, France",
+    "type": "Éclairage"
+  }
 }
 
 settings {
