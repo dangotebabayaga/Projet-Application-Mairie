@@ -1,7 +1,7 @@
 meta {
-  name: Création Signalement
+  name: Créer Signalement
   type: http
-  seq: 2
+  seq: 1
 }
 
 post {
@@ -11,18 +11,15 @@ post {
 }
 
 headers {
-  Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MiwiZW1haWwiOiJDcm9mdG5AbWFpbC5jb20iLCJyb2xlIjoiY2l0b3llbiIsImlhdCI6MTc3ODA0NzEyMSwiZXhwIjoxNzc4MDUwNzIxfQ.vGxc2n39HqJ9epoVT9Xbw_R7h3WSW_Rd4cdPH1CcS-g
+  Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MywiZW1haWwiOiJDcm9mdG5AbWFpbC5jb20iLCJyb2xlcyI6WyJjaXRveWVuIl0sImlhdCI6MTc3ODA3MjQ4MSwiZXhwIjoxNzc4MDc2MDgxfQ.VumVgOEWgixkLTaqQWpxbovfs4CRwuMro-Uh_ktRtfs
 }
 
 body:json {
   {
-    "titre": "Nid de poule rue Victor Hugo",
-    "etat": "ouvert",
-    "description": "Un gros nid de poule devant le numéro 12",
-    "adresse": "12 Rue Victor Hugo, Paris, France",
-    "typeId": 1,
-    "dateCrea": "2026-01-14 09:00:00",
-    "dateModif": "2026-01-14 09:00:00"
+    "titre": "Lampadaire cassé",
+    "description": "Le lampadaire devant le numéro 5 ne fonctionne plus depuis 3 jours",
+    "adresse": "5 Rue de la Paix, Nantes, France",
+    "type": "Éclairage"
   }
 }
 
