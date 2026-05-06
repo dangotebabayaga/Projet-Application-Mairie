@@ -1,6 +1,7 @@
 <?php
 namespace App\Entity;
 
+use App\Enum\EtatSignalement;
 use App\Repository\SignalementsRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -16,27 +17,26 @@ class Signalements
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $titre = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $etat = null;
+    // correction : string → enum EtatSignalement
+    #[ORM\Column(type: 'string', enumType: EtatSignalement::class, nullable: true)]
+    private ?EtatSignalement $etat = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
 
     #[ORM\Column(type: 'decimal', precision: 10, scale: 7, nullable: true)]
     private ?string $latitude = null;
-    
+
     #[ORM\Column(type: 'decimal', precision: 10, scale: 7, nullable: true)]
     private ?string $longitude = null;
 
-    // correction : id brut → relation ManyToOne vers TypesSignalement
     #[ORM\ManyToOne(targetEntity: TypesSignalement::class)]
     #[ORM\JoinColumn(name: 'type_id', referencedColumnName: 'id', nullable: true)]
     private ?TypesSignalement $type = null;
 
-    // correction : id brut → relation ManyToOne vers Utilisateur
     #[ORM\ManyToOne(targetEntity: Utilisateur::class)]
     #[ORM\JoinColumn(name: 'utilisateur_id', referencedColumnName: 'id', nullable: true)]
-    private ?Utilisateur $utilisateur= null;
+    private ?Utilisateur $utilisateur = null;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $dateCreation = null;
@@ -59,15 +59,15 @@ class Signalements
         $this->titre = $titre;
     }
 
-    public function getEtat(): EtatSignalement
+    // correction : type de retour ?EtatSignalement
+    public function getEtat(): ?EtatSignalement
     {
         return $this->etat;
     }
 
-    public function setEtat(?string $etat): void
+    public function setEtat(?EtatSignalement $etat): void
     {
         $this->etat = $etat;
-        return $this;
     }
 
     public function getDescription(): ?string
@@ -110,7 +110,6 @@ class Signalements
         $this->type = $type;
     }
 
-    // correction : getCitoyenId/?int → getUtilisateur/?Utilisateur
     public function getUtilisateur(): ?Utilisateur
     {
         return $this->utilisateur;
@@ -118,7 +117,7 @@ class Signalements
 
     public function setUtilisateur(?Utilisateur $utilisateur): void
     {
-        $this->Utilisateur= $utilisateur;
+        $this->utilisateur = $utilisateur; // correction : $this->Utilisateur → $this->utilisateur
     }
 
     public function getDateCreation(): ?\DateTimeInterface
