@@ -1,13 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ReportService, Report } from '../../services/report.service';
+import { TypeSignalementService, TypeSignalement } from '../../services/type-signalement.service';
+import { PhotoUploadComponent } from '../../components/photo-upload/photo-upload.component';
+
+declare const L: any;
 
 interface ReportForm {
-  category: string;
+  typeId: number | null;
   description: string;
   address: string;
-  photo: string;
 }
 
 interface StatusInfo {
@@ -19,58 +23,176 @@ interface StatusInfo {
 @Component({
   selector: 'app-reports',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PhotoUploadComponent],
   templateUrl: './reports.component.html',
   styleUrls: ['./reports.component.scss']
 })
-export class ReportsComponent implements OnInit {
+export class ReportsComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('reportPhotoUpload') reportPhotoUpload?: PhotoUploadComponent;
   showForm = false;
   reports: Report[] = [];
-  utilisateurId: number | null = null; // correction : ! → null (initialisé depuis localStorage)
-  userRole: string = 'citoyen';        // correction : initialisation explicite
-  roles: string[] = ['citoyen'];       // correction : tableau de rôles
+  types: TypeSignalement[] = [];
+  currentUserId: number;
+  userRole: string;
+
+  selectedFile: File | null = null;
+  uploadError: string | null = null;
+  submitting = false;
+
+  showMap = false;
+
+  selectedStatus: 'all' | 'enregistré' | 'en cours' | 'résolu' = 'all';
+  sortDesc = true;
+
+  statusFilters: { id: 'all' | 'enregistré' | 'en cours' | 'résolu'; label: string }[] = [
+    { id: 'all', label: 'Tous' },
+    { id: 'enregistré', label: 'Enregistrés' },
+    { id: 'en cours', label: 'En cours' },
+    { id: 'résolu', label: 'Résolus' }
+  ];
 
   formData: ReportForm = {
-    category: 'Voirie',
+    typeId: null,
     description: '',
-    address: '',
-    photo: ''
+    address: ''
   };
 
-  categories = ['Voirie', 'Éclairage', 'Propreté', 'Espaces verts', 'Mobilier urbain', 'Autre'];
+  private map: any = null;
+  private markers: any[] = [];
 
-  constructor(private reportService: ReportService) {
-    this.roles = JSON.parse(localStorage.getItem('userRole') || '["citoyen"]');
-    this.userRole = this.roles[0];
-    const userId = localStorage.getItem('userId');
-    this.utilisateurId = userId ? parseInt(userId) : null; // correction : initialisé ici
+  constructor(
+    private reportService: ReportService,
+    private typeService: TypeSignalementService,
+    private router: Router
+  ) {
+    this.currentUserId = Number(localStorage.getItem('userId')) || 0;
+    this.userRole = localStorage.getItem('userRole') || 'citoyen';
   }
 
-  get isadministrateur(): boolean {
-    return this.roles.includes('administrateur'); // correction : 'administrateur' → 'administrateur'
+  openReport(r: Report): void {
+    if (r.id) this.router.navigate(['/reports', r.id]);
   }
 
-  get isCitoyen(): boolean {
-    return this.roles.includes('citoyen');
+  get isAdmin(): boolean {
+    return this.userRole === 'admin';
   }
 
   ngOnInit(): void {
+    this.loadTypes();
     this.loadReports();
+  }
+
+  ngAfterViewInit(): void {
+    // La carte est masquée par défaut, init différée au premier toggle
+  }
+
+  ngOnDestroy(): void {
+    if (this.map) {
+      this.map.remove();
+      this.map = null;
+    }
+  }
+
+  toggleMap(): void {
+    this.showMap = !this.showMap;
+    if (this.showMap) {
+      setTimeout(() => this.initMap(), 100);
+    } else if (this.map) {
+      this.map.remove();
+      this.map = null;
+      this.markers = [];
+    }
+  }
+
+  private initMap(): void {
+    if (typeof L === 'undefined' || this.map) return;
+    const mapEl = document.getElementById('reports-map');
+    if (!mapEl) return;
+
+    this.map = L.map('reports-map').setView([46.603354, 1.888334], 6); // centre France
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap',
+      maxZoom: 19
+    }).addTo(this.map);
+
+    this.refreshMarkers();
+  }
+
+  private refreshMarkers(): void {
+    if (!this.map || typeof L === 'undefined') return;
+    this.markers.forEach(m => this.map.removeLayer(m));
+    this.markers = [];
+
+    const geoReports = this.reports.filter(r => r.latitude !== null && r.longitude !== null);
+    geoReports.forEach(r => {
+      const marker = L.marker([r.latitude, r.longitude]).addTo(this.map);
+      const status = this.getStatusInfo(r.etat).label;
+      marker.bindPopup(
+        `<strong>${this.escape(r.typeNom || r.titre)}</strong><br>` +
+        `<em>${this.escape(status)}</em><br>` +
+        `${this.escape(r.description || '')}`
+      );
+      this.markers.push(marker);
+    });
+
+    if (geoReports.length > 0) {
+      const bounds = L.latLngBounds(geoReports.map(r => [r.latitude!, r.longitude!]));
+      this.map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
+    }
+  }
+
+  private escape(s: string): string {
+    return (s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
+  }
+
+  loadTypes(): void {
+    this.typeService.getAll().subscribe({
+      next: (data) => {
+        this.types = data;
+        if (data.length > 0 && this.formData.typeId === null) {
+          this.formData.typeId = data[0].id;
+        }
+      },
+      error: (err) => console.error('Erreur chargement types', err)
+    });
   }
 
   loadReports(): void {
     this.reportService.getAll().subscribe({
-      next: (data) => this.reports = data,
+      next: (data) => {
+        this.reports = data;
+        this.refreshMarkers();
+      },
       error: (err) => console.error('Erreur chargement signalements', err)
     });
   }
 
   get myReports(): Report[] {
-    return this.reports.filter(r => r.utilisateurId === this.utilisateurId);
+    return this.applyHistoryFilters(this.reports.filter(r => r.citoyenId === this.currentUserId));
   }
 
   get otherReports(): Report[] {
-    return this.reports.filter(r => r.utilisateurId !== this.utilisateurId); // correction : === → !==
+    return this.reports.filter(r => r.citoyenId !== this.currentUserId);
+  }
+
+  private applyHistoryFilters(list: Report[]): Report[] {
+    const filtered = this.selectedStatus === 'all'
+      ? list
+      : list.filter(r => r.etat === this.selectedStatus);
+
+    return [...filtered].sort((a, b) => {
+      const da = new Date(a.dateCrea).getTime();
+      const db = new Date(b.dateCrea).getTime();
+      return this.sortDesc ? db - da : da - db;
+    });
+  }
+
+  selectStatus(status: 'all' | 'enregistré' | 'en cours' | 'résolu'): void {
+    this.selectedStatus = status;
+  }
+
+  toggleSort(): void {
+    this.sortDesc = !this.sortDesc;
   }
 
   getStatusInfo(etat: string): StatusInfo {
@@ -95,27 +217,43 @@ export class ReportsComponent implements OnInit {
 
   resetForm(): void {
     this.formData = {
-      category: 'Voirie',
+      typeId: this.types.length > 0 ? this.types[0].id : null,
       description: '',
-      address: '',
-      photo: ''
+      address: ''
     };
+    this.selectedFile = null;
+    this.uploadError = null;
+    this.reportPhotoUpload?.reset();
+  }
+
+  onPhotoSelected(file: File | null): void {
+    this.selectedFile = file;
   }
 
   onSubmit(): void {
-    if (!this.formData.description || !this.formData.address) return;
+    if (!this.formData.description || !this.formData.address || this.formData.typeId === null) return;
+
+    const typeNom = this.types.find(t => t.id === this.formData.typeId)?.nom || 'Signalement';
+
+    this.submitting = true;
     this.reportService.create({
-      titre: this.formData.category,
+      titre: typeNom,
       description: this.formData.description,
       adresse: this.formData.address,
-      etat: 'enregistré'
+      typeId: this.formData.typeId,
+      photo: this.selectedFile
     }).subscribe({
       next: () => {
+        this.submitting = false;
         this.showForm = false;
         this.resetForm();
         this.loadReports();
       },
-      error: (err) => console.error('Erreur création signalement', err)
+      error: (err) => {
+        this.submitting = false;
+        this.uploadError = err.error?.error || 'Erreur lors de la création';
+        console.error('Erreur création signalement', err);
+      }
     });
   }
 

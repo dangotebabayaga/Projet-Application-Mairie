@@ -6,25 +6,73 @@
         <h1>Bienvenue, {{ user.name }}</h1>
         <p>{{ welcomeMessage }}</p>
       </div>
-      <div class="welcome-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-        </svg>
+      <div class="bell-wrapper">
+        <button type="button" class="bell-button" (click)="toggleNotifs($event)" aria-label="Notifications">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+          <span class="notif-badge" *ngIf="notifications.length > 0">{{ notifications.length }}</span>
+        </button>
+
+        <div class="notif-dropdown" *ngIf="showNotifs" (click)="$event.stopPropagation()">
+          <div class="notif-header">
+            <h3>Notifications</h3>
+            <button *ngIf="notifications.length > 0" type="button" class="dismiss-all" (click)="dismissAll($event)">
+              Tout marquer comme lu
+            </button>
+          </div>
+
+          <div class="notif-list" *ngIf="!notifsLoading && notifications.length > 0">
+            <button *ngFor="let n of notifications" type="button" class="notif-item" (click)="goTo(n)">
+              <div class="notif-icon" [attr.data-type]="n.type">
+                <svg *ngIf="n.type === 'survey'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="20" x2="12" y2="10"></line>
+                  <line x1="18" y1="20" x2="18" y2="4"></line>
+                  <line x1="6" y1="20" x2="6" y2="16"></line>
+                </svg>
+                <svg *ngIf="n.type === 'report'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                  <line x1="12" y1="9" x2="12" y2="13"></line>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                <svg *ngIf="n.type === 'event'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+              </div>
+              <div class="notif-body">
+                <div class="notif-title">{{ n.title }}</div>
+                <div class="notif-message">{{ n.message }}</div>
+                <div class="notif-date">{{ formatDate(n.date) }}</div>
+              </div>
+            </button>
+          </div>
+
+          <div class="notif-empty" *ngIf="!notifsLoading && notifications.length === 0">
+            <p>Aucune nouvelle notification</p>
+          </div>
+
+          <div class="notif-empty" *ngIf="notifsLoading">
+            <p>Chargement…</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Modules principaux -->
-  <div class="modules-section">
+  <!-- Modules raccourci (citoyens + superadmin uniquement, jamais admin) -->
+  <div class="modules-section" *ngIf="modules.length > 0 && user?.role !== 'admin'">
     <h2>Accès rapide aux services</h2>
     <div class="modules-grid">
       <button
-  *ngFor="let module of modules"
-  class="module-card"
-  type="button"
-  (click)="onNavigate(module.id)"
->
+        *ngFor="let module of modules"
+        class="module-card"
+        type="button"
+        (click)="onNavigate(module.id)"
+      >
         <div class="module-icon" [attr.data-color]="module.color">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <use [attr.href]="'#icon-' + module.icon"></use>
@@ -43,20 +91,11 @@
     </div>
   </div>
 
-  <!-- Actualités rapides -->
-  <div class="news-card">
-    <h2>Actualité de la semaine</h2>
-    <p>Les illuminations de Noël sont installées ! Venez les découvrir dès ce soir dans tout le centre-ville.</p>
-    <button class="btn-news" [routerLink]="'/discussion'" type="button">
-  Voir toutes les actualités
-    </button>
-  </div>
-
-  <!-- Statistiques pour agents municipaux -->
-   <div class="stats-section" *ngIf="user?.roles?.includes('administrateur')">
+  <!-- Indicateurs (à la place des tuiles pour les admin) -->
+  <div class="stats-section" *ngIf="user?.role === 'admin'">
     <div class="stat-card">
       <div class="stat-header">
-        <span>Signalements en cours</span>
+        <span>Signalements actifs</span>
         <svg class="stat-icon blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
           <polyline points="14 2 14 8 20 8"></polyline>
@@ -64,8 +103,8 @@
           <line x1="16" y1="17" x2="8" y2="17"></line>
         </svg>
       </div>
-      <div class="stat-value">-</div>
-      <div class="stat-label">À traiter</div>
+      <div class="stat-value">{{ reportsActiveCount }}</div>
+      <div class="stat-label">{{ reportsRegisteredCount }} nouveaux, {{ reportsInProgressCount }} en cours</div>
     </div>
 
     <div class="stat-card">
@@ -78,12 +117,12 @@
         </svg>
       </div>
       <div class="stat-value">{{ activeSurveysCount }}</div>
-      <div class="stat-label success">En cours</div>
+      <div class="stat-label">{{ totalVotants }} réponse{{ totalVotants > 1 ? 's' : '' }} au total</div>
     </div>
 
     <div class="stat-card">
       <div class="stat-header">
-        <span>Événements planifiés</span>
+        <span>Événements à venir</span>
         <svg class="stat-icon green" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
           <line x1="16" y1="2" x2="16" y2="6"></line>
@@ -91,9 +130,18 @@
           <line x1="3" y1="10" x2="21" y2="10"></line>
         </svg>
       </div>
-      <div class="stat-value">-</div>
-      <div class="stat-label">À venir</div>
+      <div class="stat-value">{{ upcomingEventsCount }}</div>
+      <div class="stat-label">Planifiés</div>
     </div>
+  </div>
+
+  <!-- Actualités rapides -->
+  <div class="news-card">
+    <h2>Actualité de la semaine</h2>
+    <p>Les illuminations de Noël sont installées ! Venez les découvrir dès ce soir dans tout le centre-ville.</p>
+    <button class="btn-news" [routerLink]="'/discussion'" type="button">
+  Voir toutes les actualités
+    </button>
   </div>
 </div>
 
@@ -125,6 +173,16 @@
       <rect x="14" y="3" width="7" height="5"></rect>
       <rect x="14" y="12" width="7" height="9"></rect>
       <rect x="3" y="16" width="7" height="5"></rect>
+    </symbol>
+    <symbol id="icon-settings" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="3"></circle>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+    </symbol>
+    <symbol id="icon-users" viewBox="0 0 24 24">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+      <circle cx="9" cy="7" r="4"></circle>
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+      <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
     </symbol>
   </defs>
 </svg>

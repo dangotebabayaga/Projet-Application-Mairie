@@ -1,6 +1,7 @@
 <?php
 namespace App\Entity;
 
+use App\Enum\EtatSignalement;
 use App\Repository\SignalementsRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -12,38 +13,40 @@ class Signalements
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
-
+    
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $titre = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $etat = null;
-
-    #[ORM\Column(type: 'text', nullable: true)]
-    private ?string $description = null;
-
-    #[ORM\Column(type: 'decimal', precision: 10, scale: 7, nullable: true)]
-    private ?string $latitude = null;
     
-    #[ORM\Column(type: 'decimal', precision: 10, scale: 7, nullable: true)]
-    private ?string $longitude = null;
+    #[ORM\Column(type: "string", enumType: EtatSignalement::class)]
+    private EtatSignalement $etat;
 
-    // correction : id brut → relation ManyToOne vers TypesSignalement
-    #[ORM\ManyToOne(targetEntity: TypesSignalement::class)]
-    #[ORM\JoinColumn(name: 'type_id', referencedColumnName: 'id', nullable: true)]
-    private ?TypesSignalement $type = null;
+    #[ORM\Column(type: "text", nullable: true)]
+    private ?string $description = null;
+    
+    #[ORM\Column(type: "decimal", precision: 10, scale: 7, nullable: true)]
+    private ?float $latitude = null;
+    
+    #[ORM\Column(type: "decimal", precision: 10, scale: 7, nullable: true)]
+    private ?float $longitude = null;
+    
+    #[ORM\Column(nullable: true)]
+    private ?int $typeId = null;
+    
+    #[ORM\ManyToOne(targetEntity: Citoyens::class)]
+    #[ORM\JoinColumn(name: "citoyen_id", referencedColumnName: "utilisateur_id")]
+    private ?Citoyens $citoyen = null;
 
-    // correction : id brut → relation ManyToOne vers Utilisateur
-    #[ORM\ManyToOne(targetEntity: Utilisateur::class)]
-    #[ORM\JoinColumn(name: 'utilisateur_id', referencedColumnName: 'id', nullable: true)]
-    private ?Utilisateur $utilisateur= null;
+    #[ORM\Column(length: 500, nullable: true)]
+    private ?string $photo = null;
 
-    #[ORM\Column(type: 'datetime', nullable: true)]
+    #[ORM\Column(length: 500, nullable: true)]
+    private ?string $adresse = null;
+    // **Ajoute explicitement le type datetime**
+    #[ORM\Column(type: "datetime", nullable: true)]
     private ?\DateTimeInterface $dateCreation = null;
-
-    #[ORM\Column(type: 'datetime', nullable: true)]
+    
+    #[ORM\Column(type: "datetime", nullable: true)]
     private ?\DateTimeInterface $dateModification = null;
-
     public function getId(): ?int
     {
         return $this->id;
@@ -54,7 +57,7 @@ class Signalements
         return $this->titre;
     }
 
-    public function setTitre(?string $titre): void
+    public function setTitre(?string $titre)
     {
         $this->titre = $titre;
     }
@@ -63,8 +66,8 @@ class Signalements
     {
         return $this->etat;
     }
-
-    public function setEtat(?string $etat): void
+    
+    public function setEtat(EtatSignalement $etat): self
     {
         $this->etat = $etat;
         return $this;
@@ -75,50 +78,51 @@ class Signalements
         return $this->description;
     }
 
-    public function setDescription(?string $description): void
+    public function setDescription(?string $description)
     {
         $this->description = $description;
     }
 
-    public function getLatitude(): ?string
+    public function getLatitude(): ?float
     {
         return $this->latitude;
     }
 
-    public function setLatitude(?string $latitude): void
+    public function setLatitude(?float $latitude)
     {
         $this->latitude = $latitude;
     }
 
-    public function getLongitude(): ?string
+    public function getLongitude(): ?float
     {
         return $this->longitude;
     }
 
-    public function setLongitude(?string $longitude): void
+    public function setLongitude(?float $longitude)
     {
         $this->longitude = $longitude;
     }
 
-    public function getType(): ?TypesSignalement
+    public function getTypeId(): ?int
     {
-        return $this->type;
+        return $this->typeId;
     }
 
-    public function setType(?TypesSignalement $type): void
+    public function setTypeId(?int $typeId)
     {
-        $this->type = $type;
+        $this->typeId = $typeId;
     }
 
-    // correction : getCitoyenId/?int → getUtilisateur/?Utilisateur
-    public function getUtilisateur(): ?Utilisateur
+    // getter et setter
+    public function getCitoyen(): ?Citoyens
     {
-        return $this->utilisateur;
+        return $this->citoyen;
     }
-
-    public function setUtilisateur(?Utilisateur $utilisateur): void
+    
+    public function setCitoyen(?Citoyens $citoyen): self
     {
-        $this->Utilisateur= $utilisateur;
+        $this->citoyen = $citoyen;
+        return $this;
     }
 
     public function getDateCreation(): ?\DateTimeInterface
@@ -126,7 +130,7 @@ class Signalements
         return $this->dateCreation;
     }
 
-    public function setDateCreation(?\DateTimeInterface $dateCreation): void
+    public function setDateCreation(?\DateTimeInterface $dateCreation)
     {
         $this->dateCreation = $dateCreation;
     }
@@ -136,8 +140,30 @@ class Signalements
         return $this->dateModification;
     }
 
-    public function setDateModification(?\DateTimeInterface $dateModification): void
+    public function setDateModification(?\DateTimeInterface $dateModification)
     {
         $this->dateModification = $dateModification;
+    }
+
+    public function getPhoto(): ?string
+    {
+        return $this->photo;
+    }
+
+    public function setPhoto(?string $photo): self
+    {
+        $this->photo = $photo;
+        return $this;
+    }
+
+    public function getAdresse(): ?string
+    {
+        return $this->adresse;
+    }
+
+    public function setAdresse(?string $adresse): self
+    {
+        $this->adresse = $adresse;
+        return $this;
     }
 }

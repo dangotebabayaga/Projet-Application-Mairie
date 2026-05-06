@@ -1,0 +1,23 @@
+meta {
+  name: Connexion Admin
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:8000/api/utilisateur/login
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+      "email": "ironman@mail.com",
+      "motDePasse": "jtmplopr"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

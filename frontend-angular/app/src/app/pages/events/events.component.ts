@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { EventService, EventItem, EventPayload } from '../../services/event.service';
 
 interface ThemeFilter {
@@ -41,8 +42,7 @@ export class EventsComponent implements OnInit {
   selectedDateRange: DateRangeId = 'upcoming';
   savedEvents: string[] = [];
   events: EventItem[] = [];
-  userRole: string = 'citoyen';
-  roles: string[] = ['citoyen'];
+  userRole: string;
 
   showCreateForm = false;
   submitting = false;
@@ -62,17 +62,16 @@ export class EventsComponent implements OnInit {
     { id: 'all', label: 'Tous' }
   ];
 
-  constructor(private eventService: EventService) {
-    this.roles = JSON.parse(localStorage.getItem('userRole') || '["citoyen"]');
-    this.userRole = this.roles[0];
+  constructor(private eventService: EventService, private router: Router) {
+    this.userRole = localStorage.getItem('userRole') || 'citoyen';
   }
 
-  get isadministrateur(): boolean {
-      return this.roles.includes('administrateur');
+  openEvent(event: EventItem): void {
+    if (event.id) this.router.navigate(['/events', event.id]);
   }
-  
-  get isElu(): boolean {
-      return this.roles.includes('elu');
+
+  get isAdmin(): boolean {
+    return this.userRole === 'admin';
   }
 
   ngOnInit(): void {

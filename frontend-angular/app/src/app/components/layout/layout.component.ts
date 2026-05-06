@@ -10,7 +10,7 @@ interface NavItem {
 
 interface User {
   name: string;
-  role: string[];
+  role: 'citizen' | 'municipal';
 }
 
 interface CityConfig {
@@ -35,7 +35,7 @@ export class LayoutComponent {
   // TODO: À remplacer par AuthService
   user: User = {
     name: 'Jean Dupont',
-    role: ['citoyen']
+    role: 'citizen'
   };
 
   cityConfig: CityConfig = {
@@ -45,23 +45,22 @@ export class LayoutComponent {
   };
 
   navItems: NavItem[] = [
-    { id: 'home',       label: 'Accueil',      icon: 'home',             roles: ['citoyen', 'elu', 'administrateur'] },
-    { id: 'reports',    label: 'Signalements', icon: 'file-text',        roles: ['citoyen', 'administrateur'] },
-    { id: 'surveys',    label: 'Sondages',     icon: 'bar-chart',        roles: ['citoyen', 'elu', 'administrateur'] },
-    { id: 'events',     label: 'Agenda',       icon: 'calendar',         roles: ['citoyen', 'elu', 'administrateur'] },
-    { id: 'discussion', label: 'Discussion',   icon: 'message-square',   roles: ['citoyen', 'elu', 'administrateur'] },
-    { id: 'backoffice', label: 'Back-Office',  icon: 'layout-dashboard', roles: ['elu', 'administrateur'] }
+    { id: 'home', label: 'Accueil', icon: 'home', roles: ['citizen', 'municipal'] },
+    { id: 'reports', label: 'Signalements', icon: 'file-text', roles: ['citizen', 'municipal'] },
+    { id: 'surveys', label: 'Sondages', icon: 'bar-chart', roles: ['citizen', 'municipal'] },
+    { id: 'events', label: 'Agenda', icon: 'calendar', roles: ['citizen', 'municipal'] },
+    { id: 'discussion', label: 'Discussion', icon: 'message-square', roles: ['citizen', 'municipal'] },
+    { id: 'backoffice', label: 'Back-Office', icon: 'layout-dashboard', roles: ['municipal'] }
   ];
 
   get filteredNavItems(): NavItem[] {
     return this.navItems.filter(item =>
-      this.user && item.roles.some(r => this.user.role.includes(r))
+      this.user && item.roles.includes(this.user.role)
     );
   }
 
   get userRoleLabel(): string {
-    return this.user?.role.includes('elu') ? 'Élu/Agent' : 
-       this.user?.role.includes('administrateur') ? 'administrateur' : 'Citoyen';
+    return this.user?.role === 'municipal' ? 'Élu/Agent' : 'Citoyen';
   }
 
   onNavigate(pageId: string): void {

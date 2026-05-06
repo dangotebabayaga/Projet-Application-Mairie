@@ -6,6 +6,10 @@ services:
       - "8000:8000"
     volumes:
       - ./backend-symfony/app:/var/www
+      # Volumes nommés pour vendor/ et var/cache/ : évite le bind mount Windows
+      # qui est extrêmement lent (FUSE), gain de perf majeur
+      - symfony_vendor:/var/www/vendor
+      - symfony_cache:/var/www/var/cache
     depends_on:
       - db
     command: bash -c "php -S 0.0.0.0:8000 -t public"
@@ -30,16 +34,17 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - ./Base_de_donnee/SimplifiUniCyties.sql:/docker-entrypoint-initdb.d/init.sql
-      - ./Base_de_donnee/migrations:/migrations
-    command: >
-      bash -c "
-        docker-entrypoint.sh postgres &
-        sleep 5 &&
-        bash /migrations/apply_migrations.sh &&
-        wait
-      "
+      - ./docs/SimplifiUniCyties.sql:/docker-entrypoint-initdb.d/init.sql
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: mailhog
+    ports:
+      - "1025:1025"   # SMTP
+      - "8025:8025"   # Web UI (consulter les mails reçus)
 
 volumes:
   pgdata:
+  symfony_vendor:
+  symfony_cache:
 

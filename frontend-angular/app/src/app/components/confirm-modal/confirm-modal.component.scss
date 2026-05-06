@@ -1,0 +1,119 @@
+@import '../../../styles/variables';
+
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: $spacing-4;
+  animation: confirmFadeIn 0.15s ease-out;
+}
+
+@keyframes confirmFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.confirm-card {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: $radius-2xl;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 420px;
+  padding: $spacing-6;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-3;
+  animation: confirmSlideUp 0.2s ease-out;
+}
+
+@keyframes confirmSlideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.confirm-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  &.danger {
+    background: #FEE2E2;
+    color: #DC2626;
+  }
+}
+
+h2 {
+  font-size: $text-lg;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0;
+}
+
+p {
+  font-size: $text-sm;
+  color: var(--color-text-muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: $spacing-3;
+  width: 100%;
+  margin-top: $spacing-3;
+
+  button {
+    flex: 1;
+    padding: $spacing-2 $spacing-4;
+    border-radius: $radius-lg;
+    font-size: $text-base;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+}
+
+.btn-cancel {
+  background: var(--color-surface-alt);
+  color: var(--color-text);
+
+  &:hover {
+    background: var(--color-border);
+  }
+}
+
+.btn-confirm {
+  background: var(--color-primary);
+  color: #FFFFFF;
+
+  &:hover {
+    background: var(--color-primary-dark);
+  }
+
+  &.danger {
+    background: #DC2626;
+
+    &:hover {
+      background: #B91C1C;
+    }
+  }
+}

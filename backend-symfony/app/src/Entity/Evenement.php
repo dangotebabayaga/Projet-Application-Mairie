@@ -17,29 +17,30 @@ class Evenement
     private ?string $titre = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    private ?string $commentaire = null;
+    private ?string $commentaire = null; // <-- texte long
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $lieux = null;
 
-    #[ORM\Column(type: 'date', name: 'dateev', nullable: true)]
+    #[ORM\Column(type: 'date',name:"dateev", nullable: true)]
     private ?\DateTimeInterface $dateEv = null;
 
-    #[ORM\Column(type: 'time', name: 'heuredeb', nullable: true)]
+    #[ORM\Column(type: 'time',name:"heuredeb", nullable: true)]
     private ?\DateTimeInterface $heureDeb = null;
 
-    #[ORM\Column(type: 'time', name: 'heurefin', nullable: true)]
+    #[ORM\Column(type: 'time',name:"heurefin", nullable: true)]
     private ?\DateTimeInterface $heureFin = null;
 
-    // correction : id brut → relation ManyToOne vers Utilisateur
-    #[ORM\ManyToOne(targetEntity: Utilisateur::class)]
-    #[ORM\JoinColumn(name: 'administrateur_id', referencedColumnName: 'id', nullable: true)]
-    private ?Utilisateur $administrateur = null;
+    #[ORM\Column(name:"administrateur_id",nullable: true)]
+    private ?int $administrateurId = null;
 
-    // correction : id brut → relation ManyToOne vers TypeEv
-    #[ORM\ManyToOne(targetEntity: TypeEv::class)]
-    #[ORM\JoinColumn(name: 'type', referencedColumnName: 'id', nullable: true)]
-    private ?TypeEv $type = null;
+    #[ORM\Column(nullable: true)]
+    private ?int $type = null;
+
+    #[ORM\Column(length: 500, nullable: true)]
+    private ?string $photo = null;
+
+    // ===== Getters & Setters =====
 
     public function getId(): ?int
     {
@@ -112,27 +113,36 @@ class Evenement
         return $this;
     }
 
-    // correction : ?int → ?Utilisateur
-    public function getadministrateur(): ?Utilisateur
+    public function getAdministrateurId(): ?int
     {
-        return $this->administrateur;
+        return $this->administrateurId;
     }
 
-    public function setadministrateur(?Utilisateur $administrateur): self
+    public function setAdministrateurId(?int $administrateurId): self
     {
-        $this->administrateur = $administrateur;
+        $this->administrateurId = $administrateurId;
         return $this;
     }
 
-    // correction : ?int → ?TypeEv
-    public function getType(): ?TypeEv
+    public function getType(): ?int
     {
         return $this->type;
     }
 
-    public function setType(?TypeEv $type): self
+    public function setType(?int $type): self
     {
         $this->type = $type;
+        return $this;
+    }
+
+    public function getPhoto(): ?string
+    {
+        return $this->photo;
+    }
+
+    public function setPhoto(?string $photo): self
+    {
+        $this->photo = $photo;
         return $this;
     }
 }

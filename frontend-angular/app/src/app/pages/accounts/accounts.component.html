@@ -1,0 +1,245 @@
+<div class="accounts-page">
+  <!-- En-tête -->
+  <div class="page-header">
+    <div>
+      <h1>Gestion des comptes</h1>
+      <p>Créer et gérer les comptes citoyens et élus</p>
+    </div>
+    <button class="btn-primary" (click)="toggleCreate()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+      <span>{{ showCreateForm ? 'Annuler' : 'Nouveau compte' }}</span>
+    </button>
+  </div>
+
+  <!-- Formulaire de création -->
+  <div class="create-card" *ngIf="showCreateForm">
+    <h2>Créer un nouveau compte</h2>
+    <form (ngSubmit)="onSubmit()" class="create-form">
+      <div class="form-row">
+        <label>
+          <span>Type de compte *</span>
+          <select name="role" [(ngModel)]="form.role" required>
+            <option [ngValue]="1">Citoyen</option>
+            <option [ngValue]="2">Élu / Agent municipal</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="form-row">
+        <label>
+          <span>Nom *</span>
+          <input type="text" name="nom" [(ngModel)]="form.nom" required />
+        </label>
+        <label>
+          <span>Prénom *</span>
+          <input type="text" name="prenom" [(ngModel)]="form.prenom" required />
+        </label>
+      </div>
+
+      <div class="form-row">
+        <label>
+          <span>Email *</span>
+          <input type="email" name="email" [(ngModel)]="form.email" required />
+        </label>
+        <label>
+          <span>Mot de passe initial *</span>
+          <input type="text" name="motDePasse" [(ngModel)]="form.motDePasse" minlength="6" required />
+        </label>
+      </div>
+
+      <p class="form-error" *ngIf="createError">{{ createError }}</p>
+      <p class="form-success" *ngIf="createSuccess">{{ createSuccess }}</p>
+
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="toggleCreate()" [disabled]="creating">
+          Annuler
+        </button>
+        <button type="submit" class="btn-primary" [disabled]="creating">
+          {{ creating ? 'Création…' : 'Créer le compte' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Filtres par rôle -->
+  <div class="card-list-filter-card">
+    <div class="card-list-filter-section">
+      <div class="card-list-filter-section-header">
+        <div class="card-list-filter-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+          <span>Filtrer par rôle</span>
+        </div>
+      </div>
+      <div class="card-filter-buttons">
+        <button type="button" class="card-filter-btn filter-role-all"
+                [class.active]="selectedRoleFilter === 'all'"
+                (click)="selectRoleFilter('all')">
+          Tous ({{ users.length }})
+        </button>
+        <button type="button" class="card-filter-btn filter-role-citoyen"
+                [class.active]="selectedRoleFilter === 'citoyen'"
+                (click)="selectRoleFilter('citoyen')">
+          Citoyens ({{ countByRole('citoyen') }})
+        </button>
+        <button type="button" class="card-filter-btn filter-role-admin"
+                [class.active]="selectedRoleFilter === 'admin'"
+                (click)="selectRoleFilter('admin')">
+          Élus ({{ countByRole('admin') }})
+        </button>
+        <button type="button" class="card-filter-btn filter-role-superadmin"
+                [class.active]="selectedRoleFilter === 'superadmin'"
+                (click)="selectRoleFilter('superadmin')">
+          Super-admins ({{ countByRole('superadmin') }})
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Liste -->
+  <div class="loading" *ngIf="loading">Chargement…</div>
+  <div class="error" *ngIf="loadError">{{ loadError }}</div>
+
+  <div class="users-table" *ngIf="!loading && !loadError">
+    <div class="users-row header">
+      <div class="col-name">Nom</div>
+      <div class="col-email">Email</div>
+      <div class="col-role">Rôle</div>
+      <div class="col-date">Créé le</div>
+    </div>
+
+    <div class="users-row clickable"
+         *ngFor="let user of filteredUsers"
+         [class.is-me]="user.id === currentUserId"
+         (click)="openDetail(user)">
+      <div class="col-name">
+        <strong>{{ user.prenom }} {{ user.nom }}</strong>
+        <span class="me-tag" *ngIf="user.id === currentUserId">vous</span>
+      </div>
+      <div class="col-email">{{ user.email }}</div>
+      <div class="col-role">
+        <span class="role-badge" [ngClass]="'role-' + user.role">{{ roleLabel(user.role) }}</span>
+      </div>
+      <div class="col-date">{{ formatDate(user.dateCreation) }}</div>
+    </div>
+
+    <div class="empty-state" *ngIf="filteredUsers.length === 0">
+      <p>Aucun compte avec ce filtre.</p>
+    </div>
+  </div>
+
+  <!-- Modal de détail -->
+  <div class="modal-overlay" *ngIf="selectedUser" (click)="closeDetail()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Détails du compte</h2>
+        <button type="button" class="modal-close" (click)="closeDetail()" aria-label="Fermer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Mode lecture -->
+      <div class="modal-body" *ngIf="!detailEditing">
+        <div class="detail-row">
+          <span class="detail-label">Nom complet</span>
+          <span class="detail-value">{{ selectedUser.prenom }} {{ selectedUser.nom }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Email</span>
+          <span class="detail-value">{{ selectedUser.email }}</span>
+        </div>
+        <div class="detail-row" *ngIf="selectedUser.telephone">
+          <span class="detail-label">Téléphone</span>
+          <span class="detail-value">{{ selectedUser.telephone }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Rôle</span>
+          <span class="role-badge" [ngClass]="'role-' + selectedUser.role">
+            {{ roleLabel(selectedUser.role) }}
+          </span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Compte créé le</span>
+          <span class="detail-value">{{ formatDate(selectedUser.dateCreation) }}</span>
+        </div>
+      </div>
+
+      <!-- Mode édition -->
+      <form *ngIf="detailEditing" class="modal-body" (ngSubmit)="saveDetail()">
+        <div class="form-row">
+          <label>
+            <span>Nom *</span>
+            <input type="text" name="nom" [(ngModel)]="form.nom" required />
+          </label>
+          <label>
+            <span>Prénom *</span>
+            <input type="text" name="prenom" [(ngModel)]="form.prenom" required />
+          </label>
+        </div>
+        <div class="form-row">
+          <label>
+            <span>Email *</span>
+            <input type="email" name="email" [(ngModel)]="form.email" required />
+          </label>
+        </div>
+        <p class="form-error" *ngIf="detailError">{{ detailError }}</p>
+
+        <div class="form-actions">
+          <button type="button" class="btn-secondary"
+                  (click)="cancelDetailEdit()" [disabled]="detailSaving">
+            Annuler
+          </button>
+          <button type="submit" class="btn-primary" [disabled]="detailSaving">
+            {{ detailSaving ? 'Enregistrement…' : 'Enregistrer' }}
+          </button>
+        </div>
+      </form>
+
+      <!-- Feedback envoi mail réinitialisation -->
+      <div class="modal-body" *ngIf="!detailEditing && (resetMessage || resetError)" style="padding-top: 0;">
+        <p class="form-success" *ngIf="resetMessage">✉ {{ resetMessage }}</p>
+        <p class="form-error" *ngIf="resetError">{{ resetError }}</p>
+      </div>
+
+      <!-- Footer actions (mode lecture uniquement) -->
+      <div class="modal-footer" *ngIf="!detailEditing">
+        <button *ngIf="selectedUser.id !== currentUserId"
+                class="btn-action edit"
+                (click)="startDetailEdit()">
+          Modifier les infos
+        </button>
+        <button *ngIf="selectedUser.id !== currentUserId"
+                class="btn-action reset"
+                [disabled]="resetSending"
+                (click)="sendResetEmail()">
+          {{ resetSending ? 'Envoi…' : '✉ Envoyer mail de réinitialisation' }}
+        </button>
+        <button *ngIf="selectedUser.role === 'citoyen'"
+                class="btn-action promote"
+                (click)="promote(selectedUser)">
+          Promouvoir en élu
+        </button>
+        <button *ngIf="selectedUser.role === 'admin'"
+                class="btn-action demote"
+                (click)="demote(selectedUser)">
+          Rétrograder citoyen
+        </button>
+        <button *ngIf="selectedUser.role !== 'superadmin' && selectedUser.id !== currentUserId"
+                class="btn-action delete"
+                (click)="deleteUser(selectedUser)">
+          Supprimer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

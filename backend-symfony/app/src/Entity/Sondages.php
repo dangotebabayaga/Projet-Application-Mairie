@@ -1,10 +1,10 @@
 <?php
 namespace App\Entity;
-
 use App\Repository\SondagesRepository;
 use Doctrine\ORM\Mapping as ORM;
+use phpDocumentor\Reflection\DocBlock\Description;
 
-#[ORM\Entity(repositoryClass: Sondages::class)]
+#[ORM\Entity(repositoryClass: SondagesRepository::class)]
 #[ORM\Table(name: 'sondages')]
 class Sondages
 {
@@ -13,7 +13,7 @@ class Sondages
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255)]
     private ?string $titre = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
@@ -25,26 +25,67 @@ class Sondages
     #[ORM\Column(name: 'date_fin', type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $dateFin = null;
 
-    // correction : administrateur → administrateur
-    #[ORM\ManyToOne(targetEntity: Utilisateur::class)]
-    #[ORM\JoinColumn(name: 'administrateur_id', referencedColumnName: 'id', nullable: true)]
-    private ?Utilisateur $administrateur = null;
+    #[ORM\Column(name: 'administrateur_id', nullable: true)]
+    private ?int $administrateurId = null;
 
-    public function getId(): ?int { return $this->id; }
+    #[ORM\Column(name: 'multi_choice', type: 'boolean', options: ['default' => true])]
+    private bool $multiChoice = true;
 
-    public function getTitre(): ?string { return $this->titre; }
-    public function setTitre(?string $titre): void { $this->titre = $titre; }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
-    public function getDescription(): ?string { return $this->description; }
-    public function setDescription(?string $description): void { $this->description = $description; }
+    public function getTitre(): ?string
+    {
+        return $this->titre;
+    }
 
-    public function getDateDebut(): ?\DateTimeInterface { return $this->dateDebut; }
-    public function setDateDebut(?\DateTimeInterface $dateDebut): void { $this->dateDebut = $dateDebut; }
+    public function setTitre(?string $titre){
+        $this->titre = $titre;
+    }
 
-    public function getDateFin(): ?\DateTimeInterface { return $this->dateFin; }
-    public function setDateFin(?\DateTimeInterface $dateFin): void { $this->dateFin = $dateFin; }
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
 
-    // correction : getadministrateur → getAdministrateur
-    public function getAdministrateur(): ?Utilisateur { return $this->administrateur; }
-    public function setAdministrateur(?Utilisateur $administrateur): void { $this->administrateur = $administrateur; }
+    public function setDescription(?string $description){
+        $this->description=$description;
+    }
+
+    public function getDateDebut(): ?\DateTimeInterface
+    {
+        return $this->dateDebut;
+    }
+
+    public function setDateDebut(?\DateTimeInterface $dateDebut){
+        $this->dateDebut = $dateDebut;
+    }
+
+    public function getDateFin(): ?\DateTimeInterface
+    {
+        return $this->dateFin;
+    }
+    public function setDateFin(?\DateTimeInterface $dateFin){
+        $this->dateFin=$dateFin;
+    }
+    public function getAdministrateur(): ?int
+    {
+        return $this->administrateurId;
+    }
+    public function setAdminstrateur(int $idAdmin){
+        $this->administrateurId=$idAdmin;
+    }
+
+    public function isMultiChoice(): bool
+    {
+        return $this->multiChoice;
+    }
+
+    public function setMultiChoice(bool $multiChoice): self
+    {
+        $this->multiChoice = $multiChoice;
+        return $this;
+    }
 }

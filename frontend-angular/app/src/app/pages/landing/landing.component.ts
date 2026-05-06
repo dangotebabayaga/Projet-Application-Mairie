@@ -41,7 +41,7 @@ export class LandingComponent {
     },
     {
       icon: 'shield',
-      title: 'Back-office elu',
+      title: 'Back-office municipal',
       description: 'Outil de gestion pour les élus et agents municipaux'
     },
     {
@@ -57,7 +57,7 @@ export class LandingComponent {
     'Suivi en temps réel des signalements',
     'Historique complet et consultable',
     'Interface intuitive et moderne',
-    'Données synchronisées entre citoyens et eluité'
+    'Données synchronisées entre citoyens et municipalité'
   ];
 
   onEnter(): void {

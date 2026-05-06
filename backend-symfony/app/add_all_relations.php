@@ -80,7 +80,7 @@ $villeRelations = '
     private Collection $thematiquesEvenements;
 
     #[ORM\OneToMany(mappedBy: \'ville\', targetEntity: Utilisateur::class)]
-    private Collection $Utilisateur;
+    private Collection $utilisateurs;
 
     #[ORM\OneToMany(mappedBy: \'ville\', targetEntity: Sondage::class)]
     private Collection $sondages;
@@ -99,7 +99,7 @@ $villeRelations = '
         $this->quartiers = new ArrayCollection();
         $this->categoriesCitoyens = new ArrayCollection();
         $this->thematiquesEvenements = new ArrayCollection();
-        $this->Utilisateur = new ArrayCollection();
+        $this->utilisateurs = new ArrayCollection();
         $this->sondages = new ArrayCollection();
         $this->evenements = new ArrayCollection();
         $this->actualites = new ArrayCollection();
@@ -109,7 +109,7 @@ $villeRelations = '
     public function getQuartiers(): Collection { return $this->quartiers; }
     public function getCategoriesCitoyens(): Collection { return $this->categoriesCitoyens; }
     public function getThematiquesEvenements(): Collection { return $this->thematiquesEvenements; }
-    public function getUtilisateur(): Collection { return $this->Utilisateur; }
+    public function getUtilisateurs(): Collection { return $this->utilisateurs; }
     public function getSondages(): Collection { return $this->sondages; }
     public function getEvenements(): Collection { return $this->evenements; }
     public function getActualites(): Collection { return $this->actualites; }
@@ -196,7 +196,7 @@ file_put_contents($thematiqueFile, $thematiqueContent);
 echo "  ✅ ThematiquesEvenement.php mis à jour\n";
 
 // ============================================================================
-// 5. Utilisateur- ManyToOne vers Ville, Quartier, Categorie
+// 5. UTILISATEUR - ManyToOne vers Ville, Quartier, Categorie
 // ============================================================================
 echo "📝 [5/19] Utilisateur.php...\n";
 
@@ -213,8 +213,8 @@ removeGetterSetter($utilisateurContent, 'setQuartierId');
 removeGetterSetter($utilisateurContent, 'getCategorieId');
 removeGetterSetter($utilisateurContent, 'setCategorieId');
 
-$UtilisateurRelations = '
-    #[ORM\ManyToOne(targetEntity: Ville::class, inversedBy: \'Utilisateur\')]
+$utilisateurRelations = '
+    #[ORM\ManyToOne(targetEntity: Ville::class, inversedBy: \'utilisateurs\')]
     #[ORM\JoinColumn(name: \'ville_id\', nullable: false)]
     private ?Ville $ville = null;
 
@@ -236,7 +236,7 @@ $UtilisateurRelations = '
     public function setCategorie(?CategoriesCitoyen $categorie): static { $this->categorie = $categorie; return $this; }
 ';
 
-addRelationProperty($utilisateurContent, $UtilisateurRelations, true);
+addRelationProperty($utilisateurContent, $utilisateurRelations, true);
 file_put_contents($utilisateurFile, $utilisateurContent);
 echo "  ✅ Utilisateur.php mis à jour\n";
 
@@ -257,7 +257,7 @@ $fichierRelation = '
     #[ORM\JoinColumn(name: \'uploade_par\', nullable: false)]
     private ?Utilisateur $uploadePar = null;
 
-    public function getUploadePar(): ?Utilisateurs{ return $this->uploadePar; }
+    public function getUploadePar(): ?Utilisateur { return $this->uploadePar; }
     public function setUploadePar(?Utilisateur $uploadePar): static { $this->uploadePar = $uploadePar; return $this; }
 ';
 
@@ -299,7 +299,7 @@ $signalementRelations = '
     public function getFichier(): ?Fichier { return $this->fichier; }
     public function setFichier(?Fichier $fichier): static { $this->fichier = $fichier; return $this; }
 
-    public function getCitoyen(): ?Utilisateurs{ return $this->citoyen; }
+    public function getCitoyen(): ?Utilisateur { return $this->citoyen; }
     public function setCitoyen(?Utilisateur $citoyen): static { $this->citoyen = $citoyen; return $this; }
 
     public function getQuartier(): ?Quartier { return $this->quartier; }
@@ -337,7 +337,7 @@ $historiqueRelations = '
     public function getSignalement(): ?Signalement { return $this->signalement; }
     public function setSignalement(?Signalement $signalement): static { $this->signalement = $signalement; return $this; }
 
-    public function getModifiePar(): ?Utilisateurs{ return $this->modifiePar; }
+    public function getModifiePar(): ?Utilisateur { return $this->modifiePar; }
     public function setModifiePar(?Utilisateur $modifiePar): static { $this->modifiePar = $modifiePar; return $this; }
 ';
 
@@ -372,7 +372,7 @@ $commentaireRelations = '
     public function getSignalement(): ?Signalement { return $this->signalement; }
     public function setSignalement(?Signalement $signalement): static { $this->signalement = $signalement; return $this; }
 
-    public function getAuteur(): ?Utilisateurs{ return $this->auteur; }
+    public function getAuteur(): ?Utilisateur { return $this->auteur; }
     public function setAuteur(?Utilisateur $auteur): static { $this->auteur = $auteur; return $this; }
 ';
 
@@ -427,7 +427,7 @@ $sondageRelations = '
     public function getCategorie(): ?CategoriesCitoyen { return $this->categorie; }
     public function setCategorie(?CategoriesCitoyen $categorie): static { $this->categorie = $categorie; return $this; }
 
-    public function getCreePar(): ?Utilisateurs{ return $this->creePar; }
+    public function getCreePar(): ?Utilisateur { return $this->creePar; }
     public function setCreePar(?Utilisateur $creePar): static { $this->creePar = $creePar; return $this; }
 ';
 
@@ -526,7 +526,7 @@ $voteRelations = '
     public function getSondage(): ?Sondage { return $this->sondage; }
     public function setSondage(?Sondage $sondage): static { $this->sondage = $sondage; return $this; }
 
-    public function getCitoyen(): ?Utilisateurs{ return $this->citoyen; }
+    public function getCitoyen(): ?Utilisateur { return $this->citoyen; }
     public function setCitoyen(?Utilisateur $citoyen): static { $this->citoyen = $citoyen; return $this; }
 
     public function getQuestion(): ?QuestionsSondage { return $this->question; }
@@ -577,7 +577,7 @@ $evenementRelations = '
     public function getVille(): ?Ville { return $this->ville; }
     public function setVille(?Ville $ville): static { $this->ville = $ville; return $this; }
 
-    public function getCreePar(): ?Utilisateurs{ return $this->creePar; }
+    public function getCreePar(): ?Utilisateur { return $this->creePar; }
     public function setCreePar(?Utilisateur $creePar): static { $this->creePar = $creePar; return $this; }
 ';
 
@@ -586,7 +586,7 @@ file_put_contents($evenementFile, $evenementContent);
 echo "  ✅ Evenement.php mis à jour\n";
 
 // ============================================================================
-// 15. EVENEMENTS_Utilisateur- ManyToOne vers Utilisateur, Evenement
+// 15. EVENEMENTS_UTILISATEUR - ManyToOne vers Utilisateur, Evenement
 // ============================================================================
 echo "📝 [15/19] EvenementsUtilisateur.php...\n";
 
@@ -603,14 +603,14 @@ removeGetterSetter($evUserContent, 'setEvenementId');
 $evUserRelations = '
     #[ORM\ManyToOne(targetEntity: Utilisateur::class)]
     #[ORM\JoinColumn(name: \'utilisateur_id\', nullable: false)]
-    private ?Utilisateur $Utilisateur= null;
+    private ?Utilisateur $utilisateur = null;
 
     #[ORM\ManyToOne(targetEntity: Evenement::class)]
     #[ORM\JoinColumn(name: \'evenement_id\', nullable: false)]
     private ?Evenement $evenement = null;
 
-    public function getUtilisateur(): ?Utilisateurs{ return $this->utilisateur; }
-    public function setUtilisateur(?Utilisateur $utilisateur): static { $this->Utilisateur= $utilisateur; return $this; }
+    public function getUtilisateur(): ?Utilisateur { return $this->utilisateur; }
+    public function setUtilisateur(?Utilisateur $utilisateur): static { $this->utilisateur = $utilisateur; return $this; }
 
     public function getEvenement(): ?Evenement { return $this->evenement; }
     public function setEvenement(?Evenement $evenement): static { $this->evenement = $evenement; return $this; }
@@ -647,7 +647,7 @@ $actualiteRelations = '
     public function getVille(): ?Ville { return $this->ville; }
     public function setVille(?Ville $ville): static { $this->ville = $ville; return $this; }
 
-    public function getAuteur(): ?Utilisateurs{ return $this->auteur; }
+    public function getAuteur(): ?Utilisateur { return $this->auteur; }
     public function setAuteur(?Utilisateur $auteur): static { $this->auteur = $auteur; return $this; }
 ';
 
@@ -697,7 +697,7 @@ $notificationRelation = '
     #[ORM\JoinColumn(name: \'destinataire_id\', nullable: false)]
     private ?Utilisateur $destinataire = null;
 
-    public function getDestinataire(): ?Utilisateurs{ return $this->destinataire; }
+    public function getDestinataire(): ?Utilisateur { return $this->destinataire; }
     public function setDestinataire(?Utilisateur $destinataire): static { $this->destinataire = $destinataire; return $this; }
 ';
 
@@ -720,10 +720,10 @@ removeGetterSetter($logContent, 'setUtilisateurId');
 $logRelation = '
     #[ORM\ManyToOne(targetEntity: Utilisateur::class)]
     #[ORM\JoinColumn(name: \'utilisateur_id\', nullable: true)]
-    private ?Utilisateur $Utilisateur= null;
+    private ?Utilisateur $utilisateur = null;
 
-    public function getUtilisateur(): ?Utilisateurs{ return $this->utilisateur; }
-    public function setUtilisateur(?Utilisateur $utilisateur): static { $this->Utilisateur= $utilisateur; return $this; }
+    public function getUtilisateur(): ?Utilisateur { return $this->utilisateur; }
+    public function setUtilisateur(?Utilisateur $utilisateur): static { $this->utilisateur = $utilisateur; return $this; }
 ';
 
 addRelationProperty($logContent, $logRelation, true);

@@ -1,6 +1,5 @@
 <?php
 namespace App\Entity;
-
 use App\Repository\ReseauSocialeRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -13,15 +12,13 @@ class ReseauSociale
     #[ORM\Column]
     private ?int $id = null;
 
-    // correction : id brut → relation ManyToOne vers Ville
-    #[ORM\ManyToOne(targetEntity: Ville::class)]
-    #[ORM\JoinColumn(name: 'ville_id', referencedColumnName: 'id', nullable: true)]
-    private ?Ville $ville = null;
+    #[ORM\Column(nullable: true)]
+    private ?int $villeId = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $plateforme = null; // correction : typo "plateform" → "plateforme"
+    #[ORM\Column(name: 'plateforme', nullable: true)]
+    private ?string $plateform = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(nullable: true)]
     private ?string $lien = null;
 
     public function getId(): ?int
@@ -29,25 +26,24 @@ class ReseauSociale
         return $this->id;
     }
 
-    // correction : ?int → ?Ville
-    public function getVille(): ?Ville
+    public function getVilleId(): ?int
     {
-        return $this->ville;
+        return $this->villeId;
     }
 
-    public function setVille(?Ville $ville): void
+    public function setVilleId(?int $villeId)
     {
-        $this->ville = $ville;
+        $this->villeId = $villeId;
     }
 
-    public function getPlateforme(): ?string
+    public function getPlateform(): ?string
     {
-        return $this->plateforme;
+        return $this->plateform;
     }
 
-    public function setPlateforme(?string $plateforme): void
+    public function setPlateform(?string $plateform)
     {
-        $this->plateforme = $plateforme;
+        $this->plateform = $plateform;
     }
 
     public function getLien(): ?string
@@ -55,7 +51,7 @@ class ReseauSociale
         return $this->lien;
     }
 
-    public function setLien(?string $lien): void
+    public function setLien(?string $lien)
     {
         $this->lien = $lien;
     }

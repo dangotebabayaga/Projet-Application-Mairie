@@ -17,12 +17,12 @@
   h1 {
     font-size: 1.5rem;
     font-weight: 600;
-    color: $gray-900;
+    color: var(--color-text);
     margin: 0;
   }
 
   p {
-    color: $gray-600;
+    color: var(--color-text-muted);
     margin: $spacing-1 0 0;
   }
 }
@@ -31,8 +31,8 @@
   display: inline-flex;
   align-items: center;
   gap: $spacing-2;
-  background: $blue-600;
-  color: $white;
+  background: var(--color-primary);
+  color: #FFFFFF;
   border: none;
   border-radius: $radius-lg;
   padding: $spacing-2 $spacing-4;
@@ -41,7 +41,7 @@
   transition: background-color 0.2s;
 
   &:hover {
-    background: $blue-700;
+    background: var(--color-primary-dark);
   }
 
   svg {
@@ -52,7 +52,8 @@
 
 // Create Form Card
 .create-card {
-  background: $white;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: $radius-xl;
   box-shadow: $shadow-sm;
   padding: $spacing-5;
@@ -60,7 +61,7 @@
   h2 {
     font-size: $text-lg;
     font-weight: 600;
-    color: $gray-900;
+    color: var(--color-text);
     margin: 0 0 $spacing-4;
   }
 }
@@ -85,7 +86,7 @@
     flex-direction: column;
     gap: $spacing-1;
     font-size: $text-sm;
-    color: $gray-700;
+    color: var(--color-text);
     font-weight: 500;
 
     &.full {
@@ -97,16 +98,16 @@
   textarea,
   select {
     padding: $spacing-2 $spacing-3;
-    border: 1px solid $gray-300;
+    border: 1px solid var(--color-border);
     border-radius: $radius-lg;
     font: inherit;
-    color: $gray-900;
-    background: $white;
+    color: var(--color-text);
+    background: var(--color-surface);
 
     &:focus {
       outline: none;
-      border-color: $blue-500;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px var(--color-primary-light);
     }
   }
 
@@ -147,26 +148,27 @@
 }
 
 .btn-primary {
-  background: $blue-600;
-  color: $white;
+  background: var(--color-primary);
+  color: #FFFFFF;
 
   &:hover:not(:disabled) {
-    background: $blue-700;
+    background: var(--color-primary-dark);
   }
 }
 
 .btn-secondary {
-  background: $gray-200;
-  color: $gray-800;
+  background: var(--color-surface-alt);
+  color: var(--color-text);
 
   &:hover:not(:disabled) {
-    background: $gray-300;
+    background: var(--color-border);
   }
 }
 
 // Filter Card
 .filter-card {
-  background: $white;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: $radius-xl;
   box-shadow: $shadow-sm;
   padding: $spacing-4;
@@ -176,7 +178,7 @@
 }
 
 .filter-section + .filter-section {
-  border-top: 1px solid $gray-100;
+  border-top: 1px solid var(--color-border);
   padding-top: $spacing-4;
 }
 
@@ -189,12 +191,12 @@
   svg {
     width: 20px;
     height: 20px;
-    color: $gray-600;
+    color: var(--color-text-muted);
   }
 
   span {
     font-weight: 500;
-    color: $gray-900;
+    color: var(--color-text);
   }
 }
 
@@ -219,7 +221,7 @@
 
   &.active {
     opacity: 1;
-    box-shadow: 0 0 0 2px $white, 0 0 0 4px $blue-500;
+    box-shadow: 0 0 0 2px var(--color-surface), 0 0 0 4px var(--color-primary);
   }
 
   &.theme-all {
@@ -259,7 +261,7 @@
     h2 {
       font-size: $text-lg;
       font-weight: 600;
-      color: $gray-900;
+      color: var(--color-text);
       margin: 0;
     }
   }
@@ -280,14 +282,23 @@
 }
 
 .event-card {
-  background: $white;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: $radius-xl;
   box-shadow: $shadow-sm;
   overflow: hidden;
-  transition: box-shadow 0.2s;
+  transition: box-shadow 0.2s, transform 0.2s;
 
   &:hover {
     box-shadow: $shadow-md;
+  }
+
+  &.clickable {
+    cursor: pointer;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
   }
 }
 
@@ -302,7 +313,7 @@
   }
 
   &.placeholder {
-    background: $gray-100;
+    background: var(--color-surface-alt);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -310,7 +321,7 @@
     svg {
       width: 48px;
       height: 48px;
-      color: $gray-400;
+      color: var(--color-text-muted);
     }
   }
 }
@@ -360,7 +371,7 @@
   cursor: pointer;
   padding: 0;
   line-height: 1;
-  color: $gray-300;
+  color: var(--color-text-muted);
   transition: transform 0.2s;
 
   &:hover {
@@ -374,13 +385,13 @@
 
 .event-content h3 {
   font-weight: 600;
-  color: $gray-900;
+  color: var(--color-text);
   margin: 0 0 $spacing-2;
 }
 
 .event-description {
   font-size: $text-sm;
-  color: $gray-600;
+  color: var(--color-text-muted);
   margin: 0 0 $spacing-4;
   line-height: 1.5;
   display: -webkit-box;
@@ -401,7 +412,7 @@
   align-items: center;
   gap: $spacing-2;
   font-size: $text-sm;
-  color: $gray-600;
+  color: var(--color-text-muted);
 
   svg {
     width: 16px;
@@ -416,8 +427,8 @@
   align-items: center;
   justify-content: center;
   gap: $spacing-2;
-  background: $blue-600;
-  color: $white;
+  background: var(--color-primary);
+  color: #FFFFFF;
   padding: $spacing-2 0;
   border: none;
   border-radius: $radius-lg;
@@ -426,7 +437,7 @@
   transition: background-color 0.2s;
 
   &:hover {
-    background: $blue-700;
+    background: var(--color-primary-dark);
   }
 
   svg {
@@ -437,7 +448,8 @@
 
 // Empty State
 .empty-state {
-  background: $white;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: $radius-xl;
   box-shadow: $shadow-sm;
   padding: $spacing-12;
@@ -446,12 +458,12 @@
   svg {
     width: 48px;
     height: 48px;
-    color: $gray-400;
+    color: var(--color-text-muted);
     margin: 0 auto $spacing-3;
   }
 
   p {
-    color: $gray-600;
+    color: var(--color-text-muted);
     margin: 0;
   }
 }
@@ -461,20 +473,20 @@
   h2 {
     font-size: $text-lg;
     font-weight: 600;
-    color: $gray-900;
+    color: var(--color-text);
     margin: 0 0 $spacing-4;
   }
 }
 
 .favorites-banner {
-  background: $blue-50;
-  border: 1px solid $blue-200;
+  background: var(--color-primary-light);
+  border: 1px solid var(--color-border);
   border-radius: $radius-xl;
   padding: $spacing-4;
 
   p {
     font-size: $text-sm;
-    color: #1E40AF;
+    color: var(--color-primary);
     margin: 0;
   }
 }

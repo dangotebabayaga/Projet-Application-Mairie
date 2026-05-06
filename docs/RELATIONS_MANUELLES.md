@@ -33,14 +33,14 @@ use Doctrine\Common\Collections\Collection;
     private Collection $thematiquesEvenements;
 
     #[ORM\OneToMany(mappedBy: 'ville', targetEntity: Utilisateur::class)]
-    private Collection $Utilisateur;
+    private Collection $utilisateurs;
 
     public function __construct()
     {
         $this->quartiers = new ArrayCollection();
         $this->categoriesCitoyens = new ArrayCollection();
         $this->thematiquesEvenements = new ArrayCollection();
-        $this->Utilisateur = new ArrayCollection();
+        $this->utilisateurs = new ArrayCollection();
     }
 ```
 
@@ -61,9 +61,9 @@ use Doctrine\Common\Collections\Collection;
         return $this->thematiquesEvenements;
     }
 
-    public function getUtilisateur(): Collection
+    public function getUtilisateurs(): Collection
     {
-        return $this->Utilisateur;
+        return $this->utilisateurs;
     }
 ```
 
@@ -176,7 +176,7 @@ private ?int $categorieId = null;
 
 **REMPLACER par :**
 ```php
-    #[ORM\ManyToOne(targetEntity: Ville::class, inversedBy: 'Utilisateur')]
+    #[ORM\ManyToOne(targetEntity: Ville::class, inversedBy: 'utilisateurs')]
     #[ORM\JoinColumn(name: 'ville_id', nullable: false)]
     private ?Ville $ville = null;
 
