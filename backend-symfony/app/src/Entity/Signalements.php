@@ -38,6 +38,9 @@ class Signalements
 
     #[ORM\Column(length: 500, nullable: true)]
     private ?string $photo = null;
+
+    #[ORM\Column(length: 500, nullable: true)]
+    private ?string $adresse = null;
     // **Ajoute explicitement le type datetime**
     #[ORM\Column(type: "datetime", nullable: true)]
     private ?\DateTimeInterface $dateCreation = null;
@@ -150,6 +153,17 @@ class Signalements
     public function setPhoto(?string $photo): self
     {
         $this->photo = $photo;
+        return $this;
+    }
+
+    public function getAdresse(): ?string
+    {
+        return $this->adresse;
+    }
+
+    public function setAdresse(?string $adresse): self
+    {
+        $this->adresse = $adresse;
         return $this;
     }
 }

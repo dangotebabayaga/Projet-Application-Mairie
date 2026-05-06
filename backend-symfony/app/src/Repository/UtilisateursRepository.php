@@ -4,6 +4,7 @@ namespace App\Repository;
 use App\Entity\Utilisateurs;
 use App\Entity\Citoyens;
 use App\Entity\Admin;
+use App\Entity\SuperAdministrateur;
 use App\Entity\Ville;
 use App\Repository\VilleRepository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -83,43 +84,122 @@ class UtilisateursRepository extends ServiceEntityRepository
         $this->em->flush();
     
         if ($data['role'] == 1) {
-        
+
             $citoyen = new Citoyens();
             $citoyen->setUtilisateurId($user->getId());
             $this->em->persist($citoyen);
-        
+            $this->em->flush();
+
+            // Attribution quartier / catégorie via SQL natif
+            $quartierId = isset($data['quartierId']) && $data['quartierId'] !== '' ? (int) $data['quartierId'] : null;
+            $categorieId = isset($data['categorieId']) && $data['categorieId'] !== '' ? (int) $data['categorieId'] : null;
+            if ($quartierId !== null || $categorieId !== null) {
+                $this->em->getConnection()->executeStatement(
+                    'UPDATE citoyens SET quartier_id = :q, categorie_id = :c WHERE utilisateur_id = :u',
+                    ['q' => $quartierId, 'c' => $categorieId, 'u' => $user->getId()]
+                );
+            }
         } elseif ($data['role'] == 2) {
-        
+
             $admin = new Admin();
             $admin->setUtilisateurId($user->getId());
             $this->em->persist($admin);
-        
         }
-    
+
         $this->em->flush();
-    
+
         return $user;
+    }
+
+    public function updateUtilisateur(Utilisateurs $user, array $data): void
+    {
+        if (array_key_exists('nom', $data) && $data['nom'] !== null) {
+            $user->setNom($data['nom']);
+        }
+        if (array_key_exists('prenom', $data) && $data['prenom'] !== null) {
+            $user->setPrenom($data['prenom']);
+        }
+        if (array_key_exists('email', $data) && $data['email'] !== null) {
+            $user->setEmail($data['email']);
+        }
+        if (array_key_exists('telephone', $data)) {
+            $user->setTelephone($data['telephone'] ?: null);
+        }
+        if (array_key_exists('dateNaissance', $data)) {
+            $user->setDateNaissance(
+                $data['dateNaissance'] ? new \DateTime($data['dateNaissance']) : null
+            );
+        }
+        $this->em->flush();
     }
 
     public function infoUser(int $id): array{
         $user=$this->em->getRepository(Utilisateurs::class)->findOneBy(['id'=>$id]);
-        $data=[];
-        $data=[
+        $role = $this->getRole($user);
+
+        $quartierId = null;
+        $categorieId = null;
+        if ($role === 'citoyen') {
+            $row = $this->em->getConnection()->fetchAssociative(
+                'SELECT quartier_id, categorie_id FROM citoyens WHERE utilisateur_id = :id',
+                ['id' => $id]
+            );
+            if ($row) {
+                $quartierId = $row['quartier_id'] !== null ? (int) $row['quartier_id'] : null;
+                $categorieId = $row['categorie_id'] !== null ? (int) $row['categorie_id'] : null;
+            }
+        }
+
+        return [
             "id" => $user->getId(),
             "nom"=>$user->getNom(),
             "prenom"=>$user->getPrenom(),
             "email" => $user->getEmail(),
             "telephonne" => $user->getTelephone(),
             "date Naissance"=> $user->getDateNaissance(),
-            "role" => $this->getRole($user)
+            "role" => $role,
+            "villeId" => $user->getVilleId(),
+            "quartierId" => $quartierId,
+            "categorieId" => $categorieId
         ];
+    }
 
-        return $data;
+    /**
+     * Met à jour quartier et/ou catégorie pour un citoyen donné.
+     * Champs absents de $data = pas de changement.
+     */
+    public function updateCitoyenAffectation(int $userId, array $data): void
+    {
+        $hasQuartier = array_key_exists('quartierId', $data);
+        $hasCategorie = array_key_exists('categorieId', $data);
+        if (!$hasQuartier && !$hasCategorie) return;
+
+        $sets = [];
+        $params = ['u' => $userId];
+        if ($hasQuartier) {
+            $sets[] = 'quartier_id = :q';
+            $params['q'] = $data['quartierId'] === null || $data['quartierId'] === '' ? null : (int) $data['quartierId'];
+        }
+        if ($hasCategorie) {
+            $sets[] = 'categorie_id = :c';
+            $params['c'] = $data['categorieId'] === null || $data['categorieId'] === '' ? null : (int) $data['categorieId'];
+        }
+
+        $this->em->getConnection()->executeStatement(
+            'UPDATE citoyens SET ' . implode(', ', $sets) . ' WHERE utilisateur_id = :u',
+            $params
+        );
     }
 
     public function getRole(Utilisateurs $user): string
     {
         $em = $this->getEntityManager();
+
+        // Priorité : superadmin > admin > citoyen
+        $isSuperAdmin = $em->getRepository(SuperAdministrateur::class)
+                           ->find($user->getId());
+
+        if ($isSuperAdmin) return 'superadmin';
 
         $isAdmin = $em->getRepository(Admin::class)
                       ->find($user->getId());

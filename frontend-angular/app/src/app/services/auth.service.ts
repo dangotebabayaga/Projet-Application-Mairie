@@ -34,6 +34,9 @@ export class AuthService {
     localStorage.setItem('userPrenom', infoUser.prenom);
     localStorage.setItem('userEmail', infoUser.email);
     localStorage.setItem('userRole', infoUser.role || 'citoyen');
+    if (infoUser.villeId) {
+      localStorage.setItem('villeId', String(infoUser.villeId));
+    }
   }
 
   logout(): void {
@@ -60,5 +63,27 @@ export class AuthService {
 
   getUserRole(): string {
     return localStorage.getItem('userRole') || 'citoyen';
+  }
+
+  getMe(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/me`);
+  }
+
+  updateMe(data: {
+    nom?: string;
+    prenom?: string;
+    email?: string;
+    telephone?: string;
+    dateNaissance?: string;
+  }): Observable<any> {
+    return this.http.put(`${this.apiUrl}/me`, data);
+  }
+
+  forgotPassword(email: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/forgot-password`, { email });
+  }
+
+  resetPassword(token: string, motDePasse: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/reset-password`, { token, motDePasse });
   }
 }

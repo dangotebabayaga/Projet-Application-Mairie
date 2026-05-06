@@ -56,12 +56,8 @@ use Doctrine\ORM\EntityManagerInterface;
 
         $data = array_map(function($s) use ($userId) {
 
-            $lat = $s->getLatitude();
-            $lng = $s->getLongitude();
-
-            $adresse = ($lat && $lng)
-                ? $this->convertAdresse->coordinatesToAddress($lat, $lng)
-                : null;
+            // L'adresse est mise en cache en BDD à la création — pas d'appel Nominatim ici
+            $adresse = $s->getAdresse();
 
             $type = $s->getTypeId()
                 ? $this->em->getRepository(TypesSignalement::class)->find($s->getTypeId())
@@ -131,8 +127,9 @@ use Doctrine\ORM\EntityManagerInterface;
          $s->setCitoyen($citoyen);
          $s->setTypeId(isset($data['typeId']) ? (int) $data['typeId'] : null);
 
-         // Si on a une adresse, on convertit en coordonnées
+         // Si on a une adresse texte, on la stocke et on calcule lat/lng
          if (!empty($data['adresse'])) {
+            $s->setAdresse($data['adresse']);
             $coords = $this->convertAdresse->addressToCoordinates($data['adresse']);
             if ($coords !== null) {
                 $s->setLatitude($coords['lat']);
@@ -188,7 +185,7 @@ use Doctrine\ORM\EntityManagerInterface;
         return 'http://localhost:8000/' . ltrim($relativePath, '/');
     }
 
-    #[Route('/{id}', name: 'ChangeEtat', methods: ['GET'])] 
+    #[Route('/{id}', name: 'ChangeEtat', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function changeEtat(Request $request, int $id): JsonResponse
     {
          $user = $this->auth->getuserfromrequest($request);
@@ -222,5 +219,102 @@ use Doctrine\ORM\EntityManagerInterface;
             "message"=>"etat modifié",
             "nouvelEtat"=>$etatSuivant->value
         ]);
+    }
+
+    #[Route('/{id}', name: 'update_signalement', methods: ['PUT', 'POST'], requirements: ['id' => '\d+'])]
+    public function update(Request $request, int $id): JsonResponse
+    {
+        $user = $this->auth->getUserFromRequest($request);
+        if (!$user) {
+            return $this->json(["error" => "Token manquant ou invalide"], 401);
+        }
+
+        $signalement = $this->em->getRepository(Signalements::class)->find($id);
+        if (!$signalement) {
+            return $this->json(["error" => "Signalement introuvable"], 404);
+        }
+
+        // L'auteur peut modifier uniquement tant que l'état est "enregistré"
+        $isAuthor = $signalement->getCitoyen()?->getUtilisateurId() === $user['userId'];
+        if (!$isAuthor) {
+            return $this->json(["error" => "Vous n'êtes pas l'auteur de ce signalement"], 403);
+        }
+        if ($signalement->getEtat()->value !== EtatSignalement::ENREGISTRE->value) {
+            return $this->json(["error" => "Ce signalement a déjà été pris en charge, modification impossible"], 403);
+        }
+
+        $contentType = $request->headers->get('Content-Type', '');
+        if (str_contains($contentType, 'multipart/form-data')) {
+            $data = $request->request->all();
+            $photoFile = $request->files->get('photo');
+        } else {
+            $data = json_decode($request->getContent(), true) ?: [];
+            $photoFile = null;
+        }
+
+        if (isset($data['titre'])) $signalement->setTitre($data['titre']);
+        if (isset($data['description'])) $signalement->setDescription($data['description']);
+        if (isset($data['typeId'])) $signalement->setTypeId((int) $data['typeId']);
+
+        if (!empty($data['adresse'])) {
+            $signalement->setAdresse($data['adresse']);
+            $coords = $this->convertAdresse->addressToCoordinates($data['adresse']);
+            if ($coords !== null) {
+                $signalement->setLatitude($coords['lat']);
+                $signalement->setLongitude($coords['lng']);
+            }
+        }
+
+        if ($photoFile) {
+            $error = $this->validatePhoto($photoFile);
+            if ($error) {
+                return $this->json(["error" => $error], 400);
+            }
+            $filename = uniqid('sig_', true) . '.' . $photoFile->guessExtension();
+            $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads/signalements';
+            if (!is_dir($uploadDir)) {
+                @mkdir($uploadDir, 0775, true);
+            }
+            $photoFile->move($uploadDir, $filename);
+            $signalement->setPhoto('uploads/signalements/' . $filename);
+        }
+
+        $signalement->setDateModification(new \DateTime());
+        $this->em->flush();
+
+        return $this->json([
+            'message' => 'Signalement mis à jour',
+            'photo' => $signalement->getPhoto() ? $this->getPhotoUrl($signalement->getPhoto()) : null
+        ]);
+    }
+
+    #[Route('/{id}', name: 'delete_signalement', methods: ['DELETE'], requirements: ['id' => '\d+'])]
+    public function delete(Request $request, int $id): JsonResponse
+    {
+        $user = $this->auth->getUserFromRequest($request);
+        if (!$user) {
+            return $this->json(["error" => "Token manquant ou invalide"], 401);
+        }
+
+        $signalement = $this->em->getRepository(Signalements::class)->find($id);
+        if (!$signalement) {
+            return $this->json(["error" => "Signalement introuvable"], 404);
+        }
+
+        // L'auteur peut supprimer si état === enregistré ; un admin peut toujours supprimer
+        $isAuthor = $signalement->getCitoyen()?->getUtilisateurId() === $user['userId'];
+        $isAdmin = $this->auth->checkRole($user, 'admin');
+        $isRegistered = $signalement->getEtat()->value === EtatSignalement::ENREGISTRE->value;
+
+        if (!$isAdmin && !($isAuthor && $isRegistered)) {
+            return $this->json([
+                "error" => "Suppression non autorisée (signalement déjà pris en charge)"
+            ], 403);
+        }
+
+        $this->em->remove($signalement);
+        $this->em->flush();
+
+        return $this->json(['message' => 'Signalement supprimé']);
     }
  }

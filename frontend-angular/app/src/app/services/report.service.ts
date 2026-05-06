@@ -55,4 +55,23 @@ export class ReportService {
   advanceState(id: number): Observable<any> {
     return this.http.get(`${this.apiUrl}/${id}`);
   }
+
+  update(id: number, payload: ReportPayload): Observable<any> {
+    const fd = new FormData();
+    fd.append('titre', payload.titre);
+    fd.append('description', payload.description);
+    fd.append('adresse', payload.adresse);
+    if (payload.typeId !== null && payload.typeId !== undefined) {
+      fd.append('typeId', String(payload.typeId));
+    }
+    if (payload.photo) {
+      fd.append('photo', payload.photo);
+    }
+    // POST sur /:id (le backend accepte aussi PUT, mais POST gère mieux multipart)
+    return this.http.post(`${this.apiUrl}/${id}`, fd);
+  }
+
+  delete(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`);
+  }
 }

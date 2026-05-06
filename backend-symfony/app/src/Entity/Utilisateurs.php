@@ -115,7 +115,7 @@ class Utilisateurs
         $this->telephone = $telephone;
     }
 
-    public function getVileId(): ?int
+    public function getVilleId(): ?int
     {
         return $this->villeId;
     }

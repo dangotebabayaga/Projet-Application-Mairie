@@ -11,19 +11,20 @@
   h1 {
     font-size: 1.5rem;
     font-weight: 600;
-    color: $gray-900;
+    color: var(--color-text);
     margin: 0;
   }
 
   p {
-    color: $gray-600;
+    color: var(--color-text-muted);
     margin: $spacing-1 0 0;
   }
 }
 
 // Social Links Card
 .social-links-card {
-  background: $white;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: $radius-xl;
   box-shadow: $shadow-sm;
   padding: $spacing-6;
@@ -31,7 +32,7 @@
   h2 {
     font-size: $text-lg;
     font-weight: 600;
-    color: $gray-900;
+    color: var(--color-text);
     margin: 0 0 $spacing-4;
   }
 }
@@ -48,17 +49,19 @@
 
 .social-loading,
 .social-empty {
-  color: $gray-500;
+  color: var(--color-text-muted);
   font-size: $text-sm;
 }
 
+// Les couleurs de marque RS sont conservées (Facebook, Twitter, etc.)
+// car elles font partie de l'identité de chaque plateforme
 .social-link {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: $spacing-4;
   border-radius: $radius-lg;
-  color: $white;
+  color: #FFFFFF;
   text-decoration: none;
   transition: all 0.2s;
   background: $gray-700;
@@ -66,8 +69,8 @@
   &:hover { background: $gray-800; }
 
   &.social-facebook {
-    background: $blue-600;
-    &:hover { background: $blue-700; }
+    background: #1877F2;
+    &:hover { background: #1464D8; }
   }
 
   &.social-twitter,
@@ -123,13 +126,14 @@
   h2 {
     font-size: $text-lg;
     font-weight: 600;
-    color: $gray-900;
+    color: var(--color-text);
     margin: 0 0 $spacing-4;
   }
 }
 
 .facebook-embed {
-  background: $white;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: $radius-xl;
   box-shadow: $shadow-sm;
   overflow: hidden;
@@ -144,14 +148,14 @@
 
 // Info Banner
 .info-banner {
-  background: $blue-50;
-  border: 1px solid $blue-200;
+  background: var(--color-primary-light);
+  border: 1px solid var(--color-border);
   border-radius: $radius-xl;
   padding: $spacing-6;
 
   h3 {
     font-weight: 600;
-    color: #1E3A8A;
+    color: var(--color-primary);
     margin: 0 0 $spacing-2;
 
     &::before {
@@ -161,7 +165,7 @@
 
   p {
     font-size: $text-sm;
-    color: #1E40AF;
+    color: var(--color-text);
     margin: 0;
     line-height: 1.5;
   }

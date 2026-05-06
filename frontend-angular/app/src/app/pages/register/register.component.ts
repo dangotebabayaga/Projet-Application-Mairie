@@ -1,9 +1,11 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { QuartierService, Quartier } from '../../services/quartier.service';
+import { CategorieService, Categorie } from '../../services/categorie.service';
 
 interface CityConfig {
   name: string;
@@ -18,7 +20,8 @@ interface RegisterForm {
   password: string;
   confirmPassword: string;
   address: string;
-  neighborhood: string;
+  quartierId: number | null;
+  categorieId: number | null;
 }
 
 @Component({
@@ -28,7 +31,7 @@ interface RegisterForm {
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss']
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnInit {
   @Output() backToLogin = new EventEmitter<void>();
   @Output() registerSuccess = new EventEmitter<void>();
 
@@ -39,7 +42,8 @@ export class RegisterComponent {
     password: '',
     confirmPassword: '',
     address: '',
-    neighborhood: ''
+    quartierId: null,
+    categorieId: null
   };
 
   loading: boolean = false;
@@ -54,15 +58,26 @@ export class RegisterComponent {
     slogan: 'Une ville connectée'
   };
 
-  neighborhoods: string[] = [
-    'Centre-ville',
-    'Quartier Nord',
-    'Quartier Sud',
-    'Quartier Est',
-    'Quartier Ouest'
-  ];
+  quartiers: Quartier[] = [];
+  categories: Categorie[] = [];
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private quartierService: QuartierService,
+    private categorieService: CategorieService
+  ) {}
+
+  ngOnInit(): void {
+    this.quartierService.getAll().subscribe({
+      next: (data) => this.quartiers = data,
+      error: () => this.quartiers = []
+    });
+    this.categorieService.getAll().subscribe({
+      next: (data) => this.categories = data,
+      error: () => this.categories = []
+    });
+  }
 
   onSubmit(): void {
     this.error = '';
@@ -84,15 +99,22 @@ export class RegisterComponent {
       return;
     }
 
+    if (!this.formData.quartierId || !this.formData.categorieId) {
+      this.error = 'Veuillez sélectionner votre quartier et votre catégorie';
+      return;
+    }
+
     this.loading = true;
 
-    const payload = {
+    const payload: any = {
       nom: this.formData.nom,
       prenom: this.formData.prenom,
       email: this.formData.email,
       motDePasse: this.formData.password,
       role: 1
     };
+    if (this.formData.quartierId) payload.quartierId = this.formData.quartierId;
+    if (this.formData.categorieId) payload.categorieId = this.formData.categorieId;
 
     this.authService.register(payload).subscribe({
       next: () => {

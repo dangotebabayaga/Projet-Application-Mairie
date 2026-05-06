@@ -17,6 +17,7 @@ export interface Survey {
   choix: Choix[];
   hasVoted: boolean;
   nbVotants?: number;
+  multiChoice?: boolean;
 }
 
 export interface VotePayload {

@@ -38,6 +38,8 @@ class SondagesRepository extends ServiceEntityRepository
         $sondage->setDateDebut($dateDebut);
         $sondage->setDateFin($dateFin);
         $sondage->setAdminstrateur($data['administrateur_Id']);
+        // Par défaut multi-choix (compat ancien comportement)
+        $sondage->setMultiChoice(array_key_exists('multiChoice', $data) ? (bool) $data['multiChoice'] : true);
 
         // On ne flush pas ici, le contrôleur s'en charge
         $this->em->persist($sondage);

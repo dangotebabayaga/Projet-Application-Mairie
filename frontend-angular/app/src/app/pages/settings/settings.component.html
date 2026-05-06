@@ -29,6 +29,20 @@
     {{ success }}
   </div>
 
+  <!-- Mode étendu (superadmin uniquement) -->
+  <div class="settings-card" *ngIf="isSuperAdmin && !loading">
+    <h2>Affichage navbar</h2>
+    <p class="card-description">
+      Par défaut, vous voyez uniquement les pages d'administration. Activez le mode étendu pour
+      afficher également les pages citoyennes (Accueil, Signalements, Sondages, Agenda, Discussion).
+    </p>
+    <button type="button" class="btn-save"
+            (click)="toggleExtendedMode()"
+            [style.background]="superAdminExtended ? '#16A34A' : '#2563eb'">
+      {{ superAdminExtended ? 'Désactiver le mode étendu' : 'Activer le mode étendu' }}
+    </button>
+  </div>
+
   <div class="settings-content" *ngIf="!loading">
     <!-- Informations de la ville -->
     <div class="settings-card">
@@ -62,36 +76,36 @@
           [class.selected]="selectedTheme === theme.id"
           (click)="selectTheme(theme.id)"
         >
-          <div class="theme-preview">
-            <div class="theme-header" [style.background]="theme.primary">
-              <div class="theme-dot"></div>
-              <div class="theme-dot"></div>
-              <div class="theme-dot"></div>
-            </div>
-            <div class="theme-body" [style.background]="theme.primaryLight">
-              <div class="theme-bar" [style.background]="theme.primary"></div>
-              <div class="theme-bar short" [style.background]="theme.primaryDark"></div>
-              <div class="theme-bar shorter" [style.background]="theme.primary" style="opacity: 0.5"></div>
+          <!-- Preview pleine taille montrant fond + carte + boutons -->
+          <div class="theme-preview"
+               [style.background]="theme.bg"
+               [style.borderColor]="theme.border">
+            <div class="theme-preview-card"
+                 [style.background]="theme.surface"
+                 [style.borderColor]="theme.border">
+              <div class="theme-preview-line big" [style.background]="theme.text"></div>
+              <div class="theme-preview-line" [style.background]="theme.border"></div>
+              <div class="theme-preview-line short" [style.background]="theme.border"></div>
+              <div class="theme-preview-button" [style.background]="theme.primary"></div>
             </div>
           </div>
+
           <div class="theme-info">
-            <span class="theme-name">{{ theme.name }}</span>
-            <div class="theme-colors">
-              <span class="color-dot" [style.background]="theme.primary"></span>
-              <span class="color-dot" [style.background]="theme.primaryDark"></span>
-              <span class="color-dot" [style.background]="theme.primaryLight" style="border: 1px solid #ddd"></span>
+            <div class="theme-text">
+              <span class="theme-name">{{ theme.name }}</span>
+              <span class="theme-description">{{ theme.description }}</span>
             </div>
-          </div>
-          <div class="theme-check" *ngIf="selectedTheme === theme.id">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
+            <div class="theme-check" *ngIf="selectedTheme === theme.id">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Bouton sauvegarder -->
+    <!-- Bouton sauvegarder (concerne uniquement infos ville + thème) -->
     <div class="save-section">
       <button class="btn-save" (click)="onSave()" [disabled]="saving">
         <svg *ngIf="!saving" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -101,6 +115,76 @@
         </svg>
         {{ saving ? 'Sauvegarde en cours...' : 'Sauvegarder la configuration' }}
       </button>
+    </div>
+
+    <!-- Quartiers de la ville -->
+    <div class="settings-card">
+      <h2>Quartiers de la ville</h2>
+      <p class="card-description">
+        Liste des quartiers que les citoyens peuvent choisir à l'inscription
+        et qui peuvent servir à cibler un sondage.
+      </p>
+
+      <ul class="config-list">
+        <li *ngFor="let q of quartiers" class="config-item">
+          <span>{{ q.nom }}</span>
+          <button type="button" class="btn-icon-delete" (click)="deleteQuartier(q)" title="Supprimer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </li>
+        <li *ngIf="quartiers.length === 0" class="config-empty">
+          Aucun quartier configuré
+        </li>
+      </ul>
+
+      <div class="config-add">
+        <input type="text"
+               [(ngModel)]="newQuartierNom"
+               placeholder="Nom du nouveau quartier"
+               (keyup.enter)="addQuartier()" />
+        <button type="button" class="btn-add" (click)="addQuartier()">
+          + Ajouter
+        </button>
+      </div>
+      <p class="form-error" *ngIf="quartierError">{{ quartierError }}</p>
+    </div>
+
+    <!-- Catégories de citoyens -->
+    <div class="settings-card">
+      <h2>Catégories de citoyens</h2>
+      <p class="card-description">
+        Catégories démographiques (Étudiants, Familles, Seniors…) que les citoyens
+        peuvent choisir à l'inscription et qui peuvent servir à cibler un sondage.
+      </p>
+
+      <ul class="config-list">
+        <li *ngFor="let c of categories" class="config-item">
+          <span>{{ c.libelle }}</span>
+          <button type="button" class="btn-icon-delete" (click)="deleteCategorie(c)" title="Supprimer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </li>
+        <li *ngIf="categories.length === 0" class="config-empty">
+          Aucune catégorie configurée
+        </li>
+      </ul>
+
+      <div class="config-add">
+        <input type="text"
+               [(ngModel)]="newCategorieLibelle"
+               placeholder="Nom de la nouvelle catégorie"
+               (keyup.enter)="addCategorie()" />
+        <button type="button" class="btn-add" (click)="addCategorie()">
+          + Ajouter
+        </button>
+      </div>
+      <p class="form-error" *ngIf="categorieError">{{ categorieError }}</p>
     </div>
   </div>
 </div>

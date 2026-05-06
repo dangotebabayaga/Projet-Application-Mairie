@@ -37,6 +37,9 @@ class Evenement
     #[ORM\Column(nullable: true)]
     private ?int $type = null;
 
+    #[ORM\Column(length: 500, nullable: true)]
+    private ?string $photo = null;
+
     // ===== Getters & Setters =====
 
     public function getId(): ?int
@@ -129,6 +132,17 @@ class Evenement
     public function setType(?int $type): self
     {
         $this->type = $type;
+        return $this;
+    }
+
+    public function getPhoto(): ?string
+    {
+        return $this->photo;
+    }
+
+    public function setPhoto(?string $photo): self
+    {
+        $this->photo = $photo;
         return $this;
     }
 }

@@ -32,7 +32,7 @@
       <form (ngSubmit)="onSubmit()" class="register-form" *ngIf="!successMessage">
         <!-- Nom -->
         <div class="form-group">
-          <label for="nom">Nom</label>
+          <label for="nom">Nom <span class="required">*</span></label>
           <input
             type="text"
             id="nom"
@@ -46,7 +46,7 @@
 
         <!-- Prénom -->
         <div class="form-group">
-          <label for="prenom">Prénom</label>
+          <label for="prenom">Prénom <span class="required">*</span></label>
           <input
             type="text"
             id="prenom"
@@ -60,7 +60,7 @@
 
         <!-- Email -->
         <div class="form-group">
-          <label for="email">Email</label>
+          <label for="email">Email <span class="required">*</span></label>
           <input
             type="email"
             id="email"
@@ -74,7 +74,7 @@
 
         <!-- Mot de passe -->
         <div class="form-group">
-          <label for="password">Mot de passe</label>
+          <label for="password">Mot de passe <span class="required">*</span></label>
           <div class="password-wrapper">
             <input
               [type]="showPassword ? 'text' : 'password'"
@@ -101,7 +101,7 @@
 
         <!-- Confirmer mot de passe -->
         <div class="form-group">
-          <label for="confirmPassword">Confirmer le mot de passe</label>
+          <label for="confirmPassword">Confirmer le mot de passe <span class="required">*</span></label>
           <div class="password-wrapper">
             <input
               [type]="showConfirmPassword ? 'text' : 'password'"
@@ -141,15 +141,31 @@
 
         <!-- Quartier -->
         <div class="form-group">
-          <label for="neighborhood">Quartier</label>
+          <label for="quartier">Quartier <span class="required">*</span></label>
           <select
-            id="neighborhood"
-            [(ngModel)]="formData.neighborhood"
-            name="neighborhood"
+            id="quartier"
+            [(ngModel)]="formData.quartierId"
+            name="quartierId"
+            required
             [disabled]="loading"
           >
-            <option value="">Sélectionnez votre quartier</option>
-            <option *ngFor="let n of neighborhoods" [value]="n">{{ n }}</option>
+            <option [ngValue]="null" disabled>Sélectionnez votre quartier</option>
+            <option *ngFor="let q of quartiers" [ngValue]="q.id">{{ q.nom }}</option>
+          </select>
+        </div>
+
+        <!-- Catégorie -->
+        <div class="form-group">
+          <label for="categorie">Catégorie <span class="required">*</span></label>
+          <select
+            id="categorie"
+            [(ngModel)]="formData.categorieId"
+            name="categorieId"
+            required
+            [disabled]="loading"
+          >
+            <option [ngValue]="null" disabled>Sélectionnez votre catégorie</option>
+            <option *ngFor="let c of categories" [ngValue]="c.id">{{ c.libelle }}</option>
           </select>
         </div>
 
@@ -157,7 +173,7 @@
         <button
           type="submit"
           class="btn-submit"
-          [disabled]="loading || !formData.nom || !formData.prenom || !formData.email || !formData.password || !formData.confirmPassword"
+          [disabled]="loading || !formData.nom || !formData.prenom || !formData.email || !formData.password || !formData.confirmPassword || !formData.quartierId || !formData.categorieId"
         >
           {{ loading ? 'Création du compte...' : 'Créer mon compte' }}
         </button>

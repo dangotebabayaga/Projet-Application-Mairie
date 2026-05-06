@@ -1,0 +1,23 @@
+<div class="photo-upload">
+  <label [attr.for]="inputId" class="photo-upload-label">
+    <svg class="label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+      <circle cx="12" cy="13" r="4"></circle>
+    </svg>
+    {{ label }}
+  </label>
+  <input
+    type="file"
+    [id]="inputId"
+    accept="image/*"
+    (change)="onChange($event)"
+  />
+  <p class="photo-upload-hint">{{ hint }}</p>
+
+  <p class="photo-upload-error" *ngIf="error">{{ error }}</p>
+
+  <div class="photo-upload-preview" *ngIf="preview">
+    <img [src]="preview" alt="Aperçu" />
+    <button type="button" class="btn-remove" (click)="remove()">Retirer</button>
+  </div>
+</div>

@@ -20,18 +20,18 @@
     svg {
       width: 20px;
       height: 20px;
-      color: $gray-500;
+      color: var(--color-text-muted);
     }
 
     &:hover svg {
-      color: $gray-700;
+      color: var(--color-text);
     }
   }
 }
 
 .register-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, $blue-50, #E0E7FF);
+  background: linear-gradient(135deg, var(--color-primary-light), var(--color-surface-alt));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -43,7 +43,6 @@
   width: 100%;
 }
 
-// City Header
 .city-header {
   text-align: center;
   margin-bottom: $spacing-8;
@@ -57,18 +56,18 @@
 .city-name {
   font-size: $text-3xl;
   font-weight: 600;
-  color: $gray-900;
+  color: var(--color-text);
   margin: 0 0 $spacing-2;
 }
 
 .city-slogan {
-  color: $gray-600;
+  color: var(--color-text-muted);
   margin: 0;
 }
 
-// Register Card
 .register-card {
-  background: $white;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: $radius-2xl;
   box-shadow: $shadow-xl;
   padding: $spacing-8;
@@ -83,18 +82,17 @@
   .header-icon {
     width: 24px;
     height: 24px;
-    color: $blue-600;
+    color: var(--color-primary);
   }
 
   h2 {
     font-size: $text-xl;
     font-weight: 600;
-    color: $gray-900;
+    color: var(--color-text);
     margin: 0;
   }
 }
 
-// Success message
 .success-message {
   margin-bottom: $spacing-4;
   padding: $spacing-3;
@@ -106,18 +104,16 @@
   text-align: center;
 }
 
-// Error message
 .error-message {
   margin-bottom: $spacing-4;
   padding: $spacing-3;
-  background: $red-50;
+  background: #FEE2E2;
   border: 1px solid #FECACA;
   border-radius: $radius-lg;
   color: #B91C1C;
   font-size: $text-sm;
 }
 
-// Form
 .register-form {
   display: flex;
   flex-direction: column;
@@ -131,32 +127,38 @@
   label {
     font-size: $text-sm;
     font-weight: 500;
-    color: $gray-700;
+    color: var(--color-text);
     margin-bottom: $spacing-1;
+
+    .required {
+      color: #DC2626;
+      margin-left: 2px;
+    }
   }
 
   input, select {
     width: 100%;
     padding: $spacing-2 $spacing-4;
-    border: 1px solid $gray-300;
+    border: 1px solid var(--color-border);
     border-radius: $radius-lg;
     font-size: $text-base;
     outline: none;
     transition: all 0.2s;
-    background: $white;
+    background: var(--color-surface);
+    color: var(--color-text);
 
     &:focus {
-      border-color: transparent;
-      box-shadow: 0 0 0 2px $blue-500;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px var(--color-primary-light);
     }
 
     &:disabled {
-      background-color: $gray-100;
+      background-color: var(--color-surface-alt);
       cursor: not-allowed;
     }
 
     &::placeholder {
-      color: $gray-400;
+      color: var(--color-text-muted);
     }
   }
 
@@ -165,7 +167,6 @@
   }
 }
 
-// Role buttons
 .role-label {
   margin-bottom: $spacing-2 !important;
 }
@@ -179,14 +180,14 @@
 .role-btn {
   padding: $spacing-3 $spacing-4;
   border-radius: $radius-lg;
-  border: 2px solid $gray-300;
+  border: 2px solid var(--color-border);
   background: transparent;
   cursor: pointer;
   transition: all 0.2s;
   text-align: left;
 
   &:hover:not(:disabled) {
-    border-color: $gray-400;
+    border-color: var(--color-text-muted);
   }
 
   &:disabled {
@@ -214,21 +215,20 @@
 
   .role-title {
     font-weight: 500;
-    color: $gray-700;
+    color: var(--color-text);
   }
 
   .role-desc {
     font-size: $text-xs;
-    color: $gray-500;
+    color: var(--color-text-muted);
     margin-top: $spacing-1;
   }
 }
 
-// Submit button
 .btn-submit {
   width: 100%;
-  background: $blue-600;
-  color: $white;
+  background: var(--color-primary);
+  color: #FFFFFF;
   padding: $spacing-3 0;
   border: none;
   border-radius: $radius-lg;
@@ -239,7 +239,7 @@
   margin-top: $spacing-2;
 
   &:hover:not(:disabled) {
-    background: $blue-700;
+    background: var(--color-primary-dark);
   }
 
   &:disabled {
@@ -248,7 +248,6 @@
   }
 }
 
-// Back link
 .back-link {
   margin-top: $spacing-6;
   text-align: center;
@@ -259,14 +258,14 @@
     gap: $spacing-2;
     background: none;
     border: none;
-    color: $blue-600;
+    color: var(--color-primary);
     cursor: pointer;
     padding: 0;
     font-size: $text-base;
     transition: color 0.2s;
 
     &:hover {
-      color: $blue-700;
+      color: var(--color-primary-dark);
     }
 
     svg {
@@ -276,14 +275,13 @@
   }
 }
 
-// Footer Info
 .footer-info {
   text-align: center;
   margin-top: $spacing-6;
 
   p {
     font-size: $text-sm;
-    color: $gray-600;
+    color: var(--color-text-muted);
     margin: 0;
   }
 }

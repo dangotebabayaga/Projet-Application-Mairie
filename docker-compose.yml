@@ -36,6 +36,13 @@ services:
       - pgdata:/var/lib/postgresql/data
       - ./docs/SimplifiUniCyties.sql:/docker-entrypoint-initdb.d/init.sql
 
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: mailhog
+    ports:
+      - "1025:1025"   # SMTP
+      - "8025:8025"   # Web UI (consulter les mails reçus)
+
 volumes:
   pgdata:
   symfony_vendor:

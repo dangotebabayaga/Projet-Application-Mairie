@@ -50,13 +50,42 @@ use App\Service\AuthChecker;
             return $this->json(["error" => "Token manquant ou invalide"], 401);
         }
 
-        $sondages = $this->em->getRepository(Sondages::class)->findAll();
-        //$userId = $user->getId();
-        $userId=1;
+        $userId = (int) ($user['userId'] ?? 0);
+        $role = $user['role'] ?? 'citoyen';
 
+        // Récupérer quartier_id et categorie_id du citoyen connecté
+        // (admin/superadmin voient tout)
+        $citQuartier = null;
+        $citCategorie = null;
+        if ($role === 'citoyen') {
+            $cit = $this->em->getConnection()->fetchAssociative(
+                'SELECT quartier_id, categorie_id FROM citoyens WHERE utilisateur_id = :id',
+                ['id' => $userId]
+            );
+            if ($cit) {
+                $citQuartier = $cit['quartier_id'] !== null ? (int) $cit['quartier_id'] : null;
+                $citCategorie = $cit['categorie_id'] !== null ? (int) $cit['categorie_id'] : null;
+            }
+        }
+
+        $sondages = $this->em->getRepository(Sondages::class)->findAll();
         $data = [];
 
         foreach ($sondages as $s) {
+            $sondageId = $s->getId();
+
+            // Quartiers et catégories ciblés (vide = ouvert à tous)
+            $quartiersIds = $this->fetchTargetIds('sondages_quartiers', 'quartier_id', $sondageId);
+            $categoriesIds = $this->fetchTargetIds('sondages_categories', 'categorie_id', $sondageId);
+
+            // Filtrage côté citoyen
+            if ($role === 'citoyen') {
+                $matchQuartier = empty($quartiersIds) || ($citQuartier !== null && in_array($citQuartier, $quartiersIds, true));
+                $matchCategorie = empty($categoriesIds) || ($citCategorie !== null && in_array($citCategorie, $categoriesIds, true));
+                if (!$matchQuartier || !$matchCategorie) {
+                    continue;
+                }
+            }
 
             $relations = $this->em
                 ->getRepository(ListeChoixSondage::class)
@@ -70,16 +99,15 @@ use App\Service\AuthChecker;
                 ];
             }, $relations);
 
-            // Vérifier si l'utilisateur a déjà voté
             $hasVoted = $this->votesRepo->findOneBy([
                 'citoyen' => $userId,
-                'sondage' => $s->getId()
+                'sondage' => $sondageId
             ]) !== null;
 
-            $nbVotants = $this->votesRepo->count(['sondage' => $s->getId()]);
+            $nbVotants = $this->votesRepo->count(['sondage' => $sondageId]);
 
             $data[] = [
-                'id' => $s->getId(),
+                'id' => $sondageId,
                 'titre' => $s->getTitre(),
                 'description' => $s->getDescription(),
                 'dateDebut' => $s->getDateDebut(),
@@ -87,11 +115,23 @@ use App\Service\AuthChecker;
                 'idAdmin' => $s->getAdministrateur(),
                 'choix' => $choix,
                 'hasVoted' => $hasVoted,
-                'nbVotants' => $nbVotants
+                'nbVotants' => $nbVotants,
+                'quartiers' => $quartiersIds,
+                'categories' => $categoriesIds,
+                'multiChoice' => $s->isMultiChoice()
             ];
         }
 
         return $this->json($data);
+    }
+
+    private function fetchTargetIds(string $table, string $column, int $sondageId): array
+    {
+        $rows = $this->em->getConnection()->fetchAllAssociative(
+            "SELECT $column FROM $table WHERE sondage_id = :id",
+            ['id' => $sondageId]
+        );
+        return array_map(fn($r) => (int) $r[$column], $rows);
     }
 
     #[Route('', name: 'api_post_sondage', methods: ['POST'])]
@@ -115,12 +155,35 @@ use App\Service\AuthChecker;
             $this->choixRepo->createOrLinkChoices($sondage, $data['choix']);
         }
 
-        // Flush unique pour enregistrer sondage et choix
+        // Flush pour générer l'id du sondage avant les liaisons
         $this->em->flush();
+
+        $sondageId = $sondage->getId();
+        $conn = $this->em->getConnection();
+
+        // Liaison aux quartiers ciblés (vide = ouvert à tous les quartiers)
+        if (!empty($data['quartiers']) && is_array($data['quartiers'])) {
+            foreach ($data['quartiers'] as $qId) {
+                $conn->insert('sondages_quartiers', [
+                    'sondage_id' => $sondageId,
+                    'quartier_id' => (int) $qId
+                ]);
+            }
+        }
+
+        // Liaison aux catégories ciblées (vide = ouvert à toutes les catégories)
+        if (!empty($data['categories']) && is_array($data['categories'])) {
+            foreach ($data['categories'] as $cId) {
+                $conn->insert('sondages_categories', [
+                    'sondage_id' => $sondageId,
+                    'categorie_id' => (int) $cId
+                ]);
+            }
+        }
 
         return $this->json([
             'message' => 'Sondage créé avec succès',
-            'id' => $sondage->getId()
+            'id' => $sondageId
         ]);
     } 
 
@@ -168,6 +231,12 @@ use App\Service\AuthChecker;
     
         if (empty($choixIds)) {
             return $this->json(['error' => 'Liste de choix invalide'], 400);
+        }
+
+        // Validation choix unique
+        $sondageEntity = $this->em->getRepository(Sondages::class)->find($sondageId);
+        if ($sondageEntity && !$sondageEntity->isMultiChoice() && count($choixIds) > 1) {
+            return $this->json(['error' => 'Ce sondage n\'accepte qu\'une seule réponse'], 400);
         }
     
         // Transforme les IDs en entités Choix

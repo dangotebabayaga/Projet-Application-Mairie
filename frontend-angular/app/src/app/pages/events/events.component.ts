@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { EventService, EventItem, EventPayload } from '../../services/event.service';
 
 interface ThemeFilter {
@@ -61,8 +62,12 @@ export class EventsComponent implements OnInit {
     { id: 'all', label: 'Tous' }
   ];
 
-  constructor(private eventService: EventService) {
+  constructor(private eventService: EventService, private router: Router) {
     this.userRole = localStorage.getItem('userRole') || 'citoyen';
+  }
+
+  openEvent(event: EventItem): void {
+    if (event.id) this.router.navigate(['/events', event.id]);
   }
 
   get isAdmin(): boolean {

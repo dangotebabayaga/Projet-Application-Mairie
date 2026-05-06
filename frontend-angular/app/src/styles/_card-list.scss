@@ -1,7 +1,7 @@
 // ===========================================
 // CARD LIST - Pattern réutilisable
 // Liste paginée de cartes avec filtres + tri
-// Utilisé par : surveys (et reports à terme)
+// Utilisé par : surveys, accounts (et reports à terme)
 // ===========================================
 
 @import 'variables';
@@ -24,11 +24,11 @@
     h1 {
       font-size: 1.5rem;
       font-weight: 600;
-      color: $gray-900;
+      color: var(--color-text);
       margin: 0;
     }
     p {
-      color: $gray-600;
+      color: var(--color-text-muted);
       margin: $spacing-1 0 0;
     }
   }
@@ -38,14 +38,15 @@
   h2 {
     font-size: $text-lg;
     font-weight: 600;
-    color: $gray-900;
+    color: var(--color-text);
     margin: 0 0 $spacing-4;
   }
 }
 
 // ----- FILTRES (style Agenda) + TRI à droite -----
 .card-list-filter-card {
-  background: $white;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: $radius-xl;
   box-shadow: $shadow-sm;
   padding: $spacing-4;
@@ -55,7 +56,7 @@
 }
 
 .card-list-filter-section + .card-list-filter-section {
-  border-top: 1px solid $gray-100;
+  border-top: 1px solid var(--color-border);
   padding-top: $spacing-4;
 }
 
@@ -76,12 +77,12 @@
   svg {
     width: 20px;
     height: 20px;
-    color: $gray-600;
+    color: var(--color-text-muted);
   }
 
   span {
     font-weight: 500;
-    color: $gray-900;
+    color: var(--color-text);
   }
 }
 
@@ -106,10 +107,10 @@
 
   &.active {
     opacity: 1;
-    box-shadow: 0 0 0 2px $white, 0 0 0 4px $blue-500;
+    box-shadow: 0 0 0 2px var(--color-surface), 0 0 0 4px var(--color-primary);
   }
 
-  // Variantes statut sondages
+  // Variantes statut sondages (pastels — restent lisibles sur tous fonds)
   &.filter-status-all {
     background: $gray-200;
     color: $gray-800;
@@ -134,15 +135,15 @@
   gap: $spacing-2;
   padding: $spacing-2 $spacing-4;
   border-radius: $radius-lg;
-  border: 1px solid $gray-300;
-  background: $white;
-  color: $gray-700;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    background: $gray-50;
+    background: var(--color-surface-alt);
   }
 
   svg {
@@ -168,7 +169,8 @@
 
 // ----- CARTE COMPACTE -----
 .card-item {
-  background: $white;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: $radius-xl;
   box-shadow: $shadow-sm;
   padding: $spacing-4;
@@ -189,8 +191,8 @@
   align-items: center;
   gap: $spacing-1;
   padding: $spacing-1 $spacing-2;
-  background: $gray-100;
-  color: $gray-700;
+  background: var(--color-surface-alt);
+  color: var(--color-text-muted);
   border-radius: 9999px;
   font-size: $text-xs;
 
@@ -213,7 +215,7 @@
     height: 12px;
   }
 
-  // Sondages
+  // Pastels — restent lisibles sur tous fonds
   &.status-active {
     background: $blue-50;
     color: $blue-600;
@@ -226,8 +228,6 @@
     background: $gray-100;
     color: $gray-600;
   }
-
-  // Signalements
   &.status-registered {
     background: $blue-50;
     color: $blue-600;
@@ -245,13 +245,13 @@
 .card-title {
   font-size: $text-base;
   font-weight: 600;
-  color: $gray-900;
+  color: var(--color-text);
   margin: 0 0 $spacing-1;
 }
 
 .card-description {
   font-size: $text-sm;
-  color: $gray-700;
+  color: var(--color-text);
   margin: 0 0 $spacing-2;
   line-height: 1.5;
   display: -webkit-box;
@@ -265,7 +265,7 @@
   align-items: center;
   gap: $spacing-1;
   font-size: $text-xs;
-  color: $gray-500;
+  color: var(--color-text-muted);
   margin-top: $spacing-1;
 
   svg {
@@ -296,10 +296,10 @@
   }
 
   &.primary {
-    background: $blue-600;
-    color: $white;
+    background: var(--color-primary);
+    color: #FFFFFF;
 
-    &:hover { background: $blue-700; }
+    &:hover { background: var(--color-primary-dark); }
   }
 
   &.secondary {
@@ -310,8 +310,8 @@
   }
 
   &.disabled {
-    background: $gray-100;
-    color: $gray-500;
+    background: var(--color-surface-alt);
+    color: var(--color-text-muted);
     cursor: not-allowed;
   }
 }
@@ -320,7 +320,7 @@
 .card-list-empty {
   text-align: center;
   padding: $spacing-8;
-  color: $gray-500;
+  color: var(--color-text-muted);
   grid-column: 1 / -1;
 
   p {

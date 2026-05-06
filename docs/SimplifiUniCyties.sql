@@ -92,7 +92,9 @@ CREATE TABLE signalements (
   type_id integer,
   citoyen_id integer,
   date_creation timestamp,
-  date_modification timestamp
+  date_modification timestamp,
+  photo varchar(500),
+  adresse varchar(500)
 );
 
 CREATE TABLE commentaire (
@@ -118,7 +120,8 @@ CREATE TABLE evenement (
   heureDeb time,
   heureFin time,
   administrateur_id integer,
-  type integer
+  type integer,
+  photo varchar(500)
 );
 
 CREATE TABLE reseau_sociale (

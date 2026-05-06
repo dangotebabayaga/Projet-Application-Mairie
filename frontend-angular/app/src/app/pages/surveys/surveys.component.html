@@ -17,97 +17,9 @@
     <p>{{ error }}</p>
   </div>
 
-  <!-- Vue détaillée d'un sondage (vote ou résultats) -->
-  <div class="survey-detail" *ngIf="selectedSurvey && !loading">
-    <button class="btn-back" (click)="closeSurvey()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="19" y1="12" x2="5" y2="12"></line>
-        <polyline points="12 19 5 12 12 5"></polyline>
-      </svg>
-      Retour aux sondages
-    </button>
-
-    <div class="survey-info">
-      <h2>{{ selectedSurvey.titre }}</h2>
-      <p>{{ selectedSurvey.description }}</p>
-
-      <div class="survey-meta">
-        <div class="meta-item" *ngIf="selectedSurvey.dateDebut">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="16" y1="2" x2="16" y2="6"></line>
-            <line x1="8" y1="2" x2="8" y2="6"></line>
-            <line x1="3" y1="10" x2="21" y2="10"></line>
-          </svg>
-          Du {{ formatDate(selectedSurvey.dateDebut) }} au {{ formatDate(selectedSurvey.dateFin) }}
-        </div>
-        <div class="meta-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="12" y1="20" x2="12" y2="10"></line>
-            <line x1="18" y1="20" x2="18" y2="4"></line>
-            <line x1="6" y1="20" x2="6" y2="16"></line>
-          </svg>
-          {{ selectedSurvey.choix.length }} choix disponibles
-        </div>
-      </div>
-    </div>
-
-    <!-- Confirmation après vote -->
-    <div class="success-message" *ngIf="isSubmitted(selectedSurvey.id) && !selectedSurvey.hasVoted">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-        <polyline points="22 4 12 14.01 9 11.01"></polyline>
-      </svg>
-      <h3>Merci pour votre participation !</h3>
-      <p>Votre vote a été enregistré.</p>
-    </div>
-
-    <!-- Résultats -->
-    <div class="results-section" *ngIf="selectedSurvey.hasVoted || isSubmitted(selectedSurvey.id)">
-      <h3>Résultats</h3>
-      <div class="results-loading" *ngIf="resultsLoading">Chargement des résultats…</div>
-      <div class="results-list" *ngIf="!resultsLoading">
-        <div class="result-item" *ngFor="let r of results">
-          <div class="result-header">
-            <span class="result-label">{{ r.choix }}</span>
-            <span class="result-count">{{ r.nb_votes }} vote(s)</span>
-          </div>
-          <div class="result-bar">
-            <div class="result-fill" [style.width.%]="getPercentage(r.nb_votes)"></div>
-          </div>
-        </div>
-        <div *ngIf="results.length === 0" class="card-list-empty">
-          <p>Aucun résultat disponible</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Formulaire de vote -->
-    <form *ngIf="!isSubmitted(selectedSurvey.id) && !selectedSurvey.hasVoted"
-          (ngSubmit)="onSubmit()" class="survey-form">
-      <div class="question-card">
-        <label class="question-label">Sélectionnez vos choix :</label>
-        <div class="options-list">
-          <label class="option-item" *ngFor="let choix of selectedSurvey.choix">
-            <input
-              type="checkbox"
-              [checked]="isChoixSelected(choix.id)"
-              (change)="toggleChoix(choix.id)"
-            />
-            <span>{{ choix.nom }}</span>
-          </label>
-        </div>
-      </div>
-
-      <div class="vote-error" *ngIf="voteError">{{ voteError }}</div>
-
-      <button type="submit" class="btn-submit">Voter</button>
-    </form>
-  </div>
-
   <!-- Liste des sondages -->
-  <ng-container *ngIf="!selectedSurvey && !loading && !error">
-    <!-- Filtres (style Agenda) + tri à droite -->
+  <ng-container *ngIf="!loading && !error">
+    <!-- Filtres + tri -->
     <div class="card-list-filter-card">
       <div class="card-list-filter-section">
         <div class="card-list-filter-section-header">
@@ -205,10 +117,10 @@
             {{ survey.nbVotants || 0 }} votant{{ (survey.nbVotants || 0) !== 1 ? 's' : '' }}
           </div>
 
-          <!-- Action : voter / voir résultats / terminé -->
+          <!-- Action : un seul bouton qui navigue vers /surveys/:id -->
           <button *ngIf="isVoted(survey)"
                   class="card-action secondary"
-                  (click)="viewResults(survey)">
+                  (click)="openSurvey(survey)">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
               <polyline points="22 4 12 14.01 9 11.01"></polyline>
@@ -218,7 +130,7 @@
 
           <button *ngIf="!isVoted(survey) && !isClosed(survey)"
                   class="card-action primary"
-                  (click)="selectSurvey(survey)">
+                  (click)="openSurvey(survey)">
             Participer au sondage
           </button>
 

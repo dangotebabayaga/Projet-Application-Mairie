@@ -1,8 +1,10 @@
-import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ReportService, Report } from '../../services/report.service';
 import { TypeSignalementService, TypeSignalement } from '../../services/type-signalement.service';
+import { PhotoUploadComponent } from '../../components/photo-upload/photo-upload.component';
 
 declare const L: any;
 
@@ -21,11 +23,12 @@ interface StatusInfo {
 @Component({
   selector: 'app-reports',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PhotoUploadComponent],
   templateUrl: './reports.component.html',
   styleUrls: ['./reports.component.scss']
 })
 export class ReportsComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('reportPhotoUpload') reportPhotoUpload?: PhotoUploadComponent;
   showForm = false;
   reports: Report[] = [];
   types: TypeSignalement[] = [];
@@ -33,7 +36,6 @@ export class ReportsComponent implements OnInit, AfterViewInit, OnDestroy {
   userRole: string;
 
   selectedFile: File | null = null;
-  photoPreview: string | null = null;
   uploadError: string | null = null;
   submitting = false;
 
@@ -60,10 +62,15 @@ export class ReportsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(
     private reportService: ReportService,
-    private typeService: TypeSignalementService
+    private typeService: TypeSignalementService,
+    private router: Router
   ) {
     this.currentUserId = Number(localStorage.getItem('userId')) || 0;
     this.userRole = localStorage.getItem('userRole') || 'citoyen';
+  }
+
+  openReport(r: Report): void {
+    if (r.id) this.router.navigate(['/reports', r.id]);
   }
 
   get isAdmin(): boolean {
@@ -215,42 +222,12 @@ export class ReportsComponent implements OnInit, AfterViewInit, OnDestroy {
       address: ''
     };
     this.selectedFile = null;
-    this.photoPreview = null;
     this.uploadError = null;
+    this.reportPhotoUpload?.reset();
   }
 
-  onFileChange(event: Event): void {
-    this.uploadError = null;
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0] || null;
-    if (!file) {
-      this.selectedFile = null;
-      this.photoPreview = null;
-      return;
-    }
-    if (!file.type.startsWith('image/')) {
-      this.uploadError = 'Le fichier doit être une image';
-      this.selectedFile = null;
-      this.photoPreview = null;
-      input.value = '';
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      this.uploadError = 'Image trop volumineuse (max 5 Mo)';
-      this.selectedFile = null;
-      this.photoPreview = null;
-      input.value = '';
-      return;
-    }
+  onPhotoSelected(file: File | null): void {
     this.selectedFile = file;
-    const reader = new FileReader();
-    reader.onload = e => this.photoPreview = e.target?.result as string;
-    reader.readAsDataURL(file);
-  }
-
-  removePhoto(): void {
-    this.selectedFile = null;
-    this.photoPreview = null;
   }
 
   onSubmit(): void {

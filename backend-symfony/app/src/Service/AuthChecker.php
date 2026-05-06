@@ -34,9 +34,13 @@ class AuthChecker
 
     /**
      * Vérifie que l'utilisateur a le rôle attendu
+     * Un superadmin hérite des droits d'un admin (mais pas l'inverse)
      */
     public function checkRole(array $payload, string $role): bool
     {
-        return isset($payload['role']) && $payload['role'] === $role;
+        $userRole = $payload['role'] ?? null;
+        if ($userRole === $role) return true;
+        if ($role === 'admin' && $userRole === 'superadmin') return true;
+        return false;
     }
 }

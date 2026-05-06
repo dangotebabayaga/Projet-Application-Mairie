@@ -56,5 +56,31 @@ class EvenementRepository extends ServiceEntityRepository
 
         return $s;
     }
+
+    /**
+     * Met à jour un événement existant. Champs absents = inchangés.
+     */
+    public function maj(Evenement $ev, array $data): void
+    {
+        $em = $this->getEntityManager();
+
+        if (array_key_exists('titre', $data)) $ev->setTitre($data['titre'] ?: null);
+        if (array_key_exists('lieux', $data)) $ev->setLieux($data['lieux'] ?: null);
+        if (array_key_exists('commentaire', $data)) $ev->setCommentaire($data['commentaire'] ?: null);
+        if (!empty($data['date Evenement'])) $ev->setDateEv(new \DateTime($data['date Evenement']));
+        if (!empty($data['Heure début'])) $ev->setHeureDeb(new \DateTime($data['Heure début']));
+        if (!empty($data['Heure fin'])) $ev->setHeureFin(new \DateTime($data['Heure fin']));
+
+        if (array_key_exists('type', $data) && $data['type']) {
+            $type = $em->getRepository(TypeEv::class)->findOneBy(['nom' => $data['type']]);
+            if (!$type) {
+                $type = new TypeEv();
+                $type->setNom($data['type']);
+                $em->persist($type);
+                $em->flush();
+            }
+            $ev->setType($type->getId());
+        }
+    }
 }
 

@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface EventItem {
+  id?: number;
   titre: string;
   lieux: string;
   commentaire: string;
@@ -11,6 +12,7 @@ export interface EventItem {
   'Heure fin': string;
   adminId: number;
   type: string;
+  photo?: string | null;
 }
 
 export interface EventType {
@@ -26,6 +28,7 @@ export interface EventPayload {
   'Heure fin': string;
   adminId: number;
   type: string;
+  photo?: File | null;
 }
 
 @Injectable({
@@ -45,6 +48,35 @@ export class EventService {
   }
 
   create(payload: EventPayload): Observable<any> {
-    return this.http.post(this.apiUrl, payload);
+    const fd = new FormData();
+    fd.append('titre', payload.titre);
+    fd.append('lieux', payload.lieux);
+    fd.append('commentaire', payload.commentaire);
+    fd.append('date Evenement', payload['date Evenement']);
+    fd.append('Heure début', payload['Heure début']);
+    fd.append('Heure fin', payload['Heure fin']);
+    fd.append('adminId', String(payload.adminId));
+    fd.append('type', payload.type);
+    if (payload.photo) {
+      fd.append('photo', payload.photo);
+    }
+    return this.http.post(this.apiUrl, fd);
+  }
+
+  update(id: number, payload: EventPayload): Observable<any> {
+    // POST + override Method via X-HTTP-Method-Override = PUT (utile car certains
+    // serveurs PHP gèrent mal les uploads en PUT). Le backend accepte PUT et POST.
+    const fd = new FormData();
+    fd.append('titre', payload.titre);
+    fd.append('lieux', payload.lieux);
+    fd.append('commentaire', payload.commentaire);
+    fd.append('date Evenement', payload['date Evenement']);
+    fd.append('Heure début', payload['Heure début']);
+    fd.append('Heure fin', payload['Heure fin']);
+    fd.append('type', payload.type);
+    if (payload.photo) {
+      fd.append('photo', payload.photo);
+    }
+    return this.http.post(`${this.apiUrl}/${id}`, fd);
   }
 }

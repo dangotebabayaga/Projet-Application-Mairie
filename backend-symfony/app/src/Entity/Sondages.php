@@ -28,6 +28,9 @@ class Sondages
     #[ORM\Column(name: 'administrateur_id', nullable: true)]
     private ?int $administrateurId = null;
 
+    #[ORM\Column(name: 'multi_choice', type: 'boolean', options: ['default' => true])]
+    private bool $multiChoice = true;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -75,4 +78,14 @@ class Sondages
         $this->administrateurId=$idAdmin;
     }
 
+    public function isMultiChoice(): bool
+    {
+        return $this->multiChoice;
+    }
+
+    public function setMultiChoice(bool $multiChoice): self
+    {
+        $this->multiChoice = $multiChoice;
+        return $this;
+    }
 }

@@ -2,7 +2,7 @@
 
 .login-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, var(--color-primary-light), #E0E7FF);
+  background: linear-gradient(135deg, var(--color-primary-light), var(--color-surface-alt));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -14,7 +14,6 @@
   width: 100%;
 }
 
-// City Header
 .city-header {
   text-align: center;
   margin-bottom: $spacing-8;
@@ -41,18 +40,18 @@
 .city-name {
   font-size: $text-3xl;
   font-weight: 600;
-  color: $gray-900;
+  color: var(--color-text);
   margin: 0 0 $spacing-2;
 }
 
 .city-slogan {
-  color: $gray-600;
+  color: var(--color-text-muted);
   margin: 0;
 }
 
-// Login Card
 .login-card {
-  background: $white;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: $radius-2xl;
   box-shadow: $shadow-xl;
   padding: $spacing-8;
@@ -73,16 +72,15 @@
   h2 {
     font-size: $text-xl;
     font-weight: 600;
-    color: $gray-900;
+    color: var(--color-text);
     margin: 0;
   }
 }
 
-// Error message
 .error-message {
   margin-bottom: $spacing-4;
   padding: $spacing-3;
-  background: $red-50;
+  background: #FEE2E2;
   border: 1px solid #FECACA;
   border-radius: $radius-lg;
   color: #B91C1C;
@@ -109,16 +107,15 @@
     svg {
       width: 20px;
       height: 20px;
-      color: $gray-500;
+      color: var(--color-text-muted);
     }
 
     &:hover svg {
-      color: $gray-700;
+      color: var(--color-text);
     }
   }
 }
 
-// Form
 .login-form {
   display: flex;
   flex-direction: column;
@@ -133,31 +130,33 @@
   label {
     font-size: $text-sm;
     font-weight: 500;
-    color: $gray-700;
+    color: var(--color-text);
     margin-bottom: $spacing-1;
   }
 
   input {
     width: 100%;
     padding: $spacing-2 $spacing-4;
-    border: 1px solid $gray-300;
+    border: 1px solid var(--color-border);
     border-radius: $radius-lg;
     font-size: $text-base;
     outline: none;
+    background: var(--color-surface);
+    color: var(--color-text);
     transition: all 0.2s;
 
     &:focus {
-      border-color: transparent;
-      box-shadow: 0 0 0 2px var(--color-primary);
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px var(--color-primary-light);
     }
 
     &:disabled {
-      background-color: $gray-100;
+      background-color: var(--color-surface-alt);
       cursor: not-allowed;
     }
 
     &::placeholder {
-      color: $gray-400;
+      color: var(--color-text-muted);
     }
   }
 }
@@ -165,7 +164,7 @@
 .btn-submit {
   width: 100%;
   background: var(--color-primary);
-  color: $white;
+  color: #FFFFFF;
   padding: $spacing-3 0;
   border: none;
   border-radius: $radius-lg;
@@ -184,15 +183,14 @@
   }
 }
 
-// Demo Section
 .demo-section {
-  border-top: 1px solid $gray-200;
+  border-top: 1px solid var(--color-border);
   padding-top: $spacing-6;
 }
 
 .demo-label {
   font-size: $text-sm;
-  color: $gray-600;
+  color: var(--color-text-muted);
   text-align: center;
   margin: 0 0 $spacing-3;
 }
@@ -236,9 +234,23 @@
   }
 }
 
-// Register Link
+.forgot-link {
+  margin-top: $spacing-3;
+  text-align: center;
+  font-size: $text-sm;
+
+  a {
+    color: var(--color-primary);
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
 .register-link {
-  margin-top: $spacing-6;
+  margin-top: $spacing-4;
   text-align: center;
 
   button {
@@ -255,14 +267,13 @@
   }
 }
 
-// Footer Info
 .footer-info {
   text-align: center;
   margin-top: $spacing-6;
 
   p {
     font-size: $text-sm;
-    color: $gray-600;
+    color: var(--color-text-muted);
     margin: 0;
   }
 }
