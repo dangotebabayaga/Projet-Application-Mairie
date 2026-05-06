@@ -12,11 +12,17 @@ export class AppComponent {
   title = 'myapp';
   showNavbar = false;
   userName = '';
-  userRole = 'Citoyen';
-  isAdmin = false;
+  userRole: string[] = ['Citoyen'];
   villeLogo = '';
   villeNom = 'Ville Connectée';
 
+  get isAdmin(): boolean {
+      return this.userRole.includes('administrateur');
+  }
+  
+  get isElu(): boolean {
+      return this.userRole.includes('elu');
+  }
   static readonly THEMES: Record<string, { primary: string; primaryDark: string; primaryLight: string }> = {
     blue:   { primary: '#2563EB', primaryDark: '#1D4ED8', primaryLight: '#EFF6FF' },
     green:  { primary: '#16A34A', primaryDark: '#15803D', primaryLight: '#F0FDF4' },
@@ -57,9 +63,8 @@ export class AppComponent {
         this.showNavbar = !['/login', '/register'].includes(url);
         if (this.showNavbar) {
           this.userName = localStorage.getItem('userPrenom') || '';
-          const role = localStorage.getItem('userRole') || 'citoyen';
-          this.isAdmin = role === 'admin';
-          this.userRole = this.isAdmin ? 'Élu / Admin' : 'Citoyen';
+          const roles: string[] = JSON.parse(localStorage.getItem('userRole') || '["citoyen"]');
+          this.userRole = roles;
           this.loadVilleConfig();
         }
       });

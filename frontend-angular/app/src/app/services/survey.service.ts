@@ -13,15 +13,15 @@ export interface Survey {
   description: string;
   dateDebut: string;
   dateFin: string;
-  idAdmin: number;
+  idadministrateur: number;
   choix: Choix[];
   hasVoted: boolean;
 }
 
 export interface VotePayload {
-  citoyenId: number;
-  sondageId: number;
-  choixIds: number[];
+    utilisateurId: number;
+    sondageId: number;
+    choixIds: number[];
 }
 
 @Injectable({

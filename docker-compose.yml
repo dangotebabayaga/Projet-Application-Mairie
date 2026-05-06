@@ -30,7 +30,15 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - ./docs/SimplifiUniCyties.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./Base_de_donnee/SimplifiUniCyties.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./Base_de_donnee/migrations:/migrations
+    command: >
+      bash -c "
+        docker-entrypoint.sh postgres &
+        sleep 5 &&
+        bash /migrations/apply_migrations.sh &&
+        wait
+      "
 
 volumes:
   pgdata:

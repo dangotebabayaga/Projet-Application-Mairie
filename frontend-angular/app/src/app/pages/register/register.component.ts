@@ -17,6 +17,7 @@ interface RegisterForm {
   email: string;
   password: string;
   confirmPassword: string;
+  role: 'citoyen' | 'elu';
   address: string;
   neighborhood: string;
 }
@@ -38,6 +39,7 @@ export class RegisterComponent {
     email: '',
     password: '',
     confirmPassword: '',
+    role: 'citoyen',
     address: '',
     neighborhood: ''
   };
@@ -91,7 +93,7 @@ export class RegisterComponent {
       prenom: this.formData.prenom,
       email: this.formData.email,
       motDePasse: this.formData.password,
-      role: 1
+      role: [this.formData.role]
     };
 
     this.authService.register(payload).subscribe({
@@ -108,6 +110,14 @@ export class RegisterComponent {
         this.error = err.error?.error || "Une erreur est survenue lors de l'inscription";
       }
     });
+  }
+
+  selectRole(role: 'citoyen' | 'elu'): void {
+    this.formData.role = role;
+    if (role === 'elu') {
+      this.formData.address = '';
+      this.formData.neighborhood = '';
+    }
   }
 
   onBackToLogin(): void {

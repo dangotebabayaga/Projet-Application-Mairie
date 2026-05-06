@@ -166,7 +166,7 @@ Si vous modifiez la BDD directement en SQL :
 
 **Étape 1** : Exécuter votre SQL
 ```bash
-docker-compose exec db psql -U user -d BD_UniCity -c "ALTER TABLE utilisateurs ADD COLUMN nouveau_champ VARCHAR(100);"
+docker-compose exec db psql -U user -d BD_UniCity -c "ALTER TABLE Utilisateur ADD COLUMN nouveau_champ VARCHAR(100);"
 ```
 
 **Étape 2** : Synchroniser l'entité PHP manuellement
@@ -194,7 +194,7 @@ Pour synchroniser complètement, créez ces entités dans cet ordre (dépendance
 - ✅ `CategorieCitoyen` (dépend de Ville)
 - ✅ `ThematiqueEvenement` (dépend de Ville)
 
-### **2. Entités utilisateurs**
+### **2. Entités Utilisateur**
 - ✅ `Utilisateur` (dépend de Ville, Quartier, CategorieCitoyen)
 
 ### **3. Entités fonctionnelles**
@@ -260,13 +260,13 @@ done
 
 | Table BDD | Entité PHP | Nom de fichier |
 |-----------|----------|----------------|
-| `utilisateurs` | `Utilisateur` | `Utilisateur.php` |
+| `Utilisateur` | `Utilisateur` | `Utilisateur.php` |
 | `signalements` | `Signalement` | `Signalement.php` |
 | `votes_sondage` | `VoteSondage` | `VoteSondage.php` |
 
 **Doctrine convertit automatiquement** :
 - `CamelCase` → `snake_case` pour les tables
-- `Utilisateur` → `utilisateurs`
+- `Utilisateur` → `Utilisateur`
 
 ### **2. Annotations vs Attributs PHP 8**
 
@@ -275,7 +275,7 @@ done
 ```php
 // ✅ MODERNE (PHP 8 Attributes)
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
-#[ORM\Table(name: 'utilisateurs')]
+#[ORM\Table(name: 'Utilisateur')]
 class Utilisateur
 {
     #[ORM\Id]
@@ -287,9 +287,9 @@ class Utilisateur
 // ❌ ANCIEN (Annotations - deprecated)
 /**
  * @ORM\Entity(repositoryClass=UtilisateurRepository::class)
- * @ORM\Table(name="utilisateurs")
+ * @ORM\Table(name="Utilisateur")
  */
-class Utilisateur { }
+class Utilisateur{ }
 ```
 
 ### **3. Relations entre entités**
@@ -298,13 +298,13 @@ Exemple : `Utilisateur` ↔ `Ville`
 
 ```php
 // Dans Utilisateur.php
-#[ORM\ManyToOne(targetEntity: Ville::class, inversedBy: 'utilisateurs')]
+#[ORM\ManyToOne(targetEntity: Ville::class, inversedBy: 'Utilisateur')]
 #[ORM\JoinColumn(nullable: false)]
 private ?Ville $ville = null;
 
 // Dans Ville.php
 #[ORM\OneToMany(mappedBy: 'ville', targetEntity: Utilisateur::class)]
-private Collection $utilisateurs;
+private Collection $Utilisateur;
 ```
 
 ---
@@ -313,7 +313,7 @@ private Collection $utilisateurs;
 
 ```bash
 # 1. Vérifier que Doctrine voit bien la BDD
-docker-compose exec symfony php bin/console dbal:run-sql "SELECT COUNT(*) FROM utilisateurs"
+docker-compose exec symfony php bin/console dbal:run-sql "SELECT COUNT(*) FROM Utilisateur"
 
 # 2. Lister les entités reconnues par Doctrine
 docker-compose exec symfony php bin/console doctrine:mapping:info
@@ -341,7 +341,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
-#[ORM\Table(name: 'utilisateurs')]
+#[ORM\Table(name: 'Utilisateur')]
 class Utilisateur
 {
     #[ORM\Id]

@@ -5,7 +5,7 @@ use App\Repository\VilleRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: VilleRepository::class)]
-#[ORM\Table(name: 'Ville')]
+#[ORM\Table(name: 'ville')] // correction : 'Ville' → 'ville'
 class Ville
 {
     #[ORM\Id]
@@ -13,19 +13,19 @@ class Ville
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $nom = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $slogan = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $logo = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?string $themecouleur = null;
+    #[ORM\Column(name: 'themeCouleur', length: 255, nullable: true)] // correction : nom de colonne conforme au SQL
+    private ?string $themeCouleur = null;
 
-    #[ORM\Column(type:"datetime",name:"date_creation",nullable: true)]
+    #[ORM\Column(type: 'datetime', name: 'date_creation', nullable: true)]
     private ?\DateTimeInterface $dateCreation = null;
 
     public function getId(): ?int
@@ -38,7 +38,7 @@ class Ville
         return $this->nom;
     }
 
-    public function setNom(?string $nom)
+    public function setNom(?string $nom): void
     {
         $this->nom = $nom;
     }
@@ -48,7 +48,7 @@ class Ville
         return $this->slogan;
     }
 
-    public function setSlogan(?string $slogan)
+    public function setSlogan(?string $slogan): void
     {
         $this->slogan = $slogan;
     }
@@ -58,19 +58,19 @@ class Ville
         return $this->logo;
     }
 
-    public function setLogo(?string $logo)
+    public function setLogo(?string $logo): void
     {
         $this->logo = $logo;
     }
 
-    public function getThemecouleur(): ?string
+    public function getThemeCouleur(): ?string // correction : getThemecouleur → getThemeCouleur
     {
-        return $this->themecouleur;
+        return $this->themeCouleur;
     }
 
-    public function setThemecouleur(?string $themecouleur)
+    public function setThemeCouleur(?string $themeCouleur): void // correction : setThemecouleur → setThemeCouleur
     {
-        $this->themecouleur = $themecouleur;
+        $this->themeCouleur = $themeCouleur;
     }
 
     public function getDateCreation(): ?\DateTimeInterface
@@ -78,10 +78,8 @@ class Ville
         return $this->dateCreation;
     }
 
-    public function setDateCreation(?\DateTimeInterface $dateCreation)
+    public function setDateCreation(?\DateTimeInterface $dateCreation): void
     {
         $this->dateCreation = $dateCreation;
     }
-
-
 }

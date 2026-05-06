@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 class ListeChoixVote
 {
     #[ORM\Id]
-    #[ORM\ManyToOne(targetEntity: VotesSondage::class, inversedBy: 'choixVotes')]
+    #[ORM\ManyToOne(targetEntity: VotesSondage::class)]
     #[ORM\JoinColumn(name: 'id_vote', referencedColumnName: 'id', nullable: false)]
     private VotesSondage $vote;
 

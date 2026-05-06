@@ -128,30 +128,62 @@
 
         <!-- Adresse -->
         <div class="form-group">
-          <label for="address">Adresse</label>
-          <input
-            type="text"
-            id="address"
-            [(ngModel)]="formData.address"
-            name="address"
-            placeholder="12 rue de la République"
-            [disabled]="loading"
-          />
+          <label class="role-label">Type de compte</label>
+          <div class="role-buttons">
+            <button
+              type="button"
+              class="role-btn"
+              [class.active]="formData.role === 'citoyen'"
+              [class.citoyen]="formData.role === 'citoyen'"
+              (click)="selectRole('citoyen')"
+              [disabled]="loading"
+            >
+              <div class="role-title">Citoyen</div>
+              <div class="role-desc">Habitant de la ville</div>
+            </button>
+            <button
+              type="button"
+              class="role-btn"
+              [class.active]="formData.role === 'elu'"
+              [class.elu]="formData.role === 'elu'"
+              (click)="selectRole('elu')"
+              [disabled]="loading"
+            >
+              <div class="role-title">Élu/Agent</div>
+              <div class="role-desc">Personnel elu</div>
+            </button>
+          </div>
         </div>
 
-        <!-- Quartier -->
-        <div class="form-group">
-          <label for="neighborhood">Quartier</label>
-          <select
-            id="neighborhood"
-            [(ngModel)]="formData.neighborhood"
-            name="neighborhood"
-            [disabled]="loading"
-          >
-            <option value="">Sélectionnez votre quartier</option>
-            <option *ngFor="let n of neighborhoods" [value]="n">{{ n }}</option>
-          </select>
-        </div>
+        <!-- Champs spécifiques citoyen -->
+        <ng-container *ngIf="formData.role === 'citoyen'">
+          <!-- Adresse -->
+          <div class="form-group">
+            <label for="address">Adresse</label>
+            <input
+              type="text"
+              id="address"
+              [(ngModel)]="formData.address"
+              name="address"
+              placeholder="12 rue de la République"
+              [disabled]="loading"
+            />
+          </div>
+
+          <!-- Quartier -->
+          <div class="form-group">
+            <label for="neighborhood">Quartier</label>
+            <select
+              id="neighborhood"
+              [(ngModel)]="formData.neighborhood"
+              name="neighborhood"
+              [disabled]="loading"
+            >
+              <option value="">Sélectionnez votre quartier</option>
+              <option *ngFor="let n of neighborhoods" [value]="n">{{ n }}</option>
+            </select>
+          </div>
+        </ng-container>
 
         <!-- Submit button -->
         <button

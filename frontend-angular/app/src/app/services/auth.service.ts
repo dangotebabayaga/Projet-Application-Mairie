@@ -16,7 +16,7 @@ export class AuthService {
     prenom: string;
     email: string;
     motDePasse: string;
-    role: number;
+    role: string[];
     dateNaissance?: string;
     telephone?: string;
   }): Observable<any> {
@@ -33,7 +33,7 @@ export class AuthService {
     localStorage.setItem('userNom', infoUser.nom);
     localStorage.setItem('userPrenom', infoUser.prenom);
     localStorage.setItem('userEmail', infoUser.email);
-    localStorage.setItem('userRole', infoUser.role || 'citoyen');
+    localStorage.setItem('userRole', JSON.stringify(infoUser.role || ['citoyen']));
   }
 
   logout(): void {
@@ -59,6 +59,6 @@ export class AuthService {
   }
 
   getUserRole(): string {
-    return localStorage.getItem('userRole') || 'citoyen';
+    return JSON.parse(localStorage.getItem('userRole') || '["citoyen"]');
   }
 }

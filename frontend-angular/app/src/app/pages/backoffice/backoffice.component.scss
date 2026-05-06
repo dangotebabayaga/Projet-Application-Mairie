@@ -128,8 +128,8 @@
   margin-top: $spacing-1;
 }
 
-// Admin Banner
-.admin-banner {
+// administrateur Banner
+.administrateur-banner {
   background: linear-gradient(135deg, $blue-600, #4F46E5);
   border-radius: $radius-xl;
   box-shadow: $shadow-sm;
@@ -203,7 +203,7 @@
   }
 }
 
-.admin-form {
+.administrateur-form {
   display: flex;
   flex-direction: column;
   gap: $spacing-4;
@@ -367,7 +367,7 @@
   gap: $spacing-3;
 }
 
-.report-admin-card {
+.report-administrateur-card {
   background: $white;
   border-radius: $radius-xl;
   box-shadow: $shadow-sm;
@@ -495,7 +495,7 @@
   gap: $spacing-3;
 }
 
-.survey-admin-card {
+.survey-administrateur-card {
   background: $white;
   border-radius: $radius-xl;
   box-shadow: $shadow-sm;
@@ -555,7 +555,7 @@
   }
 }
 
-.event-admin-card {
+.event-administrateur-card {
   background: $white;
   border-radius: $radius-xl;
   box-shadow: $shadow-sm;

@@ -1,7 +1,7 @@
 <div class="backoffice-page">
   <!-- En-tête -->
   <div class="page-header">
-    <h1>Back-Office Municipal</h1>
+    <h1>Back-Office elu</h1>
     <p>Gestion des services municipaux</p>
   </div>
 
@@ -90,7 +90,7 @@
       </div>
     </div>
 
-    <div class="admin-banner">
+    <div class="administrateur-banner">
       <h2>Tableau de bord administrateur</h2>
       <p>Gérez les signalements citoyens, créez des sondages et publiez des événements depuis cette interface.</p>
     </div>
@@ -103,7 +103,7 @@
     </div>
 
     <div class="reports-list">
-      <div class="report-admin-card" *ngFor="let report of reports">
+      <div class="report-administrateur-card" *ngFor="let report of reports">
         <div class="report-content">
           <img *ngIf="report.photo" [src]="report.photo" alt="" class="report-photo" />
           <div class="report-details">
@@ -169,7 +169,7 @@
     <!-- Formulaire sondage -->
     <div class="form-card" *ngIf="showSurveyForm">
       <h3>Créer un sondage</h3>
-      <form (ngSubmit)="onCreateSurvey()" class="admin-form">
+      <form (ngSubmit)="onCreateSurvey()" class="administrateur-form">
         <div class="form-group">
           <label>Titre</label>
           <input type="text" [(ngModel)]="surveyForm.titre" name="titre" required />
@@ -223,7 +223,7 @@
 
     <!-- Liste sondages -->
     <div class="surveys-list">
-      <div class="survey-admin-card" *ngFor="let survey of surveys">
+      <div class="survey-administrateur-card" *ngFor="let survey of surveys">
         <div class="survey-info">
           <h3>{{ survey.titre }}</h3>
           <p>{{ survey.description }}</p>
@@ -258,7 +258,7 @@
     <!-- Formulaire événement -->
     <div class="form-card" *ngIf="showEventForm">
       <h3>Créer un événement</h3>
-      <form (ngSubmit)="onCreateEvent()" class="admin-form">
+      <form (ngSubmit)="onCreateEvent()" class="administrateur-form">
         <div class="form-group">
           <label>Titre</label>
           <input type="text" [(ngModel)]="eventForm.title" name="title" required />
@@ -302,7 +302,7 @@
 
     <!-- Liste événements -->
     <div class="events-grid">
-      <div class="event-admin-card" *ngFor="let event of events">
+      <div class="event-administrateur-card" *ngFor="let event of events">
         <img *ngIf="event.imageUrl" [src]="event.imageUrl" [alt]="event.title" class="event-image" />
         <div class="event-info">
           <h3>{{ event.title }}</h3>

@@ -116,7 +116,7 @@ export class SurveysComponent implements OnInit {
     }
 
     this.surveyService.vote({
-      citoyenId: parseInt(userId),
+      utilisateurId: parseInt(userId),
       sondageId: this.selectedSurvey.id,
       choixIds: this.selectedChoixIds
     }).subscribe({

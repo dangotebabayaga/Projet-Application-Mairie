@@ -26,8 +26,9 @@ interface StatusInfo {
 export class ReportsComponent implements OnInit {
   showForm = false;
   reports: Report[] = [];
-  currentUserId: number;
-  userRole: string;
+  utilisateurId: number | null = null; // correction : ! → null (initialisé depuis localStorage)
+  userRole: string = 'citoyen';        // correction : initialisation explicite
+  roles: string[] = ['citoyen'];       // correction : tableau de rôles
 
   formData: ReportForm = {
     category: 'Voirie',
@@ -39,12 +40,18 @@ export class ReportsComponent implements OnInit {
   categories = ['Voirie', 'Éclairage', 'Propreté', 'Espaces verts', 'Mobilier urbain', 'Autre'];
 
   constructor(private reportService: ReportService) {
-    this.currentUserId = Number(localStorage.getItem('userId')) || 0;
-    this.userRole = localStorage.getItem('userRole') || 'citoyen';
+    this.roles = JSON.parse(localStorage.getItem('userRole') || '["citoyen"]');
+    this.userRole = this.roles[0];
+    const userId = localStorage.getItem('userId');
+    this.utilisateurId = userId ? parseInt(userId) : null; // correction : initialisé ici
   }
 
-  get isAdmin(): boolean {
-    return this.userRole === 'admin';
+  get isadministrateur(): boolean {
+    return this.roles.includes('administrateur'); // correction : 'administrateur' → 'administrateur'
+  }
+
+  get isCitoyen(): boolean {
+    return this.roles.includes('citoyen');
   }
 
   ngOnInit(): void {
@@ -59,11 +66,11 @@ export class ReportsComponent implements OnInit {
   }
 
   get myReports(): Report[] {
-    return this.reports.filter(r => r.citoyenId === this.currentUserId);
+    return this.reports.filter(r => r.utilisateurId === this.utilisateurId);
   }
 
   get otherReports(): Report[] {
-    return this.reports.filter(r => r.citoyenId !== this.currentUserId);
+    return this.reports.filter(r => r.utilisateurId !== this.utilisateurId); // correction : === → !==
   }
 
   getStatusInfo(etat: string): StatusInfo {
@@ -97,7 +104,6 @@ export class ReportsComponent implements OnInit {
 
   onSubmit(): void {
     if (!this.formData.description || !this.formData.address) return;
-
     this.reportService.create({
       titre: this.formData.category,
       description: this.formData.description,

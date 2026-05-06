@@ -11,6 +11,7 @@ use Doctrine\ORM\EntityManagerInterface;
  use Symfony\Component\HttpFoundation\Request;
  use Symfony\Component\HttpFoundation\JsonResponse;
  use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
  #[Route('/api/signalements')]
  class SignalementsApi extends AbstractController {
     private EntityManagerInterface $em;
@@ -24,64 +25,46 @@ use Doctrine\ORM\EntityManagerInterface;
         $this->auth = $auth;
     }
 
-    #[Route('', name: 'api_get_signalement', methods: ['GET'])]
+   #[Route('', name: 'api_get_signalement', methods: ['GET'])]
     public function getAll(Request $request): JsonResponse
     {
-        $user = $this->auth->getUserFromRequest($request);
+        $signalements = $this->em->getRepository(Signalements::class)->findAll();
 
-        if (!$user) {
-            return $this->json(["error"=>"Token invalide"],401);
-        }
+        $data = array_map(function ($s) {
+            $lat = $s->getLatitude() ?? null;
+            $lng = $s->getLongitude() ?? null;
 
-        $userId = $user['userId'];
-        $role = $user['role'];
-
-        if ($role === 'admin') {
-            $signalement = $this->em
-                ->getRepository(Signalements::class)
-                ->findAll();
-        } else {
-            $signalement = $this->em
-                ->getRepository(Signalements::class)
-                ->createQueryBuilder('s')
-                ->where('s.etat != :etat')
-                ->orWhere('s.citoyen = :userId')
-                ->setParameter('etat', 'enregistre')
-                ->setParameter('userId', $userId)
-                ->getQuery()
-                ->getResult();
-        }
-
-        $data = array_map(function($s) use ($userId) {
-
-            $lat = $s->getLatitude();
-            $lng = $s->getLongitude();
-
-            $adresse = ($lat && $lng)
+            $adresse = ($lat !== null && $lng !== null)
                 ? $this->convertAdresse->coordinatesToAddress($lat, $lng)
                 : null;
 
             return [
-                'id' => $s->getId(),
-                'titre' => $s->getTitre(),
-                'etat' => $s->getEtat(),
+                'id'          => $s->getId(),
+                'titre'       => $s->getTitre(),
+                'etat'        => $s->getEtat(),
                 'description' => $s->getDescription(),
-                'adresse' => $adresse,
-                'typeId' => $s->getTypeId(),
-                'citoyenId' => $s->getCitoyen()->getUtilisateurId(),
-                'auteur?' => $s->getCitoyen()->getUtilisateurId() === $userId,
-                'dateCrea' => $s->getDateCreation(),
-                'dateModif' => $s->getDateModification()
+                'adresse'     => $adresse,
+                'typeId'      => $s->getType()?->getId(),
+                'type'        => $s->getType()?->getNom(),
+                'citoyenId'   => $s->getUtilisateur()?->getId(),
+                'dateCrea'    => $s->getDateCreation()?->format('Y-m-d H:i:s'),
+                'dateModif'   => $s->getDateModification()?->format('Y-m-d H:i:s')
             ];
-
-        }, $signalement);
+        }, $signalements);
 
         return $this->json($data);
-    }
-
+    } 
 
     #[Route('', name: 'api_post_signalement', methods: ['POST'])] 
     public function create(Request $request): JsonResponse{
+        
+        $user = $this->auth->getUserFromRequest($request); 
+        if (!$user) {
+            return $this->json(["error" => "Token manquant ou invalide"], 401);
+        }
+        if (!$this->auth->checkAnyRole($user, ['citoyen', 'administrateur'])) {
+            return $this->json(["error" => "Accès interdit"], 403);
+        }
 
          $user = $this->auth->getuserfromrequest($request);
         if (!$user) {

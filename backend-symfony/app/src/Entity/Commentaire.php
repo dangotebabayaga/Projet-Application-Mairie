@@ -1,10 +1,11 @@
 <?php
 namespace App\Entity;
+
 use App\Repository\CommentaireRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CommentaireRepository::class)]
-#[ORM\Table(name: 'Commentaire')]
+#[ORM\Table(name: 'commentaire')]
 class Commentaire
 {
     #[ORM\Id]
@@ -15,16 +16,18 @@ class Commentaire
     #[ORM\Column(nullable: true)]
     private ?string $titre = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?int $auteur = null;
-
-    #[ORM\Column(nullable: true)]
+    // correction : id brut → relation ManyToOne vers Utilisateur
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class)]
+    #[ORM\JoinColumn(name: 'auteur', referencedColumnName: 'id', nullable: true)]
+    private ?Utilisateur $auteur = null;
+    
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $dateCreation = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $dateModification = null;
 
     public function getId(): ?int
@@ -37,7 +40,7 @@ class Commentaire
         return $this->titre;
     }
 
-    public function setTitre(?string $titre)
+    public function setTitre(?string $titre): void
     {
         $this->titre = $titre;
     }
@@ -47,17 +50,18 @@ class Commentaire
         return $this->description;
     }
 
-    public function setDescription(?string $description)
+    public function setDescription(?string $description): void
     {
         $this->description = $description;
     }
 
-    public function getAuteur(): ?int
+    // correction : ?int → ?Utilisateur
+    public function getAuteur(): ?Utilisateur
     {
         return $this->auteur;
     }
 
-    public function setAuteur(?int $auteur)
+    public function setAuteur(?Utilisateur $auteur): void
     {
         $this->auteur = $auteur;
     }
@@ -67,7 +71,7 @@ class Commentaire
         return $this->dateCreation;
     }
 
-    public function setDateCreation(?\DateTimeInterface $dateCreation)
+    public function setDateCreation(?\DateTimeInterface $dateCreation): void
     {
         $this->dateCreation = $dateCreation;
     }
@@ -77,10 +81,8 @@ class Commentaire
         return $this->dateModification;
     }
 
-    public function setDateModification(?\DateTimeInterface $dateModification)
+    public function setDateModification(?\DateTimeInterface $dateModification): void
     {
         $this->dateModification = $dateModification;
     }
-
-
 }

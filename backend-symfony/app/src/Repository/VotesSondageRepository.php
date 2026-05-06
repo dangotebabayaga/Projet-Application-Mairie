@@ -4,7 +4,7 @@ namespace App\Repository;
 use App\Entity\VotesSondage;
 use App\Entity\ListeChoixVote;
 use App\Entity\Choix;
-use App\Entity\Citoyens;
+use App\Entity\Utilisateur;
 use App\Entity\Sondages;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -16,16 +16,16 @@ use Doctrine\ORM\EntityManagerInterface;
 class VotesSondageRepository extends ServiceEntityRepository
 {
     private EntityManagerInterface $em;
+
     public function __construct(ManagerRegistry $registry, EntityManagerInterface $em)
     {
         parent::__construct($registry, VotesSondage::class);
-        $this->em = $em; // on stocke l'EntityManager injecté
+        $this->em = $em;
     }
 
-    public function resultatSondage(int $idSondage)
+    public function resultatSondage(int $idSondage): array
     {
         $conn = $this->em->getConnection();
-    
         $sql = "
             SELECT c.nom AS choix, COUNT(lcv.id_vote) AS nb_votes
             FROM liste_choix_vote lcv
@@ -34,43 +34,41 @@ class VotesSondageRepository extends ServiceEntityRepository
             WHERE vs.id_sondage = :idSondage
             GROUP BY c.nom
             ORDER BY nb_votes DESC
-        ";
-    
+        ";  // correction : liens Markdown [lcv.id](http://...) → noms de colonnes SQL bruts
+
         $stmt = $conn->prepare($sql);
         $stmt->bindValue('idSondage', $idSondage);
-        $result = $stmt->executeQuery()->fetchAllAssociative();
-    
-        return $result;
+        return $stmt->executeQuery()->fetchAllAssociative();
     }
 
-     /**
-     * Enregistre un vote pour un citoyen et un choix
+    /**
+     * Enregistre un vote pour un Utilisateuret un choix
      * Ne crée rien si le vote existe déjà
      *
-     * @param int $idCitoyen
+     * @param int $idUtilisateur
      * @param Choix $choix
      * @param int $idSondage
      */
-    public function voteChoix(int $idCitoyen, Choix $choix, int $idSondage): void
+    public function voteChoix(int $idUtilisateur, Choix $choix, int $idSondage): void
     {
         // Récupère les entités nécessaires
-        $citoyen = $this->em->getRepository(Citoyens::class)->find($idCitoyen);
-        $sondage = $this->em->getRepository(Sondages::class)->find($idSondage);
+        $utilisateur= $this->em->getRepository(Utilisateur::class)->find($idUtilisateur);
+        $sondage     = $this->em->getRepository(Sondages::class)->find($idSondage);
 
-        if (!$citoyen || !$sondage) {
-            throw new \Exception("Citoyen ou sondage introuvable.");
+        if (!$utilisateur|| !$sondage) {
+            throw new \Exception("Utilisateur ou sondage introuvable.");
         }
 
-        // 1. Vérifie si le citoyen a déjà voté pour ce sondage
+        // 1. Vérifie si l'Utilisateura déjà voté pour ce sondage
         $existingVote = $this->findOneBy([
-            'citoyen' => $citoyen,
-            'sondage' => $sondage
+            'utilisateur' => $utilisateur, // correction : citoyen → utilisateur
+            'sondage'     => $sondage,
         ]);
 
         if (!$existingVote) {
             // 2. Crée le vote
             $vote = new VotesSondage();
-            $vote->setCitoyen($citoyen);
+            $vote->setUtilisateur($utilisateur); // correction : setCitoyen → setUtilisateur
             $vote->setSondage($sondage);
             $vote->setDateVote(new \DateTime());
             $this->em->persist($vote);
@@ -81,24 +79,28 @@ class VotesSondageRepository extends ServiceEntityRepository
             $listeChoixVote->setChoix($choix);
             $this->em->persist($listeChoixVote);
         }
-
         // 4. Pas de flush ici : le contrôleur fait le flush global
     }
 
-    public function voteChoixMultiple(int $idCitoyen, array $choixList, int $idSondage): void
+    public function voteChoixMultiple(int $idUtilisateur, array $choixList, int $idSondage): void
     {
-        $citoyen = $this->em->getRepository(Citoyens::class)->find($idCitoyen);
-        $sondage = $this->em->getRepository(Sondages::class)->find($idSondage);
-        // 1. Vérifie si le citoyen a déjà voté pour ce sondage
+        $utilisateur= $this->em->getRepository(Utilisateur::class)->find($idUtilisateur);
+        $sondage     = $this->em->getRepository(Sondages::class)->find($idSondage);
+
+        if (!$utilisateur|| !$sondage) {
+            throw new \Exception("Utilisateur ou sondage introuvable.");
+        }
+
+        // 1. Vérifie si l'Utilisateura déjà voté pour ce sondage
         $existingVote = $this->findOneBy([
-            'citoyen' => $idCitoyen,
-            'sondage' => $idSondage
+            'utilisateur' => $utilisateur, // correction : id bruts → objets Doctrine
+            'sondage'     => $sondage,
         ]);
 
         if (!$existingVote) {
             // 2. Crée le vote
             $vote = new VotesSondage();
-            $vote->setCitoyen($citoyen);
+            $vote->setUtilisateur($utilisateur); // correction : setCitoyen → setUtilisateur
             $vote->setSondage($sondage);
             $vote->setDateVote(new \DateTime());
             $this->em->persist($vote);
@@ -111,9 +113,6 @@ class VotesSondageRepository extends ServiceEntityRepository
                 $this->em->persist($listeChoixVote);
             }
         }
-
         // 4. Pas de flush ici : le contrôleur fera le flush global
     }
-
 }
-

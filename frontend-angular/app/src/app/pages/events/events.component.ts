@@ -41,7 +41,8 @@ export class EventsComponent implements OnInit {
   selectedDateRange: DateRangeId = 'upcoming';
   savedEvents: string[] = [];
   events: EventItem[] = [];
-  userRole: string;
+  userRole: string = 'citoyen';
+  roles: string[] = ['citoyen'];
 
   showCreateForm = false;
   submitting = false;
@@ -62,11 +63,16 @@ export class EventsComponent implements OnInit {
   ];
 
   constructor(private eventService: EventService) {
-    this.userRole = localStorage.getItem('userRole') || 'citoyen';
+    this.roles = JSON.parse(localStorage.getItem('userRole') || '["citoyen"]');
+    this.userRole = this.roles[0];
   }
 
-  get isAdmin(): boolean {
-    return this.userRole === 'admin';
+  get isadministrateur(): boolean {
+      return this.roles.includes('administrateur');
+  }
+  
+  get isElu(): boolean {
+      return this.roles.includes('elu');
   }
 
   ngOnInit(): void {

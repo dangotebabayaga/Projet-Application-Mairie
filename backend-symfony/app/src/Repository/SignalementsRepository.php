@@ -15,6 +15,5 @@ class SignalementsRepository extends ServiceEntityRepository
         parent::__construct($registry, Signalements::class);
     }
 
-    // Ajoutez vos méthodes personnalisées ici
 }
 

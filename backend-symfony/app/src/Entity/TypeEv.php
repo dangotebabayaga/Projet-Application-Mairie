@@ -5,7 +5,7 @@ use App\Repository\TypeEvRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TypeEvRepository::class)]
-#[ORM\Table(name: 'Type_ev')]
+#[ORM\Table(name: 'type_ev')] // correction : 'Type_ev' → 'type_ev' (cohérence avec le SQL)
 class TypeEv
 {
     #[ORM\Id]
@@ -13,7 +13,7 @@ class TypeEv
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $nom = null;
 
     public function getId(): ?int
@@ -26,10 +26,8 @@ class TypeEv
         return $this->nom;
     }
 
-    public function setNom(?string $nom)
+    public function setNom(?string $nom): void // correction : ': void' manquant
     {
         $this->nom = $nom;
     }
-
-
 }

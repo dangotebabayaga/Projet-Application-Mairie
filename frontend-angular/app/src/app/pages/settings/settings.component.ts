@@ -55,8 +55,8 @@ export class SettingsComponent implements OnInit {
   constructor(private http: HttpClient, private router: Router) {}
 
   ngOnInit(): void {
-    const role = localStorage.getItem('userRole');
-    if (role !== 'admin') {
+    const roles: string[] = JSON.parse(localStorage.getItem('userRole') || '["citoyen"]');
+    if (!roles.includes('administrateur') && !roles.includes('elu')) {
       this.router.navigate(['/home']);
       return;
     }
@@ -117,7 +117,6 @@ export class SettingsComponent implements OnInit {
       slogan: this.villeConfig.slogan,
       logo: this.villeConfig.logo,
       theme: this.selectedTheme,
-      administrateur_Id: parseInt(userId || '0')
     };
 
     this.http.post('http://localhost:8000/api/paramettre', payload).subscribe({

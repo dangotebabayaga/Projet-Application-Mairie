@@ -53,7 +53,7 @@
   </div>
 
   <!-- Statistiques pour agents municipaux -->
-  <div class="stats-section" *ngIf="user?.role === 'admin'">
+   <div class="stats-section" *ngIf="user?.roles?.includes('administrateur')">
     <div class="stat-card">
       <div class="stat-header">
         <span>Signalements en cours</span>
