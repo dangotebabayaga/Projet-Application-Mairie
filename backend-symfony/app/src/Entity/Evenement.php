@@ -17,22 +17,18 @@ class Evenement
     private ?string $titre = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    private ?string $commentaire = null;
-    private ?string $commentaire = null;
+    private ?string $commentaire = null; // <-- texte long
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $lieux = null;
 
-    #[ORM\Column(type: 'date', name: 'dateev', nullable: true)]
-    #[ORM\Column(type: 'date', name: 'dateev', nullable: true)]
+    #[ORM\Column(type: 'date',name:"dateev", nullable: true)]
     private ?\DateTimeInterface $dateEv = null;
 
-    #[ORM\Column(type: 'time', name: 'heuredeb', nullable: true)]
-    #[ORM\Column(type: 'time', name: 'heuredeb', nullable: true)]
+    #[ORM\Column(type: 'time',name:"heuredeb", nullable: true)]
     private ?\DateTimeInterface $heureDeb = null;
 
-    #[ORM\Column(type: 'time', name: 'heurefin', nullable: true)]
-    #[ORM\Column(type: 'time', name: 'heurefin', nullable: true)]
+    #[ORM\Column(type: 'time',name:"heurefin", nullable: true)]
     private ?\DateTimeInterface $heureFin = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -167,6 +163,17 @@ class Evenement
     public function setType(?TypeEv $type): self
     {
         $this->type = $type;
+        return $this;
+    }
+
+    public function getPhoto(): ?string
+    {
+        return $this->photo;
+    }
+
+    public function setPhoto(?string $photo): self
+    {
+        $this->photo = $photo;
         return $this;
     }
 }

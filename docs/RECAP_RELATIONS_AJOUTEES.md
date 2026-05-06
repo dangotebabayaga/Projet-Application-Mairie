@@ -52,7 +52,7 @@ Found 19 mapped entities:
 - `Collection $quartiers` → Quartier
 - `Collection $categoriesCitoyens` → CategoriesCitoyen
 - `Collection $thematiquesEvenements` → ThematiquesEvenement
-- `Collection $Utilisateur` → Utilisateur
+- `Collection $utilisateurs` → Utilisateur
 - `Collection $sondages` → Sondage
 - `Collection $evenements` → Evenement
 - `Collection $actualites` → Actualite
@@ -82,7 +82,7 @@ Found 19 mapped entities:
 
 ### **5. Utilisateur.php**
 **Relations ManyToOne** :
-- `Ville $ville` (inversedBy: 'Utilisateur', nullable: false)
+- `Ville $ville` (inversedBy: 'utilisateurs', nullable: false)
 - `Quartier $quartier` (nullable: true)
 - `CategoriesCitoyen $categorie` (nullable: true)
 

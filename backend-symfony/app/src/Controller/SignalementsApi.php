@@ -48,11 +48,15 @@ class SignalementsApi extends AbstractController
             $adresse = ($lat !== null && $lng !== null)
                 ? $this->convertAdresse->coordinatesToAddress($lat, $lng)
                 : null;
+            $citoyenId = $s->getCitoyen()?->getUtilisateurId();
+
+            $photo = $s->getPhoto();
+            $photoUrl = $photo ? $this->getPhotoUrl($photo) : null;
 
             return [
-                'id'          => $s->getId(),
-                'titre'       => $s->getTitre(),
-                'etat'        => $s->getEtat(),
+                'id' => $s->getId(),
+                'titre' => $s->getTitre(),
+                'etat' => $s->getEtat()->value,
                 'description' => $s->getDescription(),
                 'adresse'     => $adresse,
                 'typeId'      => $s->getType()?->getId(),
@@ -61,7 +65,8 @@ class SignalementsApi extends AbstractController
                 'dateCrea'    => $s->getDateCreation()?->format('Y-m-d H:i:s'),
                 'dateModif'   => $s->getDateModification()?->format('Y-m-d H:i:s')
             ];
-        }, $signalements);
+
+        }, $signalement);
 
         return $this->json($data);
     }

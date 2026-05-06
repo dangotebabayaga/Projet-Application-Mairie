@@ -1,6 +1,6 @@
 # Projet UniCity - Application Mairie
 
-Application full-stack de gestion elue (Angular + Symfony + PostgreSQL).
+Application full-stack de gestion municipale (Angular + Symfony + PostgreSQL).
 
 ## Installation rapide pour les développeurs
 

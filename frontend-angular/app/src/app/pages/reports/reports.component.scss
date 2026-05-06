@@ -6,6 +6,117 @@
   gap: $spacing-6;
 }
 
+// Carte
+.map-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: $radius-xl;
+  box-shadow: $shadow-sm;
+  padding: $spacing-4;
+}
+
+.map-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font: inherit;
+  color: var(--color-text);
+
+  .map-toggle-label {
+    display: flex;
+    align-items: center;
+    gap: $spacing-2;
+    font-size: $text-lg;
+    font-weight: 600;
+
+    svg {
+      width: 20px;
+      height: 20px;
+      color: var(--color-primary);
+    }
+  }
+
+  .chevron {
+    width: 20px;
+    height: 20px;
+    color: var(--color-text-muted);
+    transition: transform 0.2s ease;
+
+    &.open {
+      transform: rotate(180deg);
+    }
+  }
+
+  &:hover .chevron {
+    color: var(--color-text);
+  }
+}
+
+#reports-map {
+  height: 400px;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  z-index: 0;
+  margin-top: $spacing-3;
+}
+
+// Photo preview dans le formulaire
+.photo-preview {
+  margin-top: $spacing-3;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+  align-items: flex-start;
+
+  img {
+    max-width: 240px;
+    max-height: 180px;
+    border-radius: $radius-lg;
+    border: 1px solid var(--color-border);
+  }
+}
+
+.btn-remove-photo {
+  background: var(--color-surface-alt);
+  color: var(--color-text);
+  border: none;
+  padding: $spacing-1 $spacing-3;
+  border-radius: $radius-lg;
+  cursor: pointer;
+  font-size: $text-sm;
+
+  &:hover {
+    background: var(--color-border);
+  }
+}
+
+// Photo dans les cartes signalement
+.report-photo {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: $radius-lg;
+  margin-bottom: $spacing-3;
+
+  &.small {
+    max-height: 140px;
+  }
+}
+
+.form-error {
+  color: #991B1B;
+  background: #FEE2E2;
+  padding: $spacing-2 $spacing-3;
+  border-radius: $radius-lg;
+  font-size: $text-sm;
+  margin: $spacing-2 0;
+}
+
 // Page Header
 .page-header {
   display: flex;
@@ -19,12 +130,12 @@
   h1 {
     font-size: 1.5rem;
     font-weight: 600;
-    color: $gray-900;
+    color: var(--color-text);
     margin: 0;
   }
 
   p {
-    color: $gray-600;
+    color: var(--color-text-muted);
     margin: $spacing-1 0 0;
   }
 }
@@ -33,8 +144,8 @@
   display: flex;
   align-items: center;
   gap: $spacing-2;
-  background: $blue-600;
-  color: $white;
+  background: var(--color-primary);
+  color: #FFFFFF;
   padding: $spacing-3 $spacing-6;
   border-radius: $radius-lg;
   border: none;
@@ -43,7 +154,7 @@
   transition: background-color 0.2s;
 
   &:hover {
-    background: $blue-700;
+    background: var(--color-primary-dark);
   }
 
   svg {
@@ -54,7 +165,8 @@
 
 // Form Card
 .form-card {
-  background: $white;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: $radius-xl;
   box-shadow: $shadow-sm;
   padding: $spacing-6;
@@ -62,7 +174,7 @@
   h2 {
     font-size: $text-lg;
     font-weight: 600;
-    color: $gray-900;
+    color: var(--color-text);
     margin: 0 0 $spacing-4;
   }
 }
@@ -83,7 +195,7 @@
     gap: $spacing-1;
     font-size: $text-sm;
     font-weight: 500;
-    color: $gray-700;
+    color: var(--color-text);
     margin-bottom: $spacing-1;
   }
 
@@ -95,21 +207,22 @@
   input, select, textarea {
     width: 100%;
     padding: $spacing-2 $spacing-4;
-    border: 1px solid $gray-300;
+    border: 1px solid var(--color-border);
     border-radius: $radius-lg;
     font-size: $text-base;
     outline: none;
     transition: all 0.2s;
-    background: $white;
+    background: var(--color-surface);
+    color: var(--color-text);
     font-family: inherit;
 
     &:focus {
-      border-color: transparent;
-      box-shadow: 0 0 0 2px $blue-500;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 2px var(--color-primary-light);
     }
 
     &::placeholder {
-      color: $gray-400;
+      color: var(--color-text-muted);
     }
   }
 
@@ -125,7 +238,7 @@
 
 .form-hint {
   font-size: $text-xs;
-  color: $gray-500;
+  color: var(--color-text-muted);
   margin: $spacing-1 0 0;
 }
 
@@ -137,8 +250,8 @@
 
 .btn-submit {
   flex: 1;
-  background: $blue-600;
-  color: $white;
+  background: var(--color-primary);
+  color: #FFFFFF;
   padding: $spacing-2 0;
   border: none;
   border-radius: $radius-lg;
@@ -147,7 +260,7 @@
   transition: background-color 0.2s;
 
   &:hover:not(:disabled) {
-    background: $blue-700;
+    background: var(--color-primary-dark);
   }
 
   &:disabled {
@@ -158,15 +271,15 @@
 
 .btn-cancel {
   padding: $spacing-2 $spacing-6;
-  border: 1px solid $gray-300;
+  border: 1px solid var(--color-border);
   background: transparent;
-  color: $gray-700;
+  color: var(--color-text);
   border-radius: $radius-lg;
   cursor: pointer;
   transition: background-color 0.2s;
 
   &:hover {
-    background: $gray-50;
+    background: var(--color-surface-alt);
   }
 }
 
@@ -175,7 +288,7 @@
   h2 {
     font-size: $text-lg;
     font-weight: 600;
-    color: $gray-900;
+    color: var(--color-text);
     margin: 0 0 $spacing-4;
   }
 }
@@ -188,7 +301,8 @@
 }
 
 .report-card {
-  background: $white;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: $radius-xl;
   box-shadow: $shadow-sm;
   padding: $spacing-6;
@@ -216,8 +330,8 @@
 .badge-category {
   display: inline-block;
   padding: $spacing-1 $spacing-3;
-  background: $gray-100;
-  color: $gray-700;
+  background: var(--color-surface-alt);
+  color: var(--color-text-muted);
   border-radius: 9999px;
   font-size: $text-sm;
 
@@ -276,7 +390,7 @@
 }
 
 .report-description {
-  color: $gray-900;
+  color: var(--color-text);
   margin: $spacing-2 0 0;
   line-height: 1.5;
 }
@@ -295,7 +409,7 @@
   gap: $spacing-4;
   padding-top: $spacing-3;
   margin-top: $spacing-3;
-  border-top: 1px solid $gray-100;
+  border-top: 1px solid var(--color-border);
   flex-wrap: wrap;
 }
 
@@ -304,7 +418,7 @@
   align-items: center;
   gap: $spacing-1;
   font-size: $text-sm;
-  color: $gray-500;
+  color: var(--color-text-muted);
 
   svg {
     width: 16px;
@@ -321,13 +435,54 @@
   @media (min-width: $breakpoint-md) {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  @media (min-width: $breakpoint-lg) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+// Espace entre la carte de filtres et la grille des signalements
+.card-list-filter-card {
+  margin-bottom: $spacing-4;
+}
+
+// Variantes couleurs des boutons filtre par état signalement
+// (s'appuient sur les classes globales .card-filter-btn de styles/_card-list.scss)
+.card-filter-btn {
+  &.filter-report-status-all {
+    background: $gray-200;
+    color: $gray-800;
+  }
+  &.filter-report-status-enregistré {
+    background: $blue-100;
+    color: #1E40AF;
+  }
+  &.filter-report-status-en-cours {
+    background: #FEF3C7;
+    color: #92400E;
+  }
+  &.filter-report-status-résolu {
+    background: #DCFCE7;
+    color: #166534;
+  }
 }
 
 .report-card-small {
-  background: $white;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: $radius-xl;
   box-shadow: $shadow-sm;
   padding: $spacing-4;
+  transition: box-shadow 0.2s, transform 0.2s;
+
+  &.clickable {
+    cursor: pointer;
+
+    &:hover {
+      box-shadow: $shadow-md;
+      transform: translateY(-2px);
+    }
+  }
 
   .report-badges {
     margin-bottom: $spacing-2;
@@ -352,7 +507,7 @@
 .empty-state {
   text-align: center;
   padding: $spacing-8;
-  color: $gray-500;
+  color: var(--color-text-muted);
 
   p {
     margin: 0;

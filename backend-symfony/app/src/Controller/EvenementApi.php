@@ -97,8 +97,14 @@ class EvenementApi extends AbstractController
         }
 
         $even = $this->em->getRepository(Evenement::class)->findAll();
+
         $data = [];
+
         foreach ($even as $e) {
+
+            $type = $this->em->getRepository(TypeEv::class)->find($e->getType());
+            $photo = $e->getPhoto();
+
             $data[] = [
                 "titre"          => $e->getTitre(),
                 "lieux"          => $e->getLieux(),
@@ -107,10 +113,11 @@ class EvenementApi extends AbstractController
                 "lieux"          => $e->getLieux(),
                 "commentaire"    => $e->getCommentaire(),
                 "date Evenement" => $e->getDateEv()?->format('Y-m-d'),
-                "Heure début"    => $e->getHeureDeb()?->format('H:i'),
-                "Heure fin"      => $e->getHeureFin()?->format('H:i'),
-                "administrateurId"        => $e->getadministrateur()?->getId(), // correction : getadministrateurId() → getadministrateur()->getId()
-                "type"           => $e->getType()?->getNom()           // correction : find() inutile, getType() retourne déjà un objet TypeEv
+                "Heure début" => $e->getHeureDeb()?->format('H:i'),
+                "Heure fin" => $e->getHeureFin()?->format('H:i'),
+                "adminId" => $e->getAdministrateurId(),
+                "type" => $type?->getNom(),
+                "photo" => $photo ? $this->getPhotoUrl($photo) : null
             ];
         }
 
@@ -127,6 +134,10 @@ class EvenementApi extends AbstractController
         if (!$user) {
             return $this->json(["error" => "Token manquant ou invalide"], 401);
         }
+        $type = $this->em->getRepository(TypeEv::class)->findAll();
+        $data = [];
+
+        foreach ($type as $e) {
 
         $types = $this->em->getRepository(TypeEv::class)->findAll();
         $data  = [];

@@ -1,53 +1,46 @@
 <?php
 namespace App\Service;
-
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-use App\Repository\UtilisateurRepository;
 use Symfony\Component\HttpFoundation\Request;
 
 class AuthChecker
 {
     private string $jwtSecret;
-    private UtilisateurRepository $userRepo;
 
-    public function __construct(UtilisateurRepository $userRepo)
+    public function __construct()
     {
         $this->jwtSecret = $_ENV['JWT_SECRET'] ?? 'change_me';
-        $this->userRepo  = $userRepo;
     }
 
-    public function getUserFromRequest(Request $request): mixed
+    /**
+     * Vérifie le token et retourne le payload ou null si invalide
+     */
+    public function getUserFromRequest(Request $request): ?array
     {
         $authHeader = $request->headers->get('Authorization');
         if (!$authHeader || !str_starts_with($authHeader, 'Bearer ')) {
             return null;
         }
 
-        $token = substr($authHeader, 7);
-
+        $token = substr($authHeader, 7); // enlève "Bearer "
         try {
             $payload = JWT::decode($token, new Key($this->jwtSecret, 'HS256'));
-            return $this->userRepo->findByEmail($payload->email);
+            return (array) $payload;
         } catch (\Exception $e) {
             return null;
         }
     }
 
-    // Vérifie un seul rôle
-    public function checkRole(mixed $user, string $role): bool
+    /**
+     * Vérifie que l'utilisateur a le rôle attendu
+     * Un superadmin hérite des droits d'un admin (mais pas l'inverse)
+     */
+    public function checkRole(array $payload, string $role): bool
     {
-        if ($user === null) return false;
-        return $user->hasRole($role);
-    }
-
-    // Vérifie si l'utilisateur a au moins un des rôles donnés
-    public function checkAnyRole(mixed $user, array $roles): bool
-    {
-        if ($user === null) return false;
-        foreach ($roles as $role) {
-            if ($user->hasRole($role)) return true;
-        }
+        $userRole = $payload['role'] ?? null;
+        if ($userRole === $role) return true;
+        if ($role === 'admin' && $userRole === 'superadmin') return true;
         return false;
     }
 }

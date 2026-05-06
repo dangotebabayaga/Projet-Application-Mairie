@@ -1,0 +1,209 @@
+@import '../../../styles/variables';
+
+.profile-page {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-6;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.page-header {
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0;
+  }
+  p {
+    color: var(--color-text-muted);
+    margin: $spacing-1 0 0;
+  }
+}
+
+.profile-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: $radius-xl;
+  box-shadow: $shadow-sm;
+  padding: $spacing-6;
+}
+
+.profile-summary {
+  display: flex;
+  align-items: center;
+  gap: $spacing-4;
+  padding-bottom: $spacing-4;
+  margin-bottom: $spacing-4;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.profile-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: $radius-full;
+  background: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  svg {
+    width: 30px;
+    height: 30px;
+    color: #FFFFFF;
+  }
+}
+
+.profile-identity {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-name {
+  font-size: $text-lg;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.profile-email {
+  font-size: $text-sm;
+  color: var(--color-text-muted);
+  margin: 2px 0 $spacing-2;
+}
+
+.role-badge {
+  display: inline-block;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  padding: 2px 12px;
+  border-radius: 9999px;
+  font-size: $text-xs;
+  font-weight: 600;
+}
+
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-3;
+
+    @media (min-width: $breakpoint-md) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-1;
+    font-size: $text-sm;
+    color: var(--color-text);
+    font-weight: 500;
+
+    &.full {
+      grid-column: 1 / -1;
+    }
+  }
+
+  input,
+  select {
+    padding: $spacing-2 $spacing-3;
+    border: 1px solid var(--color-border);
+    border-radius: $radius-lg;
+    font: inherit;
+    color: var(--color-text);
+    background: var(--color-surface);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+
+    &:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px var(--color-primary-light);
+    }
+  }
+
+  select {
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right $spacing-3 center;
+    padding-right: $spacing-8;
+  }
+}
+
+.form-error {
+  color: #991B1B;
+  background: #FEE2E2;
+  padding: $spacing-2 $spacing-3;
+  border-radius: $radius-lg;
+  font-size: $text-sm;
+  margin: 0;
+}
+
+.form-success {
+  color: #166534;
+  background: $green-50;
+  padding: $spacing-2 $spacing-3;
+  border-radius: $radius-lg;
+  font-size: $text-sm;
+  margin: 0;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $spacing-2;
+  margin-top: $spacing-3;
+}
+
+.btn-primary,
+.btn-secondary {
+  padding: $spacing-2 $spacing-5;
+  border-radius: $radius-lg;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: #FFFFFF;
+
+  &:hover:not(:disabled) {
+    background: var(--color-primary-dark);
+  }
+}
+
+.btn-secondary {
+  background: var(--color-surface-alt);
+  color: var(--color-text);
+
+  &:hover:not(:disabled) {
+    background: var(--color-border);
+  }
+}
+
+.loading-state {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: $radius-xl;
+  box-shadow: $shadow-sm;
+  padding: $spacing-8;
+  text-align: center;
+  color: var(--color-text-muted);
+}

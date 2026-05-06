@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { EventService, EventItem, EventPayload } from '../../services/event.service';
 
 interface ThemeFilter {
@@ -64,17 +65,16 @@ export class EventsComponent implements OnInit {
     { id: 'all', label: 'Tous' }
   ];
 
-  constructor(private eventService: EventService) {
-    this.roles = JSON.parse(localStorage.getItem('userRole') || '["citoyen"]');
-    this.userRole = this.roles[0];
+  constructor(private eventService: EventService, private router: Router) {
+    this.userRole = localStorage.getItem('userRole') || 'citoyen';
   }
 
   get isAdmin(): boolean {
       return this.roles.includes('administrateur');
   }
-  
-  get isElu(): boolean {
-      return this.roles.includes('elu');
+
+  get isAdmin(): boolean {
+    return this.userRole === 'admin';
   }
 
   ngOnInit(): void {

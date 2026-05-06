@@ -13,7 +13,7 @@ class TypesSignalement
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 100, nullable: true)] // correction : length: 100 conforme au SQL
+    #[ORM\Column(nullable: true)]
     private ?string $nom = null;
 
     public function getId(): ?int
@@ -26,8 +26,10 @@ class TypesSignalement
         return $this->nom;
     }
 
-    public function setNom(?string $nom): void // correction : ': void' manquant
+    public function setNom(?string $nom)
     {
         $this->nom = $nom;
     }
+
+
 }

@@ -1,0 +1,182 @@
+<div class="report-detail-page">
+  <!-- Chargement -->
+  <div class="empty-state" *ngIf="loading">
+    <p>Chargement…</p>
+  </div>
+
+  <!-- Erreur -->
+  <div class="empty-state" *ngIf="error && !loading">
+    <p>{{ error }}</p>
+    <button class="btn-back" (click)="back()" style="margin-top: 16px;">Retour aux signalements</button>
+  </div>
+
+  <!-- Détail -->
+  <div class="report-detail-card" *ngIf="report && !loading">
+    <button class="btn-back" (click)="back()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      Retour aux signalements
+    </button>
+
+    <!-- Photo grand format si dispo (mode lecture uniquement) -->
+    <div class="report-photo-large" *ngIf="report.photo && !editing">
+      <img [src]="report.photo" alt="Photo du signalement" />
+    </div>
+
+    <!-- ========== MODE LECTURE ========== -->
+    <div class="report-content" *ngIf="!editing">
+      <div class="report-header">
+        <div class="report-badges">
+          <span class="badge-category">{{ report.typeNom || report.titre }}</span>
+          <span class="badge-status" [ngClass]="getStatusInfo(report.etat).colorClass">
+            <svg *ngIf="report.etat === 'enregistré'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <svg *ngIf="report.etat === 'en cours'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <svg *ngIf="report.etat === 'résolu'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            {{ getStatusInfo(report.etat).label }}
+          </span>
+        </div>
+        <span *ngIf="isAuthor" class="badge-author">Votre signalement</span>
+      </div>
+
+      <h1>{{ report.typeNom || report.titre }}</h1>
+
+      <p class="report-description" *ngIf="report.description">{{ report.description }}</p>
+
+      <!-- Détails -->
+      <div class="report-details">
+        <div class="detail-item" *ngIf="report.adresse">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          <span>{{ report.adresse }}</span>
+        </div>
+        <div class="detail-item" *ngIf="report.dateCrea">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+          <span>Signalé le {{ formatDate(report.dateCrea) }}</span>
+        </div>
+        <div class="detail-item" *ngIf="report.dateModif && report.dateModif !== report.dateCrea">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <span>Mis à jour le {{ formatDate(report.dateModif) }}</span>
+        </div>
+      </div>
+
+      <!-- Mini-carte -->
+      <div class="map-section" *ngIf="report.latitude != null && report.longitude != null">
+        <h3>Localisation</h3>
+        <div id="report-detail-map"></div>
+      </div>
+
+      <!-- Actions auteur (citoyen) : modifier / supprimer si encore "enregistré" -->
+      <div class="author-actions" *ngIf="canEditOrDelete">
+        <button type="button" class="btn-action edit" (click)="startEdit()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+          </svg>
+          Modifier
+        </button>
+        <button type="button" class="btn-action delete" (click)="askDelete()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"></path>
+          </svg>
+          Supprimer
+        </button>
+      </div>
+
+      <!-- Note pour l'auteur quand l'état n'est plus modifiable -->
+      <p class="info-banner" *ngIf="isAuthor && report.etat !== 'enregistré' && report.etat !== 'résolu'">
+        🔒 Ce signalement est en cours de traitement, vous ne pouvez plus le modifier.
+      </p>
+
+      <!-- Bouton admin : faire avancer l'état -->
+      <button *ngIf="isAdmin && report.etat !== 'résolu'"
+              class="btn-advance"
+              (click)="advanceState()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+        <span *ngIf="report.etat === 'enregistré'">Marquer en cours de traitement</span>
+        <span *ngIf="report.etat === 'en cours'">Marquer comme résolu</span>
+      </button>
+    </div>
+
+    <!-- ========== MODE ÉDITION ========== -->
+    <form *ngIf="editing" (ngSubmit)="saveEdit()" class="edit-form">
+      <h2>Modifier le signalement</h2>
+
+      <div class="form-group">
+        <label>Catégorie</label>
+        <select [(ngModel)]="editForm.typeId" name="typeId" required>
+          <option *ngFor="let t of types" [ngValue]="t.id">{{ t.nom }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Description</label>
+        <textarea [(ngModel)]="editForm.description" name="description" rows="4" required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Adresse</label>
+        <input type="text" [(ngModel)]="editForm.adresse" name="adresse" required />
+      </div>
+
+      <div class="form-group">
+        <app-photo-upload
+          #editPhotoUpload
+          label="Nouvelle photo (laisser vide pour conserver l'actuelle)"
+          (fileSelected)="onEditPhotoSelected($event)">
+        </app-photo-upload>
+        <div class="current-photo" *ngIf="report.photo && !editPhoto">
+          <span>Photo actuelle :</span>
+          <img [src]="report.photo" alt="" />
+        </div>
+      </div>
+
+      <p class="form-error" *ngIf="editError">{{ editError }}</p>
+
+      <div class="form-actions">
+        <button type="button" class="btn-cancel" (click)="cancelEdit()" [disabled]="saving">
+          Annuler
+        </button>
+        <button type="submit" class="btn-save" [disabled]="saving">
+          {{ saving ? 'Enregistrement…' : 'Enregistrer les modifications' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Modal confirmation suppression -->
+  <app-confirm-modal
+    [open]="showDeleteConfirm"
+    title="Supprimer le signalement ?"
+    message="Cette action est définitive. Le signalement et sa photo seront supprimés."
+    confirmLabel="Oui, supprimer"
+    cancelLabel="Annuler"
+    variant="danger"
+    (confirm)="confirmDelete()"
+    (cancel)="cancelDelete()">
+  </app-confirm-modal>
+</div>

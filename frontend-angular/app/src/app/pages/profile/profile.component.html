@@ -1,0 +1,87 @@
+<div class="profile-page">
+  <div class="page-header">
+    <div>
+      <h1>Mon profil</h1>
+      <p>Gérez vos informations personnelles</p>
+    </div>
+  </div>
+
+  <div class="profile-card" *ngIf="!loading">
+    <div class="profile-summary">
+      <div class="profile-avatar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+      </div>
+      <div class="profile-identity">
+        <div class="profile-name">{{ form.prenom }} {{ form.nom }}</div>
+        <div class="profile-email">{{ form.email }}</div>
+        <span class="role-badge">{{ roleLabel }}</span>
+      </div>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #f="ngForm" class="profile-form">
+      <div class="form-row">
+        <label>
+          <span>Prénom *</span>
+          <input type="text" name="prenom" [(ngModel)]="form.prenom" required />
+        </label>
+        <label>
+          <span>Nom *</span>
+          <input type="text" name="nom" [(ngModel)]="form.nom" required />
+        </label>
+      </div>
+
+      <label class="full">
+        <span>Email *</span>
+        <input type="email" name="email" [(ngModel)]="form.email" required />
+      </label>
+
+      <div class="form-row">
+        <label>
+          <span>Téléphone</span>
+          <input type="tel" name="telephone" [(ngModel)]="form.telephone" placeholder="06 12 34 56 78" />
+        </label>
+        <label>
+          <span>Date de naissance</span>
+          <input type="date" name="dateNaissance" [(ngModel)]="form.dateNaissance" />
+        </label>
+      </div>
+
+      <!-- Quartier + catégorie (citoyens uniquement) -->
+      <div class="form-row" *ngIf="isCitoyen">
+        <label>
+          <span>Quartier</span>
+          <select name="quartierId" [(ngModel)]="form.quartierId">
+            <option [ngValue]="null">— Non renseigné —</option>
+            <option *ngFor="let q of quartiers" [ngValue]="q.id">{{ q.nom }}</option>
+          </select>
+        </label>
+        <label>
+          <span>Catégorie</span>
+          <select name="categorieId" [(ngModel)]="form.categorieId">
+            <option [ngValue]="null">— Non renseigné —</option>
+            <option *ngFor="let c of categories" [ngValue]="c.id">{{ c.libelle }}</option>
+          </select>
+        </label>
+      </div>
+
+      <p class="form-error" *ngIf="error">{{ error }}</p>
+      <p class="form-success" *ngIf="successMessage">{{ successMessage }}</p>
+
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="onCancel()" [disabled]="saving">
+          Annuler
+        </button>
+        <button type="submit" class="btn-primary" [disabled]="saving || !f.valid">
+          {{ saving ? 'Enregistrement…' : 'Enregistrer' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="loading-state" *ngIf="loading">
+    <p>Chargement de vos informations…</p>
+  </div>
+</div>

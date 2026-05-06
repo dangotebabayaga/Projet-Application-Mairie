@@ -25,7 +25,12 @@ class EvenementRepository extends ServiceEntityRepository
 
     public function crea(array $data): Evenement
     {
+        $em = $this->getEntityManager();
+
         // Dates et heures
+        $dateEv  = isset($data['date Evenement']) ? new \DateTime($data['date Evenement']) : new \DateTime();
+        $heureDeb = isset($data['Heure début']) ? new \DateTime($data['Heure début']) : new \DateTime();
+        $heureFin = isset($data['Heure fin']) ? new \DateTime($data['Heure fin']) : new \DateTime();
         $dateEv   = isset($data['date Evenement']) ? new \DateTime($data['date Evenement']) : new \DateTime();
         $heureDeb = isset($data['Heure début'])    ? new \DateTime($data['Heure début'])    : new \DateTime();
         $heureFin = isset($data['Heure fin'])       ? new \DateTime($data['Heure fin'])       : new \DateTime();

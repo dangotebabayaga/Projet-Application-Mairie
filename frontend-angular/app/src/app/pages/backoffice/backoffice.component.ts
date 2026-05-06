@@ -1,43 +1,22 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, HostListener, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SurveyService, Survey } from '../../services/survey.service';
 import { SocialService, ReseauSocial } from '../../services/social.service';
+import { ReportService, Report } from '../../services/report.service';
+import { EventService, EventItem, EventType } from '../../services/event.service';
+import { QuartierService, Quartier } from '../../services/quartier.service';
+import { CategorieService, Categorie } from '../../services/categorie.service';
+import { PhotoUploadComponent } from '../../components/photo-upload/photo-upload.component';
 
-type ReportStatus = 'registered' | 'in_progress' | 'resolved';
-type EventTheme = 'sport' | 'culture' | 'citoyennete' | 'environnement';
 type TabId = 'overview' | 'reports' | 'surveys' | 'events' | 'social';
 
 interface SocialForm {
   plateform: string;
   lien: string;
-}
-
-interface Report {
-  id: string;
-  userId: string;
-  userName: string;
-  category: string;
-  description: string;
-  photo?: string;
-  location: { address: string; lat: number; lng: number };
-  status: ReportStatus;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-
-interface Event {
-  id: string;
-  title: string;
-  description: string;
-  date: Date;
-  location: string;
-  theme: EventTheme;
-  organizer: string;
-  imageUrl?: string;
 }
 
 interface Tab {
@@ -52,26 +31,31 @@ interface SurveyForm {
   dateDebut: string;
   dateFin: string;
   choix: string[];
+  quartiers: number[];
+  categories: number[];
+  multiChoice: boolean;
 }
 
 interface EventForm {
-  title: string;
-  description: string;
-  date: string;
-  location: string;
-  theme: EventTheme;
-  organizer: string;
-  imageUrl: string;
+  titre: string;
+  commentaire: string;
+  dateEv: string;
+  heureDeb: string;
+  heureFin: string;
+  lieux: string;
+  type: string;
+  newType: string;
 }
 
 @Component({
   selector: 'app-backoffice',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule],
+  imports: [CommonModule, FormsModule, HttpClientModule, PhotoUploadComponent],
   templateUrl: './backoffice.component.html',
   styleUrls: ['./backoffice.component.scss']
 })
 export class BackofficeComponent implements OnInit {
+  @ViewChild('eventPhotoUpload') eventPhotoUpload?: PhotoUploadComponent;
   activeTab: TabId = 'overview';
   showSurveyForm = false;
   showEventForm = false;
@@ -83,15 +67,153 @@ export class BackofficeComponent implements OnInit {
   socialError = '';
   socialSuccess = '';
 
+  reports: Report[] = [];
+
+  events: EventItem[] = [];
+  eventTypes: EventType[] = [];
+  eventLoading = false;
+  eventError = '';
+  eventSuccess = '';
+
+  quartiers: Quartier[] = [];
+  categories: Categorie[] = [];
+
+  showQuartierDropdown = false;
+  showCategorieDropdown = false;
+
+  selectedEventPhoto: File | null = null;
+  editingEventId: number | null = null;
+
+  private validTabs: TabId[] = ['overview', 'reports', 'surveys', 'events', 'social'];
+
   constructor(
     private surveyService: SurveyService,
     private socialService: SocialService,
-    private http: HttpClient
+    private reportService: ReportService,
+    private eventService: EventService,
+    private quartierService: QuartierService,
+    private categorieService: CategorieService,
+    private http: HttpClient,
+    private el: ElementRef,
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
     this.loadSurveys();
     this.loadSocials();
+    this.loadReports();
+    this.loadEvents();
+    this.loadEventTypes();
+    this.quartierService.getAll().subscribe({ next: (d) => this.quartiers = d });
+    this.categorieService.getAll().subscribe({ next: (d) => this.categories = d });
+
+    // Sync tab actif avec le paramètre :tab de l'URL (gère bouton retour navigateur)
+    this.route.paramMap.subscribe(params => {
+      const tab = params.get('tab') as TabId | null;
+      this.activeTab = (tab && this.validTabs.includes(tab)) ? tab : 'overview';
+    });
+  }
+
+  toggleSurveyQuartier(id: number, checked: boolean): void {
+    if (checked) {
+      if (!this.surveyForm.quartiers.includes(id)) this.surveyForm.quartiers.push(id);
+    } else {
+      this.surveyForm.quartiers = this.surveyForm.quartiers.filter(q => q !== id);
+    }
+  }
+
+  toggleSurveyCategorie(id: number, checked: boolean): void {
+    if (checked) {
+      if (!this.surveyForm.categories.includes(id)) this.surveyForm.categories.push(id);
+    } else {
+      this.surveyForm.categories = this.surveyForm.categories.filter(c => c !== id);
+    }
+  }
+
+  isSurveyQuartierChecked(id: number): boolean {
+    return this.surveyForm.quartiers.includes(id);
+  }
+
+  isSurveyCategorieChecked(id: number): boolean {
+    return this.surveyForm.categories.includes(id);
+  }
+
+  // ---- Multi-select dropdowns ----
+
+  toggleQuartierDropdown(event: Event): void {
+    event.stopPropagation();
+    this.showQuartierDropdown = !this.showQuartierDropdown;
+    if (this.showQuartierDropdown) this.showCategorieDropdown = false;
+  }
+
+  toggleCategorieDropdown(event: Event): void {
+    event.stopPropagation();
+    this.showCategorieDropdown = !this.showCategorieDropdown;
+    if (this.showCategorieDropdown) this.showQuartierDropdown = false;
+  }
+
+  get quartierLabel(): string {
+    const n = this.surveyForm.quartiers.length;
+    if (n === 0) return 'Tous les quartiers';
+    if (n === 1) return this.quartiers.find(q => q.id === this.surveyForm.quartiers[0])?.nom || '1 quartier';
+    return `${n} quartiers sélectionnés`;
+  }
+
+  get categorieLabel(): string {
+    const n = this.surveyForm.categories.length;
+    if (n === 0) return 'Toutes les catégories';
+    if (n === 1) return this.categories.find(c => c.id === this.surveyForm.categories[0])?.libelle || '1 catégorie';
+    return `${n} catégories sélectionnées`;
+  }
+
+  clearQuartiersSelection(event: Event): void {
+    event.stopPropagation();
+    this.surveyForm.quartiers = [];
+  }
+
+  clearCategoriesSelection(event: Event): void {
+    event.stopPropagation();
+    this.surveyForm.categories = [];
+  }
+
+  @HostListener('document:click', ['$event.target'])
+  onDocClickDropdown(target: HTMLElement): void {
+    if (this.showQuartierDropdown || this.showCategorieDropdown) {
+      const wrapper = (this.el?.nativeElement as HTMLElement)?.querySelector?.('.dropdowns-container');
+      if (wrapper && !wrapper.contains(target)) {
+        this.showQuartierDropdown = false;
+        this.showCategorieDropdown = false;
+      }
+    }
+  }
+
+  loadEvents(): void {
+    this.eventService.getAll().subscribe({
+      next: (data) => this.events = data,
+      error: (err) => console.error('Erreur chargement événements', err)
+    });
+  }
+
+  loadEventTypes(): void {
+    this.eventService.getTypes().subscribe({
+      next: (types) => this.eventTypes = types,
+      error: (err) => console.error('Erreur chargement types', err)
+    });
+  }
+
+  loadReports(): void {
+    this.reportService.getAll().subscribe({
+      next: (data) => this.reports = data,
+      error: (err) => console.error('Erreur chargement signalements', err)
+    });
+  }
+
+  advanceReportState(id: number): void {
+    this.reportService.advanceState(id).subscribe({
+      next: () => this.loadReports(),
+      error: (err) => console.error('Erreur changement état', err)
+    });
   }
 
   loadSocials(): void {
@@ -155,115 +277,71 @@ export class BackofficeComponent implements OnInit {
     description: '',
     dateDebut: '',
     dateFin: '',
-    choix: ['', '']
+    choix: ['', ''],
+    quartiers: [],
+    categories: [],
+    multiChoice: true
   };
   surveyLoading = false;
   surveyError = '';
   surveySuccess = '';
 
-  eventForm: EventForm = {
-    title: '',
-    description: '',
-    date: '',
-    location: '',
-    theme: 'culture',
-    organizer: 'Mairie',
-    imageUrl: ''
-  };
+  eventForm: EventForm = this.emptyEventForm();
 
   get surveys(): Survey[] {
     return this.surveysList;
   }
 
-  // Données de démonstration
-  reports: Report[] = [
-    {
-      id: '1',
-      userId: 'user-1',
-      userName: 'Jean Dupont',
-      category: 'Voirie',
-      description: 'Nid de poule important devant le 15 rue de la Mairie',
-      location: { address: '15 rue de la Mairie', lat: 48.8566, lng: 2.3522 },
-      status: 'registered',
-      createdAt: new Date('2024-01-14'),
-      updatedAt: new Date('2024-01-14')
-    },
-    {
-      id: '2',
-      userId: 'user-2',
-      userName: 'Marie Martin',
-      category: 'Éclairage',
-      description: 'Lampadaire défaillant près de l\'école',
-      location: { address: 'Rue de l\'École', lat: 48.8567, lng: 2.3523 },
-      status: 'in_progress',
-      createdAt: new Date('2024-01-10'),
-      updatedAt: new Date('2024-01-12')
-    },
-    {
-      id: '3',
-      userId: 'user-3',
-      userName: 'Pierre Bernard',
-      category: 'Propreté',
-      description: 'Dépôt sauvage de déchets',
-      location: { address: 'Rue Victor Hugo', lat: 48.8568, lng: 2.3524 },
-      status: 'resolved',
-      createdAt: new Date('2024-01-05'),
-      updatedAt: new Date('2024-01-08')
-    }
-  ];
-
-  events: Event[] = [
-    {
-      id: '1',
-      title: 'Marathon de la ville',
-      description: 'Course à pied ouverte à tous',
-      date: new Date('2024-03-15'),
-      location: 'Place de la Mairie',
-      theme: 'sport',
-      organizer: 'Club Athlétique',
-      imageUrl: 'https://images.unsplash.com/photo-1532444458054-01a7dd3e9fca?w=400'
-    },
-    {
-      id: '2',
-      title: 'Festival des Arts',
-      description: 'Exposition et spectacles',
-      date: new Date('2024-03-20'),
-      location: 'Centre Culturel',
-      theme: 'culture',
-      organizer: 'Association Culturelle'
-    }
-  ];
-
   get stats() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
     return {
       reportsTotal: this.reports.length,
-      reportsInProgress: this.reports.filter(r => r.status === 'in_progress').length,
-      reportsRegistered: this.reports.filter(r => r.status === 'registered').length,
+      reportsInProgress: this.reports.filter(r => r.etat === 'en cours').length,
+      reportsRegistered: this.reports.filter(r => r.etat === 'enregistré').length,
       surveysActive: this.surveys.length,
-      surveyResponses: 0,
-      eventsUpcoming: this.events.filter(e => new Date(e.date) > new Date()).length
+      surveyResponses: this.surveys.reduce((sum, s) => sum + (s.nbVotants ?? 0), 0),
+      eventsUpcoming: this.events.filter(e => {
+        const d = e['date Evenement'] ? new Date(e['date Evenement'] + 'T00:00:00') : null;
+        return d ? d.getTime() >= today.getTime() : false;
+      }).length
     };
   }
 
   setActiveTab(tabId: TabId): void {
-    this.activeTab = tabId;
-  }
-
-  getStatusConfig(status: ReportStatus) {
-    const configs = {
-      registered: { colorClass: 'status-registered', label: 'Enregistré' },
-      in_progress: { colorClass: 'status-in-progress', label: 'En cours' },
-      resolved: { colorClass: 'status-resolved', label: 'Résolu' }
-    };
-    return configs[status];
-  }
-
-  updateReportStatus(reportId: string, newStatus: ReportStatus): void {
-    const report = this.reports.find(r => r.id === reportId);
-    if (report) {
-      report.status = newStatus;
-      report.updatedAt = new Date();
+    // Navigation via URL pour que le bouton retour navigateur fonctionne
+    if (tabId === 'overview') {
+      this.router.navigate(['/backoffice']);
+    } else {
+      this.router.navigate(['/backoffice', tabId]);
     }
+  }
+
+  openSurvey(s: Survey): void {
+    if (s?.id) this.router.navigate(['/surveys', s.id]);
+  }
+
+  getStatusConfig(etat: string) {
+    const configs: Record<string, { colorClass: string; label: string }> = {
+      'enregistré': { colorClass: 'status-registered', label: 'Enregistré' },
+      'en cours': { colorClass: 'status-in-progress', label: 'En cours' },
+      'résolu': { colorClass: 'status-resolved', label: 'Résolu' }
+    };
+    return configs[etat] || { colorClass: 'status-registered', label: etat };
+  }
+
+  getSurveyStatus(survey: Survey): { label: string; colorClass: string } {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    const start = survey.dateDebut ? new Date(survey.dateDebut) : null;
+    const end = survey.dateFin ? new Date(survey.dateFin) : null;
+    if (start && start.getTime() > now.getTime()) {
+      return { label: 'À venir', colorClass: 'badge-upcoming' };
+    }
+    if (end && end.getTime() < now.getTime()) {
+      return { label: 'Terminé', colorClass: 'badge-closed' };
+    }
+    return { label: 'Actif', colorClass: 'badge-active' };
   }
 
   toggleSurveyForm(): void {
@@ -274,7 +352,7 @@ export class BackofficeComponent implements OnInit {
   }
 
   resetSurveyForm(): void {
-    this.surveyForm = { titre: '', description: '', dateDebut: '', dateFin: '', choix: ['', ''] };
+    this.surveyForm = { titre: '', description: '', dateDebut: '', dateFin: '', choix: ['', ''], quartiers: [], categories: [], multiChoice: true };
     this.surveyError = '';
     this.surveySuccess = '';
   }
@@ -323,7 +401,10 @@ export class BackofficeComponent implements OnInit {
       dateDebut: this.surveyForm.dateDebut,
       dateFin: this.surveyForm.dateFin,
       administrateur_Id: parseInt(userId),
-      choix: choixNonVides
+      choix: choixNonVides,
+      quartiers: this.surveyForm.quartiers,
+      categories: this.surveyForm.categories,
+      multiChoice: this.surveyForm.multiChoice
     };
 
     this.http.post('http://localhost:8000/api/sondages', payload).subscribe({
@@ -345,40 +426,121 @@ export class BackofficeComponent implements OnInit {
 
   toggleEventForm(): void {
     this.showEventForm = !this.showEventForm;
+    this.editingEventId = null;
     if (!this.showEventForm) {
       this.resetEventForm();
     }
   }
 
-  resetEventForm(): void {
+  startEditEvent(ev: EventItem): void {
+    if (!ev.id) return;
+    this.editingEventId = ev.id;
+    this.showEventForm = true;
+    this.eventError = '';
+    this.eventSuccess = '';
     this.eventForm = {
-      title: '',
-      description: '',
-      date: '',
-      location: '',
-      theme: 'culture',
-      organizer: 'Mairie',
-      imageUrl: ''
+      titre: ev.titre || '',
+      commentaire: ev.commentaire || '',
+      dateEv: ev['date Evenement'] || '',
+      heureDeb: ev['Heure début'] || '',
+      heureFin: ev['Heure fin'] || '',
+      lieux: ev.lieux || '',
+      type: ev.type || '',
+      newType: ''
+    };
+    this.selectedEventPhoto = null;
+    this.eventPhotoUpload?.reset();
+    setTimeout(() => {
+      const el = document.querySelector('.tab-content .form-card');
+      el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
+  }
+
+  get isEditingEvent(): boolean {
+    return this.editingEventId !== null;
+  }
+
+  private emptyEventForm(): EventForm {
+    return {
+      titre: '',
+      commentaire: '',
+      dateEv: '',
+      heureDeb: '',
+      heureFin: '',
+      lieux: '',
+      type: '',
+      newType: ''
     };
   }
 
-  onCreateEvent(): void {
-    if (!this.eventForm.title || !this.eventForm.description || !this.eventForm.date || !this.eventForm.location) return;
+  resetEventForm(): void {
+    this.eventForm = this.emptyEventForm();
+    this.eventError = '';
+    this.eventSuccess = '';
+    this.selectedEventPhoto = null;
+    this.editingEventId = null;
+    this.eventPhotoUpload?.reset();
+  }
 
-    const newEvent: Event = {
-      id: Date.now().toString(),
-      title: this.eventForm.title,
-      description: this.eventForm.description,
-      date: new Date(this.eventForm.date),
-      location: this.eventForm.location,
-      theme: this.eventForm.theme,
-      organizer: this.eventForm.organizer,
-      imageUrl: this.eventForm.imageUrl || undefined
+  onEventPhotoSelected(file: File | null): void {
+    this.selectedEventPhoto = file;
+  }
+
+  onCreateEvent(): void {
+    this.eventError = '';
+    this.eventSuccess = '';
+
+    const typeValue = this.eventForm.type === '__new__'
+      ? this.eventForm.newType.trim()
+      : this.eventForm.type;
+
+    if (!this.eventForm.titre.trim() || !typeValue) {
+      this.eventError = 'Le titre et le type sont obligatoires';
+      return;
+    }
+
+    const adminId = Number(localStorage.getItem('userId'));
+    if (!adminId) {
+      this.eventError = 'Vous devez être connecté';
+      return;
+    }
+
+    const payload = {
+      titre: this.eventForm.titre.trim(),
+      lieux: this.eventForm.lieux.trim(),
+      commentaire: this.eventForm.commentaire.trim(),
+      'date Evenement': this.eventForm.dateEv,
+      'Heure début': this.eventForm.heureDeb,
+      'Heure fin': this.eventForm.heureFin,
+      adminId,
+      type: typeValue,
+      photo: this.selectedEventPhoto
     };
 
-    this.events.unshift(newEvent);
-    this.showEventForm = false;
-    this.resetEventForm();
+    this.eventLoading = true;
+    const obs$ = this.editingEventId
+      ? this.eventService.update(this.editingEventId, payload)
+      : this.eventService.create(payload);
+
+    const successMsg = this.editingEventId ? 'Événement mis à jour' : 'Événement créé avec succès';
+
+    obs$.subscribe({
+      next: () => {
+        this.eventLoading = false;
+        this.eventSuccess = successMsg;
+        this.resetEventForm();
+        this.loadEvents();
+        this.loadEventTypes();
+        setTimeout(() => {
+          this.showEventForm = false;
+          this.eventSuccess = '';
+        }, 1500);
+      },
+      error: (err) => {
+        this.eventLoading = false;
+        this.eventError = err.error?.error || 'Erreur lors de l\'enregistrement';
+      }
+    });
   }
 
   formatDate(date: Date | string): string {

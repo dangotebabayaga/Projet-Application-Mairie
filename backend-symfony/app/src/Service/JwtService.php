@@ -15,15 +15,16 @@ class JwtService
     }
 
     // Générer un token
-    public function generateToken(int $userId, string $email, array $roles): string
+    public function generateToken(int $userId, string $email, string $role): string
     {
         $payload = [
-            "id"    => $userId,
+            "userId" => $userId,
             "email" => $email,
-            "roles" => $roles, // tableau de rôles
-            "iat"   => time(),
-            "exp"   => time() + 3600
+            "role" => $role,
+            "iat" => time(),
+            "exp" => time() + 3600
         ];
+
         return JWT::encode($payload, $this->secret, 'HS256');
     }
 
