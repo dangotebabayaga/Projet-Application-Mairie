@@ -67,7 +67,7 @@ export class EventsComponent implements OnInit {
     this.userRole = this.roles[0];
   }
 
-  get isadministrateur(): boolean {
+  get isAdmin(): boolean {
       return this.roles.includes('administrateur');
   }
   
