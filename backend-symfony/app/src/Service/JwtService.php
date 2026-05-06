@@ -18,7 +18,7 @@ class JwtService
     public function generateToken(int $userId, string $email, string $role): string
     {
         $payload = [
-            "userId" => $userId,
+            "id" => $userId,
             "email" => $email,
             "role" => $role,
             "iat" => time(),

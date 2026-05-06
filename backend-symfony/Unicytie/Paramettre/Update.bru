@@ -10,12 +10,14 @@ post {
   auth: inherit
 }
 
+headers {
+  Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwiZW1haWwiOiJpcm9ubWFuQG1haWwuY29tIiwicm9sZSI6ImFkbWluaXN0cmF0ZXVyIiwiaWF0IjoxNzc4MDQ4MjQwLCJleHAiOjE3NzgwNTE4NDB9.lhmY-BMszbQusYKFqC0J4N82HXyANpEehbfdSF3Ny7A
+}
+
 body:json {
   {
-    "id": 1,
-    "administrateur_Id":1,
     "nom": "Nantes",
-    "slogan": "Bonjour, fait déjàs un bon jour",
+    "slogan": "Bonjour, fait un bon jour",
     "logo": "frontend-angular/app/image/logo.png",
     "theme": "2"
   }

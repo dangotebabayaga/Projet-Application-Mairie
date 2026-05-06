@@ -9,6 +9,7 @@
  use Symfony\Component\HttpFoundation\Request;
  use Symfony\Component\HttpFoundation\JsonResponse;
  use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
  #[Route('/api/signalements')]
  class SignalementsApi extends AbstractController {
     private EntityManagerInterface $em;
@@ -22,37 +23,35 @@
         $this->auth = $auth;
     }
 
-    #[Route('', name: 'api_get_signalement', methods: ['GET'])]
+   #[Route('', name: 'api_get_signalement', methods: ['GET'])]
     public function getAll(Request $request): JsonResponse
     {
-        $sondages = $this->em->getRepository(Signalements::class)->findAll();
-    
-        $data = array_map(function($s) {
+        $signalements = $this->em->getRepository(Signalements::class)->findAll();
+
+        $data = array_map(function ($s) {
             $lat = $s->getLatitude() ?? null;
             $lng = $s->getLongitude() ?? null;
-        
-            // Adresse via OpenStreetMap
-            $adresse = ($lat !== null && $lng !== null) 
+
+            $adresse = ($lat !== null && $lng !== null)
                 ? $this->convertAdresse->coordinatesToAddress($lat, $lng)
                 : null;
-        
-            return [
-                'id' => $s->getId(),
-                'titre' => $s->getTitre(),
-                'etat' => $s->getEtat(),
-                'description' => $s->getDescription(),
-                'adresse' => $adresse,
-                'typeId' => $s->getTypeId(),
-                'citoyenId' => $s->getCitoyenId(),
-                'dateCrea' => $s->getDateCreation(),
-                'dateModif' => $s->getDateModification()
-                
-            ];
-        }, $sondages);
-    
-        return $this->json($data);
-    }
 
+            return [
+                'id'          => $s->getId(),
+                'titre'       => $s->getTitre(),
+                'etat'        => $s->getEtat(),
+                'description' => $s->getDescription(),
+                'adresse'     => $adresse,
+                'typeId'      => $s->getType()?->getId(),
+                'type'        => $s->getType()?->getNom(),
+                'citoyenId'   => $s->getUtilisateur()?->getId(),
+                'dateCrea'    => $s->getDateCreation()?->format('Y-m-d H:i:s'),
+                'dateModif'   => $s->getDateModification()?->format('Y-m-d H:i:s')
+            ];
+        }, $signalements);
+
+        return $this->json($data);
+    } 
 
     #[Route('', name: 'api_post_signalement', methods: ['POST'])] 
     public function create(Request $request): JsonResponse{

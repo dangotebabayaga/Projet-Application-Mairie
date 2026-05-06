@@ -1,20 +1,4 @@
-DROP TABLE IF EXISTS liste_choix_vote CASCADE;
-DROP TABLE IF EXISTS liste_choix_sondage CASCADE;
-DROP TABLE IF EXISTS votes_sondage CASCADE;
-DROP TABLE IF EXISTS sondages CASCADE;
-DROP TABLE IF EXISTS choix CASCADE;
-DROP TABLE IF EXISTS signalements CASCADE;
-DROP TABLE IF EXISTS types_signalement CASCADE;
-DROP TABLE IF EXISTS commentaire CASCADE;
-DROP TABLE IF EXISTS evenement CASCADE;
-DROP TABLE IF EXISTS type_ev CASCADE;
-DROP TABLE IF EXISTS reseau_sociale CASCADE;
-DROP TABLE IF EXISTS citoyens CASCADE;
-DROP TABLE IF EXISTS administrateurs CASCADE;
-DROP TABLE IF EXISTS utilisateurs CASCADE;
-DROP TABLE IF EXISTS ville CASCADE;
-
-CREATE TABLE utilisateurs (
+CREATE TABLE Utilisateur (
   id SERIAL PRIMARY KEY,
   nom varchar(100),
   prenom varchar(100),
@@ -129,12 +113,12 @@ CREATE TABLE reseau_sociale (
 );
 
 ALTER TABLE administrateurs
-ADD FOREIGN KEY (utilisateur_id) REFERENCES utilisateurs(id);
+ADD FOREIGN KEY (utilisateur_id) REFERENCES Utilisateur(id);
 
 ALTER TABLE citoyens
-ADD FOREIGN KEY (utilisateur_id) REFERENCES utilisateurs(id);
+ADD FOREIGN KEY (utilisateur_id) REFERENCES Utilisateur(id);
 
-ALTER TABLE utilisateurs
+ALTER TABLE Utilisateur
 ADD FOREIGN KEY (ville_id) REFERENCES ville(id);
 
 ALTER TABLE sondages
@@ -165,7 +149,7 @@ ALTER TABLE signalements
 ADD FOREIGN KEY (citoyen_id) REFERENCES citoyens(utilisateur_id);
 
 ALTER TABLE commentaire
-ADD FOREIGN KEY (auteur) REFERENCES utilisateurs(id);
+ADD FOREIGN KEY (auteur) REFERENCES Utilisateur(id);
 
 ALTER TABLE evenement
 ADD FOREIGN KEY (administrateur_id) REFERENCES administrateurs(utilisateur_id);

@@ -90,7 +90,7 @@ foreach ($tables as $tableName) {
     $entityName = toPascalCase(rtrim($tableName, 's')); // Enlever le 's' du pluriel
 
     // Cas spéciaux
-    if ($tableName === 'utilisateurs') $entityName = 'Utilisateur';
+    if ($tableName === 'Utilisateur') $entityName = 'Utilisateur';
     if ($tableName === 'reseaux_sociaux') $entityName = 'ReseauSocial';
     if ($tableName === 'logs_actions') $entityName = 'LogAction';
 

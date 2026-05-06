@@ -17,27 +17,29 @@ class Evenement
     private ?string $titre = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    private ?string $commentaire = null; // <-- texte long
+    private ?string $commentaire = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $lieux = null;
 
-    #[ORM\Column(type: 'date',name:"dateev", nullable: true)]
+    #[ORM\Column(type: 'date', name: 'dateev', nullable: true)]
     private ?\DateTimeInterface $dateEv = null;
 
-    #[ORM\Column(type: 'time',name:"heuredeb", nullable: true)]
+    #[ORM\Column(type: 'time', name: 'heuredeb', nullable: true)]
     private ?\DateTimeInterface $heureDeb = null;
 
-    #[ORM\Column(type: 'time',name:"heurefin", nullable: true)]
+    #[ORM\Column(type: 'time', name: 'heurefin', nullable: true)]
     private ?\DateTimeInterface $heureFin = null;
 
-    #[ORM\Column(name:"administrateur_id",nullable: true)]
-    private ?int $administrateurId = null;
+    // correction : id brut → relation ManyToOne vers Utilisateur
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class)]
+    #[ORM\JoinColumn(name: 'administrateur_id', referencedColumnName: 'id', nullable: true)]
+    private ?Utilisateur $administrateur = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?int $type = null;
-
-    // ===== Getters & Setters =====
+    // correction : id brut → relation ManyToOne vers TypeEv
+    #[ORM\ManyToOne(targetEntity: TypeEv::class)]
+    #[ORM\JoinColumn(name: 'type', referencedColumnName: 'id', nullable: true)]
+    private ?TypeEv $type = null;
 
     public function getId(): ?int
     {
@@ -110,23 +112,25 @@ class Evenement
         return $this;
     }
 
-    public function getAdministrateurId(): ?int
+    // correction : ?int → ?Utilisateur
+    public function getAdministrateur(): ?Utilisateur
     {
-        return $this->administrateurId;
+        return $this->administrateur;
     }
 
-    public function setAdministrateurId(?int $administrateurId): self
+    public function setAdministrateur(?Utilisateur $administrateur): self
     {
-        $this->administrateurId = $administrateurId;
+        $this->administrateur = $administrateur;
         return $this;
     }
 
-    public function getType(): ?int
+    // correction : ?int → ?TypeEv
+    public function getType(): ?TypeEv
     {
         return $this->type;
     }
 
-    public function setType(?int $type): self
+    public function setType(?TypeEv $type): self
     {
         $this->type = $type;
         return $this;
