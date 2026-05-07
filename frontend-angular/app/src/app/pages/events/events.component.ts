@@ -43,6 +43,8 @@ export class EventsComponent implements OnInit {
   events: EventItem[] = [];
   userRole: string = 'citoyen';
   roles: string[] = ['citoyen'];
+  userRole: string = 'citoyen';
+  roles: string[] = ['citoyen'];
 
   showCreateForm = false;
   submitting = false;

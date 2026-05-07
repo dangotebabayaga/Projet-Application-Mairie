@@ -18,24 +18,39 @@ class Evenement
 
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $commentaire = null;
+    private ?string $commentaire = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $lieux = null;
 
     #[ORM\Column(type: 'date', name: 'dateev', nullable: true)]
+    #[ORM\Column(type: 'date', name: 'dateev', nullable: true)]
     private ?\DateTimeInterface $dateEv = null;
 
+    #[ORM\Column(type: 'time', name: 'heuredeb', nullable: true)]
     #[ORM\Column(type: 'time', name: 'heuredeb', nullable: true)]
     private ?\DateTimeInterface $heureDeb = null;
 
     #[ORM\Column(type: 'time', name: 'heurefin', nullable: true)]
+    #[ORM\Column(type: 'time', name: 'heurefin', nullable: true)]
     private ?\DateTimeInterface $heureFin = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $img = null;
 
     // correction : id brut → relation ManyToOne vers Utilisateur
     #[ORM\ManyToOne(targetEntity: Utilisateur::class)]
     #[ORM\JoinColumn(name: 'administrateur_id', referencedColumnName: 'id', nullable: true)]
     private ?Utilisateur $administrateur = null;
+    // correction : id brut → relation ManyToOne vers Utilisateur
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class)]
+    #[ORM\JoinColumn(name: 'administrateur_id', referencedColumnName: 'id', nullable: true)]
+    private ?Utilisateur $administrateur = null;
 
+    // correction : id brut → relation ManyToOne vers TypeEv
+    #[ORM\ManyToOne(targetEntity: TypeEv::class)]
+    #[ORM\JoinColumn(name: 'type', referencedColumnName: 'id', nullable: true)]
+    private ?TypeEv $type = null;
     // correction : id brut → relation ManyToOne vers TypeEv
     #[ORM\ManyToOne(targetEntity: TypeEv::class)]
     #[ORM\JoinColumn(name: 'type', referencedColumnName: 'id', nullable: true)]
@@ -79,6 +94,17 @@ class Evenement
         return $this;
     }
 
+    public function getImage(): ?string
+    {
+        return $this->img;
+    }
+
+    public function setImage(?string $img): self
+    {
+        $this->img = $img;
+        return $this;
+    }
+
     public function getDateEv(): ?\DateTimeInterface
     {
         return $this->dateEv;
@@ -114,22 +140,30 @@ class Evenement
 
     // correction : ?int → ?Utilisateur
     public function getadministrateur(): ?Utilisateur
+    // correction : ?int → ?Utilisateur
+    public function getadministrateur(): ?Utilisateur
     {
+        return $this->administrateur;
         return $this->administrateur;
     }
 
     public function setadministrateur(?Utilisateur $administrateur): self
+    public function setadministrateur(?Utilisateur $administrateur): self
     {
+        $this->administrateur = $administrateur;
         $this->administrateur = $administrateur;
         return $this;
     }
 
     // correction : ?int → ?TypeEv
     public function getType(): ?TypeEv
+    // correction : ?int → ?TypeEv
+    public function getType(): ?TypeEv
     {
         return $this->type;
     }
 
+    public function setType(?TypeEv $type): self
     public function setType(?TypeEv $type): self
     {
         $this->type = $type;
