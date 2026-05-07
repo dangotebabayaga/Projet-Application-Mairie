@@ -1,0 +1,20 @@
+meta {
+  name: Récupération Signalement
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:8000/api/signalements
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiaXJvbm1hbkBtYWlsLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3MzQwMTQ0MSwiZXhwIjoxNzczNDA1MDQxfQ.TTNF7XoPDsN24ziLxpsp3zpoTGsfBx4293QsYmXbGpw
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

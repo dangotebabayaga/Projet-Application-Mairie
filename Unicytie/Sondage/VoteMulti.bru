@@ -1,0 +1,28 @@
+meta {
+  name: VoteMulti
+  type: http
+  seq: 6
+}
+
+post {
+  url: http://localhost:8000/api/sondages/vote
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjIsImVtYWlsIjoiQ3JvZnRuQG1haWwuY29tIiwicm9sZSI6ImNpdG95ZW4iLCJpYXQiOjE3NzMyNjAwMzYsImV4cCI6MTc3MzI2MzYzNn0.hu_NMutIEcqhvSkF0GHWnWQasBNV359yiKrkEfYhp9Q
+}
+
+body:json {
+  {
+    "citoyenId": 2,
+    "sondageId": 3,
+    "choixIds": [1, 3]
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

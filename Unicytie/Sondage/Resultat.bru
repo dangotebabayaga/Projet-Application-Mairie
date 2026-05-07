@@ -1,0 +1,20 @@
+meta {
+  name: Resultat
+  type: http
+  seq: 7
+}
+
+get {
+  url: http://localhost:8000/api/sondages/3/resultat
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiaXJvbm1hbkBtYWlsLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3MzI1OTE4MCwiZXhwIjoxNzczMjYyNzgwfQ.vhCUQEPNRIC_wmNeCQVdDIDYiLc5aclfrXIiLNsrErA
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

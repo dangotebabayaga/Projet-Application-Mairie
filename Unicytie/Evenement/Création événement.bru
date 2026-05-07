@@ -1,0 +1,33 @@
+meta {
+  name: Création événement
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:8000/api/evenement
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiaXJvbm1hbkBtYWlsLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3MzI1OTE4MCwiZXhwIjoxNzczMjYyNzgwfQ.vhCUQEPNRIC_wmNeCQVdDIDYiLc5aclfrXIiLNsrErA
+}
+
+body:json {
+  {
+    "titre": "Fête des pommes",
+    "lieux": "salle des fêtes",
+    "commentaire":"ramener vos repas nous les partagerons sur place",
+    "date Evenement": "10-10-2026",
+    "Heure début": "16:00",
+    "Heure fin": "19:00",
+    "adminId":1,
+    "type":"Automne"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

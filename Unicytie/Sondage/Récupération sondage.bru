@@ -1,0 +1,20 @@
+meta {
+  name: Récupération sondage
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:8000/api/sondages
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiaXJvbm1hbkBtYWlsLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3MzMyODE5NiwiZXhwIjoxNzczMzMxNzk2fQ.dmj-JoVxqiRc5biMh2qmZUz6oZxurGckzVcPfGO3HsY
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

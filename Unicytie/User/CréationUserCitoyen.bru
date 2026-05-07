@@ -1,0 +1,28 @@
+meta {
+  name: CréationUserCitoyen
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:8000/api/utilisateur/register
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "nom": "Croft",
+    "prenom": "Lara",
+    "email": "Croftn@mail.com",
+    "motDePasse": "45*1mpj@Hj",
+    "dateNaissance": "1995-05-10",
+    "telephone": "0665879420",
+    "role": 1
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

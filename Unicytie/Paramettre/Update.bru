@@ -1,0 +1,31 @@
+meta {
+  name: Update
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:8000/api/paramettre
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiaXJvbm1hbkBtYWlsLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3MzM5Mzc0NywiZXhwIjoxNzczMzk3MzQ3fQ.jmdJ396KcZ9XaSwMEwaNe5KuZTCLu6bNpUpUJ9CMCW0
+}
+
+body:json {
+  {
+    "id": 1,
+    "administrateur_Id":1,
+    "nom": "Nantes",
+    "slogan": "Bonjour, fait déjàs un bon jour",
+    "logo": "frontend-angular/app/image/logo.png",
+    "theme": "2"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
