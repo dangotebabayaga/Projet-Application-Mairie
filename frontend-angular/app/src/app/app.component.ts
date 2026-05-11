@@ -243,7 +243,7 @@ export class AppComponent {
   }
 
   loadVilleConfig(): void {
-    this.http.get<any>(`http://localhost:8000/api/paramettre/info`).subscribe({
+    this.http.get<any>(`https://novaville.fr/api/paramettre/info`).subscribe({
       next: (data) => {
         this.villeNom = data.nom || 'Ville Connectée';
         this.villeLogo = data.logo || '';

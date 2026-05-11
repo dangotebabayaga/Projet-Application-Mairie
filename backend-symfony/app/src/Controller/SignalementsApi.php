@@ -182,7 +182,8 @@ use Doctrine\ORM\EntityManagerInterface;
 
     private function getPhotoUrl(string $relativePath): string
     {
-        return 'http://localhost:8000/' . ltrim($relativePath, '/');
+        $baseUrl = $_ENV['APP_URL'] ?? 'http://localhost:8000';
+        return rtrim($baseUrl, '/') . '/' . ltrim($relativePath, '/');
     }
 
     #[Route('/{id}', name: 'ChangeEtat', methods: ['GET'], requirements: ['id' => '\d+'])]

@@ -34,7 +34,7 @@ export interface UpdateAccountPayload {
   providedIn: 'root'
 })
 export class AccountService {
-  private apiUrl = 'http://localhost:8000/api/utilisateurs';
+  private apiUrl = 'https://novaville.fr/api/utilisateurs';
 
   constructor(private http: HttpClient) {}
 

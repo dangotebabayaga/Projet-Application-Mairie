@@ -12,7 +12,7 @@ export interface Quartier {
   providedIn: 'root'
 })
 export class QuartierService {
-  private apiUrl = 'http://localhost:8000/api/quartiers';
+  private apiUrl = 'https://novaville.fr/api/quartiers';
 
   constructor(private http: HttpClient) {}
 

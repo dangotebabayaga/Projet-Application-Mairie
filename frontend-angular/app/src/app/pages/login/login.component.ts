@@ -35,7 +35,7 @@ export class LoginComponent implements OnInit {
   constructor(private router: Router, private authService: AuthService, private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.http.get<any>('http://localhost:8000/api/paramettre/info').subscribe({
+    this.http.get<any>('https://novaville.fr/api/paramettre/info').subscribe({
       next: (data) => {
         this.cityConfig.name = data.nom || 'Ma Ville';
         this.cityConfig.slogan = data.slogan || 'Une ville connectée';

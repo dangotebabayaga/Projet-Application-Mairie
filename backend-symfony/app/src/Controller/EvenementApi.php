@@ -144,7 +144,8 @@ use App\Repository\EvenementRepository;
 
     private function getPhotoUrl(string $relativePath): string
     {
-        return 'http://localhost:8000/' . ltrim($relativePath, '/');
+        $baseUrl = $_ENV['APP_URL'] ?? 'http://localhost:8000';
+        return rtrim($baseUrl, '/') . '/' . ltrim($relativePath, '/');
     }
 
     #[Route('/{id}', name: 'update_Even', methods: ['PUT', 'POST'], requirements: ['id' => '\d+'])]

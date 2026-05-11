@@ -30,7 +30,7 @@ export interface VotePayload {
   providedIn: 'root'
 })
 export class SurveyService {
-  private apiUrl = 'http://localhost:8000/api/sondages';
+  private apiUrl = 'https://novaville.fr/api/sondages';
 
   constructor(private http: HttpClient) {}
 

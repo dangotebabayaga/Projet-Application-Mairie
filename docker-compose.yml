@@ -10,6 +10,7 @@ services:
       # qui est extrêmement lent (FUSE), gain de perf majeur
       - symfony_vendor:/var/www/vendor
       - symfony_cache:/var/www/var/cache
+      - uploads_data:/var/www/public/uploads
     depends_on:
       - db
     command: bash -c "php -S 0.0.0.0:8000 -t public"
@@ -21,7 +22,7 @@ services:
       - "4200:4200"
     volumes:
       - ./frontend-angular/app:/app
-    command: bash -c "npm install && npx ng serve --host 0.0.0.0 --poll 2000"
+    command: bash -c "npm install && npx ng serve --host 0.0.0.0 --disable-host-check --poll 2000"
 
   db:
     image: postgres:15
@@ -47,4 +48,5 @@ volumes:
   pgdata:
   symfony_vendor:
   symfony_cache:
+  uploads_data:
 

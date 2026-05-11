@@ -259,7 +259,7 @@ export class SettingsComponent implements OnInit {
       return;
     }
 
-    this.http.get<any>(`http://localhost:8000/api/paramettre/info`).subscribe({
+    this.http.get<any>(`https://novaville.fr/api/paramettre/info`).subscribe({
       next: (data) => {
         this.villeConfig = {
           id: data.id,
@@ -308,7 +308,7 @@ export class SettingsComponent implements OnInit {
       administrateur_Id: parseInt(userId || '0')
     };
 
-    this.http.post('http://localhost:8000/api/paramettre', payload).subscribe({
+    this.http.post('https://novaville.fr/api/paramettre', payload).subscribe({
       next: () => {
         this.saving = false;
         this.success = 'Configuration sauvegardée avec succès !';

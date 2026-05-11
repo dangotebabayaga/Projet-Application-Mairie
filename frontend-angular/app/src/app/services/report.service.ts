@@ -30,7 +30,7 @@ export interface ReportPayload {
   providedIn: 'root'
 })
 export class ReportService {
-  private apiUrl = 'http://localhost:8000/api/signalements';
+  private apiUrl = 'https://novaville.fr/api/signalements';
 
   constructor(private http: HttpClient) {}
 

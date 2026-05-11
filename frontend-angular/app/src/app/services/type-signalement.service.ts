@@ -11,7 +11,7 @@ export interface TypeSignalement {
   providedIn: 'root'
 })
 export class TypeSignalementService {
-  private apiUrl = 'http://localhost:8000/api/types-signalement';
+  private apiUrl = 'https://novaville.fr/api/types-signalement';
 
   constructor(private http: HttpClient) {}
 

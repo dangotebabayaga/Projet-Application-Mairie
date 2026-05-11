@@ -35,7 +35,7 @@ export interface EventPayload {
   providedIn: 'root'
 })
 export class EventService {
-  private apiUrl = 'http://localhost:8000/api/evenement';
+  private apiUrl = 'https://novaville.fr/api/evenement';
 
   constructor(private http: HttpClient) {}
 

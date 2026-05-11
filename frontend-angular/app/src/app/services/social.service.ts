@@ -19,7 +19,7 @@ export interface ReseauSocialPayload {
   providedIn: 'root'
 })
 export class SocialService {
-  private apiUrl = 'http://localhost:8000/api/reseau';
+  private apiUrl = 'https://novaville.fr/api/reseau';
 
   constructor(private http: HttpClient) {}
 

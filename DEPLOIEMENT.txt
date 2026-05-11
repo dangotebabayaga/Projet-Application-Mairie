@@ -1,0 +1,232 @@
+============================================================
+  DEPLOIEMENT UniCity sur VPS OVH (Debian + Docker)
+============================================================
+
+Domaine : novaville.fr → 54.38.65.191
+Stack   : Symfony 7.2 + Angular 16 + PostgreSQL 15 + Nginx + Let's Encrypt
+
+------------------------------------------------------------
+  PREREQUIS
+------------------------------------------------------------
+
+- VPS Debian 12 avec Docker + Docker Compose installés
+- Domaine pointant sur l'IP du VPS (enregistrement A)
+- Ports 22 (SSH), 80 (HTTP), 443 (HTTPS) ouverts
+- Adresse mail OVH créée : contact@novaville.fr (mot de passe noté)
+
+------------------------------------------------------------
+  ETAPE 1 - CLONER LE PROJET
+------------------------------------------------------------
+
+ssh debian@54.38.65.191
+git clone https://github.com/dangotebabayaga/Projet-Application-Mairie.git
+cd Projet-Application-Mairie
+
+------------------------------------------------------------
+  ETAPE 2 - LANCER LES CONTAINERS DOCKER
+------------------------------------------------------------
+
+docker compose up -d
+docker compose logs -f symfony   # Ctrl+C quand "Development Server"
+docker compose logs -f angular   # Ctrl+C quand "Compiled successfully"
+
+------------------------------------------------------------
+  ETAPE 3 - INITIALISER LA BASE DE DONNEES
+------------------------------------------------------------
+
+# La BDD est auto-créée au 1er lancement via docs/SimplifiUniCyties.sql
+# Verifier que les tables sont presentes :
+docker compose exec -T db psql -U unicity_user -d unicity_db -c "\dt"
+
+# Inserer la ville Nantes (id=1) :
+docker compose exec -T db psql -U unicity_user -d unicity_db -c \
+  "INSERT INTO ville (id, nom, slogan, themecouleur, date_creation) \
+   VALUES (1, 'Nantes', 'Ville connectee', 'lavender', NOW()) \
+   ON CONFLICT (id) DO NOTHING;"
+
+# Seed des quartiers + categories + types de signalement :
+docker compose exec -T db psql -U unicity_user -d unicity_db <<'SQL'
+INSERT INTO quartiers (nom, ville_id) VALUES
+ ('Centre-ville', 1), ('Bouffay', 1), ('Doulon-Bottiere', 1),
+ ('Malakoff - Saint-Donatien', 1), ('Ile de Nantes', 1),
+ ('Hauts-Paves - Saint-Felix', 1), ('Dervallieres - Zola', 1),
+ ('Breil - Barberie', 1), ('Nantes Nord', 1), ('Nantes Erdre', 1),
+ ('Nantes Sud', 1) ON CONFLICT DO NOTHING;
+INSERT INTO categories_citoyens (libelle, ville_id) VALUES
+ ('Etudiants', 1), ('Familles', 1), ('Seniors (60+)', 1),
+ ('Actifs', 1), ('Associations', 1) ON CONFLICT DO NOTHING;
+INSERT INTO types_signalement (nom) VALUES
+ ('Voirie'), ('Eclairage'), ('Proprete'),
+ ('Espaces verts'), ('Mobilier urbain'), ('Autre')
+ON CONFLICT DO NOTHING;
+SQL
+
+------------------------------------------------------------
+  ETAPE 4 - CONFIGURER LE .env.local (SECRETS)
+------------------------------------------------------------
+
+cp backend-symfony/app/.env.local.example backend-symfony/app/.env.local
+nano backend-symfony/app/.env.local
+
+# Remplacer "CHANGE_ME_PASSWORD" par le mot de passe OVH
+# de contact@novaville.fr (URL-encoder le @ en %40 et les
+# caracteres speciaux du mot de passe).
+
+# Redemarrer Symfony pour appliquer :
+docker compose restart symfony
+
+------------------------------------------------------------
+  ETAPE 5 - CREER LE COMPTE SUPERADMIN
+------------------------------------------------------------
+
+# Creer un compte citoyen via l'API :
+echo '{"nom":"Admin","prenom":"Super","email":"admin@novaville.fr","motDePasse":"admin123","quartierId":1,"categorieId":1,"role":1}' > /tmp/admin.json
+curl -X POST http://localhost:8000/api/utilisateur/register \
+  -H "Content-Type: application/json" -d @/tmp/admin.json
+
+# Promouvoir en superadmin :
+docker compose exec -T db psql -U unicity_user -d unicity_db -c \
+  "INSERT INTO super_administrateurs (utilisateur_id) \
+   SELECT id FROM utilisateurs WHERE email='admin@novaville.fr' \
+   ON CONFLICT DO NOTHING;"
+
+# Aussi dans administrateurs (sinon erreur FK pour evenements) :
+docker compose exec -T db psql -U unicity_user -d unicity_db -c \
+  "INSERT INTO administrateurs (utilisateur_id) \
+   SELECT id FROM utilisateurs WHERE email='admin@novaville.fr' \
+   ON CONFLICT DO NOTHING;"
+
+------------------------------------------------------------
+  ETAPE 6 - INSTALLER NGINX + CERTBOT
+------------------------------------------------------------
+
+sudo apt update
+sudo apt install -y nginx python3-certbot-nginx dnsutils
+
+# Verifier que le DNS pointe sur ce VPS :
+dig +short novaville.fr @8.8.8.8
+# Doit retourner l'IP du VPS
+
+------------------------------------------------------------
+  ETAPE 7 - CONFIGURER NGINX (reverse proxy)
+------------------------------------------------------------
+
+sudo nano /etc/nginx/sites-available/novaville.fr
+
+# Coller la config suivante :
+---
+server {
+    listen 80;
+    server_name novaville.fr www.novaville.fr;
+
+    location /api/ {
+        proxy_pass http://localhost:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /uploads/ {
+        proxy_pass http://localhost:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location / {
+        proxy_pass http://localhost:4200;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+---
+
+# Activer le site, desactiver le defaut, tester et reload :
+sudo ln -s /etc/nginx/sites-available/novaville.fr /etc/nginx/sites-enabled/
+sudo rm /etc/nginx/sites-enabled/default
+sudo nginx -t
+sudo systemctl reload nginx
+
+------------------------------------------------------------
+  ETAPE 8 - OBTENIR LE CERTIFICAT SSL (Let's Encrypt)
+------------------------------------------------------------
+
+sudo certbot --nginx -d novaville.fr -d www.novaville.fr
+# Repondre : ton email (ex: pretgroup1@gmail.com)
+#            Y aux CGU
+#            N (ou Y) pour la newsletter EFF
+
+# Test :
+curl -I https://novaville.fr   # doit retourner HTTP/2 200
+
+------------------------------------------------------------
+  ETAPE 9 - TESTER L'APPLICATION
+------------------------------------------------------------
+
+# Depuis un navigateur :
+https://novaville.fr/login
+Login : admin@novaville.fr / admin123
+
+# Tester :
+- Connexion superadmin
+- Creation d'un compte citoyen (verifier liste quartiers/categories)
+- Creation d'un sondage, signalement avec photo, evenement
+- Mot de passe oublie (mail recu sur Gmail du destinataire)
+
+------------------------------------------------------------
+  COMMANDES UTILES (MAINTENANCE)
+------------------------------------------------------------
+
+# Logs en temps reel :
+docker compose logs -f symfony
+docker compose logs -f angular
+
+# Restart d'un container :
+docker compose restart symfony
+docker compose restart angular
+
+# Mise a jour du code depuis git :
+git pull origin main
+docker compose restart symfony
+docker compose exec symfony php bin/console cache:clear
+
+# Backup BDD :
+docker compose exec -T db pg_dump -U unicity_user unicity_db > backup_$(date +%F).sql
+
+# Restore BDD :
+docker compose exec -T db psql -U unicity_user -d unicity_db < backup_2026-XX-XX.sql
+
+# Renouveler le certificat SSL (auto par Certbot via cron) :
+sudo certbot renew --dry-run
+
+------------------------------------------------------------
+  EN CAS DE PROBLEME
+------------------------------------------------------------
+
+# Symfony 500 - voir l'erreur exacte :
+docker compose logs --tail=300 symfony 2>&1 | grep -E "critical|Exception" | tail
+
+# Verifier que les variables d'env sont chargees :
+docker compose exec symfony php -r "echo \$_ENV['APP_URL'] . PHP_EOL;"
+
+# Vider le cache Symfony :
+docker compose exec symfony rm -rf /var/www/var/cache/dev
+
+# Test des endpoints API :
+curl -i https://novaville.fr/api/quartiers
+curl -i https://novaville.fr/api/categories
+curl -i -X POST https://novaville.fr/api/utilisateur/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@novaville.fr","motDePasse":"admin123"}'
+
+============================================================
+  FIN
+============================================================

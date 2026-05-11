@@ -12,7 +12,7 @@ export interface Categorie {
   providedIn: 'root'
 })
 export class CategorieService {
-  private apiUrl = 'http://localhost:8000/api/categories';
+  private apiUrl = 'https://novaville.fr/api/categories';
 
   constructor(private http: HttpClient) {}
 
